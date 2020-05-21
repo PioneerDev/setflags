@@ -1,5 +1,7 @@
 image:
   file: Dockerfile
+ports:
+    - port: 5432
 tasks:
   - command: pg_start && cd demo && go build
 vscode:
