@@ -6,19 +6,21 @@ An exemplar project for setting personal, verifiable flags as part of regular in
 
 A functioning prototype at https://group-mixin.droneidentity.eu.
 
-= @todo Translate into English = 
-新型立志红包让群众监督你完成自己立下的宏愿。
-定投者发起以一年为限的定投红包，许愿每天干成什么，最少要多少人验证, 一共发放多少金额: 其中10%奖励给证人，其余是押金在每天完成任务后归还自己。
-当全部任务顺利完成时，已经发给证人的奖励将以SFC（立志币）返还发起人。
-跟传统红包不一样，定投者（红包发起人）在报告任务完成并获得成功验证以后，可以赢回押金。 为获知任务完成情况，系统要求定投者和证人（红包领取人）配合完成以下规定动作：
-* 每天系统提醒定投者报告当天任务的完成情况。
-* 根据定投者的报告，验证者独立判断该任务是否已经完成。
-* 系统只奖励结论符合共识的证人。
-* 发起过立志红包的证人获得更多奖励。
-* 只有经验证成功完成了任务，系统才退还定投者当天押金。
-* 每个红包至少价值1 USDT或者1 SFC。
-* [optional] 消息根据用户语言自动翻译!
-* [optional] 如果立志人不折不扣地完成全部任务，全部红包价值完璧归赵, 并免费获得全年完整的证据链 ! 
+Everyone can customise the personal goal as a series of daily tasks by setting a flag. The purpose of issuing such a “flag” is to audit the achievements of the tasks which lead to the achievement of the goal eventually. For example, to publish a high-quality research paper, the goal can be decomposed into much smaller and more manageable tasks which are achievable every day, facilitating collegial friends to witness, applaud or verify the achievement. One may also use the concept for other personal goals such as physical exercises and training.
+
+Specifically, the description of a flag includes the numbers of days till the deadline (365 days by default for New Years resolution), details of the task, minimal number of witnesses, and the total amount of prize, etc. Majority of the prize (for example 90%) will be rewarded back to the task taker when the task is successfully achieved by the end of each day. The remaining amount will be awarded to witnesses who "mine" the blockchain by verifying the tasks. Once the goal is fulfilled with all daily tasks achieved, the task taker can get all the prize returned, including those given away to the witnesses in the Set Flag Coins (SFC). Unlike traditional one-off red packets, which will not be rewarded back to the task taker, the flag can be returned fully by the end. 
+
+To be aware of members’ progress, the system requires the task takers and the witnesses to do the following:
+1. Download and install Mixin Messenger app, which is available in most app stores including Google Play Store and Apple App Store; 
+2. Set up the Mixin Networks wallet using the telephone number and PIN as necessary; 
+3. Search for the Mixin chatbot ID 7000103152;
+4. You can “Set Flag” using the SFC, or any other cryptocurrency to create a goal to give away red packets in the due course. Ever since, each day the system will remind you of the todo tasks and ask for uploading evidences. If you find the reminders noisy or disturbing your flow, you can also mute it;
+5. Depending on the evidence reported back to the system such as images, videos, etc., witnesses (i.e., other members in the group) will judge independently whether you have achieved the task on the day;
+6. Such decisions are independent to each other, meaning that you have not been informed of other people’s decisions, hence a consensus mechanism is required to decide collectively on the task fulfilment;
+7. The system will only reward the witnesses whose decision matches with the consensus. At the moment, such a consensus mechanism is fairly simple, i.e., the majority’s report rather than the minority report;
+8. To encourage participation, the task takers who verify other people’s tasks can get slightly more reward than the witnesses who have never carried out any tasks;
+9. The system rewards the daily amount only when the task taker has been verified to achieve the task;
+10. The system rewards all the amount given to the witnesses as a final prize in SFC, only when the task takers can achieve the goal completely. The chain of custody, i.e. forensic evidence, for achieving the goal will be ready for download by the end.
 
 ## Requirements
 
