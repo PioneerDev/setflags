@@ -1,0 +1,77 @@
+@startuml
+
+entity User {
+   * id: uuid
+   full_name: string
+   avatar_url: string
+   --
+   /users: GET
+   /users/:id: PUT
+   /myflags/:id: GET
+   /users/:id/rewards/:flag_id GET
+}
+
+entity Flag {
+    * id: uuid
+    * payer_id: uuid
+    task: string
+    days: int
+    * asset_id: uuid
+    amount: number
+    times_achieved: int
+    created_at: datetime
+    updated_at: datetime
+    --
+    /flags/:id: POST
+    /flags: GET
+    /flags/:id/done: PUT
+}
+
+entity Asset {
+    * id: uuid
+    symbol: string
+    price_usd: number
+    balance: number
+    paid_at: datetime
+    --
+    /assets/:id: GET
+}
+
+entity Evidence {
+    * attachment_id: uuid
+    * flag_id: uuid
+    file: file
+    type: string
+    created_at: datetime
+    // updated_at: datetime
+    --
+    /flags/:id/done PUT
+    /flags/:flag_id/evidences/:attachment_id: POST
+    /flags/:flag_id/evidences: GET
+}
+
+entity Witness {
+    * flag_id: uuid
+    * payee_id: uuid
+    --
+    /flags/:id/:op: PUT // yes, no
+}
+
+entity Payer {
+    paid: bool
+}
+
+entity Payee {
+    verified: bool
+}
+
+Payer --|> User
+Payee --|> User
+
+Flag "1" --- "*" Evidence: upload
+Flag "*" --- "1" Asset: pay
+Flag "*" --- "*" Witness: verify
+Witness "1" -- "*" Asset: award 
+Witness "1" -- "*" User: reward 
+
+@enduml

@@ -1,0 +1,318 @@
+swagger: "2.0"
+info:
+  description: ""
+  version: "1.0.0"
+  title: "Set Flags"
+  termsOfService: "https://github.com/set-flags/set-flags"
+  contact:
+    email: "yijun.yu@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "group-mixin.droneidentity.eu"
+basePath: "/v2"
+schemes:
+- "https"
+paths:
+  /flags:
+    get:
+      summary: "List Flags"
+      description: "list all the flags"
+      operationId: "listFlags"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Flag"
+        "400":
+          description: "Invalid status value"
+  /flags/{id}:
+    post:
+      summary: "Set a new flag"
+      description: "create a flag"
+      operationId: "createFlag"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "id"
+        description: "The id of the flag"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "data"
+        description: "Details of the flag"
+        required: true
+        schema: 
+          $ref: "#/definitions/Flag"
+      responses:
+        "405":
+          description: "Invalid input"
+  /flags/{id}/{op}:
+    put:
+      summary: "Update an existing flag"
+      description: "update an existing flag with operations for verification (yes, no) after uploaded the evidence (done)"
+      operationId: "updateFlag"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The flag to update"
+        required: true
+        type: "string"
+        format: "uuid"
+      - name: "op"
+        in: "path"
+        description: "The operation to update"
+        required: true
+        type: "string"
+        enum:
+        - "yes"
+        - "no"
+        - "done"
+      responses:
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Flag not found"
+        "405":
+          description: "Update exception"
+  /myflags/{id}:
+    get:
+      summary: "Finds flags by user"
+      description: "list all flags of the user"
+      operationId: "ListMyFlags"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The user's ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Flag"
+        "400":
+          description: "Invalid status value"
+  /flags/{flag_id}/evidences/{attachment_id}:
+    post:
+      summary: "upload evidence"
+      description: "upload evidence"
+      operationId: "uploadEvidence"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "flag_id"
+        in: "path"
+        description: "Flag ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      - name: "attachment_id"
+        in: "path"
+        description: "Attachment ID from Messenger"
+        required: true
+        type: "string"
+        format: "uuid"
+      - name: "file"
+        in: "formData"
+        description: "file to upload"
+        required: true
+        type: "file"
+      - name: "type"
+        in: "query"
+        description: ""
+        type: "string"
+      - name: "created_at"
+        in: "query"
+        description: ""
+        type: "string"
+        format: "date-time"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "Invalid tag value"
+  /flags/{flag_id}/evidences:
+    get:
+      description: "list all the evidences since yesterday"
+      parameters:
+      - name: "flag_id"
+        in: "path"
+        description: "Flag ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Evidence"
+  /users/{user_id}/rewards/{flag_id}:
+    get:
+      description: "check the total rewards received by the user for the flag"
+      parameters:
+      - name: "user_id"
+        in: "path"
+        description: "Attachment ID from Messenger"
+        required: true
+        type: "string"
+        format: "uuid"
+      - name: "flag_id"
+        in: "path"
+        description: "Flag ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Evidence"
+  /assets/{id}:
+    get:
+      description: "get the asset information"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Asset ID"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Asset"
+securityDefinitions:
+  mixin_auth:
+    type: "oauth2"
+    authorizationUrl: "https://mixin.one"
+    flow: "implicit"
+    scopes:
+      read:users: "read your pets"
+definitions:
+  Flag:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+      payer_id:
+        type: "string"
+        format: "uuid"
+      task:
+        type: "string"
+      days:
+        type: "integer"
+        format: "int32"
+      asset_id:
+        type: "string"
+        format: "uuid"
+      amount:
+        type: "number"
+      times_achieved:
+        type: "integer"
+        format: "int32"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      status:
+        type: "string"
+        enum:
+        - "paid"
+        - "unverified"
+        - "verified"
+        - "closed"
+  Evidence:
+    type: "object"
+    properties:
+      attachement_id:
+        type: "string"
+        format: "uuid"
+      flag_id:
+        type: "string"
+        format: "uuid"
+      type:
+        type: "string"
+        enum:
+        - "image"
+        - "video"
+        - "audio"
+        - "document"
+      created_at:
+        type: "string"
+        format: "date-time"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+      full_name:
+        type: "string"
+      avatar_url:
+        type: "string"
+  Witness:
+    type: "object"
+    properties:
+      flag_id:
+        type: "string"
+        format: "uuid"
+      payee_id:
+        type: "string"
+        format: "uuid"
+  Payer:
+    type: "object"
+    properties:
+      paid:
+        type: "boolean"
+  Payee:
+    type: "object"
+    properties:
+      verified:
+        type: "boolean"
+  Asset:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+      symbol:
+        type: "string"
+      balance:
+        type: "number"
+      price_usd:
+        type: "number"
+      paid_at:
+        type: "string"
+        format: "date-time"
+externalDocs:
+  description: "Find out more about Set Flags"
+  url: "http://group-mixin.droneidentity.eu"
