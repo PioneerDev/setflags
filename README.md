@@ -30,13 +30,13 @@ We follow the model-view-controller architecture pattern to design the chatbot.
 
 * Model
 
-![Entity Relationship diagram](https://github.com/set-flags/set-flags/blob/master/docs/models.png)
+![Entity Relationship diagram](https://github.com/PioneerDev/setflags/blob/master/docs/models.png)
 
-NOTE. The diagram is created using PlantUML, [after the file is opened inside GitPod](https://gitpod.io/#https://github.com/set-flags/set-flags/blob/master/docs/models.puml), type "Alt + D" to edit the diagram.
+NOTE. The diagram is created using PlantUML, [after the file is opened inside GitPod](https://gitpod.io/#https://github.com/PioneerDev/setflags/blob/master/docs/models.puml), type "Alt + D" to edit the diagram.
 
 * View
 
-The following RESFTful API table is generated from [our Swagger specification](https://github.com/set-flags/set-flags/blob/master/docs/models.yml) using [the Swagger Editor](https://editor.swagger.io) by the [markdown-swagger tool](https://github.com/rmariuzzo/markdown-swagger).
+The following RESFTful API table is generated from [our Swagger specification](https://github.com/PioneerDev/setflags/blob/master/docs/models.yml) using [the Swagger Editor](https://editor.swagger.io) by the [markdown-swagger tool](https://github.com/rmariuzzo/markdown-swagger).
 <!-- markdown-swagger -->
  Endpoint                                     | Method | Auth? | Description                                                                                          
  -------------------------------------------- | ------ | ----- | -----------------------------------------------------------------------------------------------------
