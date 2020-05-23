@@ -3,6 +3,7 @@ package v1
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	uuid "github.com/gofrs/uuid"
 	"log"
 	"net/http"
 	"set-flags/models"
@@ -88,7 +89,9 @@ func UploadEvidence(c *gin.Context) {
 	// Upload the file to specific dst.
 	c.SaveUploadedFile(file, fmt.Sprintf("./%s", file.Filename))
 
-	models.CreateEvidence(attachmentId, flagId, type_)
+	attachmentID, _ := uuid.FromString(attachmentId)
+	flagID, _ := uuid.FromString(flagId)
+	models.CreateEvidence(attachmentID, flagID, type_)
 
 	c.JSON(http.StatusOK, gin.H{
 		"info": fmt.Sprintf("'%s' uploaded!", file.Filename),
@@ -98,8 +101,8 @@ func UploadEvidence(c *gin.Context) {
 // list all the evidences since yesterday
 func ListEvidences(c *gin.Context) {
 	flagId := c.Param("flag_id")
-
-	data := models.FindEvidencesByFlag(flagId)
+	flagID, _ := uuid.FromString(flagId)
+	data := models.FindEvidencesByFlag(flagID)
 
 	c.PureJSON(http.StatusOK, data)
 }

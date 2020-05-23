@@ -1,8 +1,8 @@
 package models
 
 import (
+	uuid "github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
-	uuid "github.com/satori/go.uuid"
 	"os"
 	"time"
 )
@@ -10,17 +10,17 @@ import (
 type Evidence struct {
 	ID           uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
 	AttachmentId string    `json:"attachment_id"`
-	FlagId       string    `json:"flag_id"`
+	FlagId       uuid.UUID `json:"flag_id"`
 	File         os.File   `gorm:"-" json:"file"`
 	Type         string    `json:"type"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-func CreateEvidence(attachmentId, flagId, type_ string) bool {
+func CreateEvidence(attachmentId, flagId uuid.UUID, type_ string) bool {
 
 	db.Create(&Evidence{
-		AttachmentId: attachmentId,
+		AttachmentId: attachmentId.String(),
 		FlagId:       flagId,
 		Type:         type_,
 	})
@@ -28,7 +28,7 @@ func CreateEvidence(attachmentId, flagId, type_ string) bool {
 }
 
 // 返回自昨天开始的evidence
-func FindEvidencesByFlag(flagId string) (evidences []Evidence) {
+func FindEvidencesByFlag(flagId uuid.UUID) (evidences []Evidence) {
 	// 获取当前时间
 	now := time.Now()
 	// 回到昨天
@@ -38,15 +38,14 @@ func FindEvidencesByFlag(flagId string) (evidences []Evidence) {
 	return
 }
 
-func FindEvidenceByFlagIdAndAttachmentId(flagId, attachmentId string) (evidences []Evidence) {
+func FindEvidenceByFlagIdAndAttachmentId(flagId, attachmentId uuid.UUID) (evidences []Evidence) {
 	db.Where("flag_id = ? and attachment_id = ?", flagId, attachmentId).Find(&evidences)
 	return
 }
 
-
 // BeforeCreate will set a UUID rather than numeric ID.
 func (e *Evidence) BeforeCreate(scope *gorm.Scope) error {
-	uuid_ := uuid.NewV4()
+	uuid_, _ := uuid.NewV4()
 	scope.SetColumn("ID", uuid_)
 	scope.SetColumn("CreatedAt", time.Now())
 	return nil

@@ -2,9 +2,9 @@ package models
 
 import (
 	"fmt"
+	uuid "github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	uuid "github.com/satori/go.uuid"
 	"log"
 	"set-flags/pkg/setting"
 	"time"
@@ -16,13 +16,13 @@ var db *gorm.DB
 type Base struct {
 	ID        uuid.UUID  `gorm:"type:uuid;primary_key;"`
 	CreatedAt time.Time  `json:"created_at"`
-	UpdateAt time.Time  `json:"update_at"`
+	UpdateAt  time.Time  `json:"update_at"`
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 }
 
 func InitDB() {
 	var (
-		err                                  error
+		err                                        error
 		dbType, dbName, user, password, host, port string
 	)
 
