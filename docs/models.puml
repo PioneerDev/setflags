@@ -19,6 +19,7 @@ entity Flag {
     * asset_id: uuid
     amount: number
     times_achieved: int
+    max_witness: int
     created_at: datetime
     updated_at: datetime
     --
@@ -43,7 +44,6 @@ entity Evidence {
     file: file
     type: string
     created_at: datetime
-    // updated_at: datetime
     --
     /flags/:id/done PUT
     /flags/:flag_id/evidences/:attachment_id: POST
