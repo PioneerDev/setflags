@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS witnesses (
   PRIMARY KEY(flag_id, payee_id)
 );
 
-CREATE INDEX IF NOT EXISTS witnesses_created_paidx ON participants(created_at);
+CREATE INDEX IF NOT EXISTS witnesses_created_paidx ON witnesses(created_at);
 
 CREATE TABLE IF NOT EXISTS users (
   user_id           VARCHAR(36) PRIMARY KEY CHECK (user_id ~* '^[0-9a-f-]{36,36}$'),
@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS users_identityx ON users(identity_number);
-CREATE INDEX IF NOT EXISTS users_activex ON users(active_at);
 
 CREATE TABLE IF NOT EXISTS assets (
   asset_id         VARCHAR(36) PRIMARY KEY CHECK (asset_id ~* '^[0-9a-f-]{36,36}$'),
