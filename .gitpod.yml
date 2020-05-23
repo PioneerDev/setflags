@@ -4,6 +4,7 @@ ports:
     - port: 5432
 tasks:
   - command: pg_start && cd demo && go build
+  - command: npm install markdown-swagger && markdown-swagger ./docs/models.yml ./README.md
 vscode:
   extensions:
     - jebbs.plantuml@2.13.9:Kh1501AVTKuUtjU0w5lOEQ==
