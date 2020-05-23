@@ -109,7 +109,7 @@ paths:
               $ref: "#/definitions/Flag"
         "400":
           description: "Invalid status value"
-  /flags/{flag_id}/evidences/{attachment_id}:
+  /attachments/{attachment_id}:
     post:
       summary: "upload evidence"
       description: "upload evidence"
@@ -119,15 +119,15 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - name: "flag_id"
-        in: "path"
-        description: "Flag ID"
-        required: true
-        type: "string"
-        format: "uuid"
       - name: "attachment_id"
         in: "path"
         description: "Attachment ID from Messenger"
+        required: true
+        type: "string"
+        format: "uuid"
+      - name: "flag_id"
+        in: "query"
+        description: "Flag ID"
         required: true
         type: "string"
         format: "uuid"
@@ -229,6 +229,9 @@ definitions:
       days:
         type: "integer"
         format: "int32"
+      max_witness:
+        type: "integer"
+        format: "int32"        
       asset_id:
         type: "string"
         format: "uuid"
