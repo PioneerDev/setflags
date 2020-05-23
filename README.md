@@ -38,7 +38,7 @@ NOTE. The diagram is created using PlantUML, [after the file is opened inside Gi
 
 * View
 
-The following RESFTful API table is generated from [our Swagger specification](https://github.com/PioneerDev/setflags/blob/master/docs/models.yml) using [the Swagger Editor](https://editor.swagger.io) by the [markdown-swagger tool](https://github.com/rmariuzzo/markdown-swagger).
+The following [RESFTful API](https://github.com/PioneerDev/setflags/blob/feature/rest-api/API-README.md) table is generated from [our Swagger specification](https://github.com/PioneerDev/setflags/blob/master/docs/models.yml) using [the Swagger Editor](https://editor.swagger.io) by the [markdown-swagger tool](https://github.com/rmariuzzo/markdown-swagger).
 <!-- markdown-swagger -->
  Endpoint                             | Method | Auth? | Description                                                                                          
  ------------------------------------ | ------ | ----- | -----------------------------------------------------------------------------------------------------
