@@ -10,6 +10,8 @@ Everyone can customise the personal goal as a series of daily tasks by setting a
 
 Specifically, the description of a flag includes the numbers of days till the deadline (365 days by default for New Years resolution), details of the task, minimal number of witnesses, and the total amount of prize, etc. Majority of the prize (for example 90%) will be rewarded back to the task taker when the task is successfully achieved by the end of each day. The remaining amount will be awarded to witnesses who "mine" the blockchain by verifying the tasks. Once the goal is fulfilled with all daily tasks achieved, the task taker can get all the prize returned, including those given away to the witnesses in the Set Flag Coins (SFC). Unlike traditional one-off red packets, which will not be rewarded back to the task taker, the flag can be returned fully by the end. 
 
+## Requirements
+
 To be aware of members’ progress, the system requires the task takers and the witnesses to do the following:
 1. Download and install Mixin Messenger app, which is available in most app stores including Google Play Store and Apple App Store; 
 2. Set up the Mixin Networks wallet using the telephone number and PIN as necessary; 
@@ -21,10 +23,6 @@ To be aware of members’ progress, the system requires the task takers and the 
 8. To encourage participation, the task takers who verify other people’s tasks can get slightly more reward than the witnesses who have never carried out any tasks;
 9. The system rewards the daily amount only when the task taker has been verified to achieve the task;
 10. The system rewards all the amount given to the witnesses as a final prize in SFC, only when the task takers can achieve the goal completely. The chain of custody, i.e. forensic evidence, for achieving the goal will be ready for download by the end.
-
-## Requirements
-
-### Use Cases
 
 ## Design
 
@@ -56,12 +54,3 @@ The following [RESFTful API](https://github.com/PioneerDev/setflags/blob/feature
 
 Front-end
 
-## Implementation
-
-* The source will be organised using Model-View-Controller (MVC) architecture.
-
-models/
-
-views/
-
-controllers/
