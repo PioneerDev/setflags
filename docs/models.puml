@@ -20,8 +20,6 @@ entity Flag {
     amount: number
     times_achieved: int
     max_witness: int
-    created_at: datetime
-    updated_at: datetime
     --
     /flags/:id: POST
     /flags: GET
