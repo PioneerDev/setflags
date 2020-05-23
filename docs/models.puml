@@ -46,7 +46,7 @@ entity Evidence {
     created_at: datetime
     --
     /flags/:id/done PUT
-    /flags/:flag_id/evidences/:attachment_id: POST
+    /attachments/:attachment_id: POST
     /flags/:flag_id/evidences: GET
 }
 
