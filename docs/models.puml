@@ -20,6 +20,7 @@ entity Flag {
     amount: number
     times_achieved: int
     max_witness: int
+    paid_at: datetime
     --
     /flags/:id: POST
     /flags: GET
@@ -31,7 +32,6 @@ entity Asset {
     symbol: string
     price_usd: number
     balance: number
-    paid_at: datetime
     --
     /assets/:id: GET
 }
@@ -51,20 +51,10 @@ entity Evidence {
 entity Witness {
     * flag_id: uuid
     * payee_id: uuid
+    verified: int
     --
     /flags/:id/:op: PUT // yes, no
 }
-
-entity Payer {
-    paid: bool
-}
-
-entity Payee {
-    verified: bool
-}
-
-Payer --|> User
-Payee --|> User
 
 Flag "1" --- "*" Evidence: upload
 Flag "*" --- "1" Asset: pay

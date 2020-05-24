@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	uuid "github.com/gofrs/uuid"
 	"net/http"
 	"set-flags/models"
 )
@@ -10,7 +11,8 @@ import (
 func CheckRewards(c *gin.Context) {
 	userId := c.Param("user_id")
 	flagId := c.Param("flag_id")
-
-	data := models.FindEvidenceByFlagIdAndAttachmentId(flagId, userId)
+	userID, _ := uuid.FromString(userId)
+	flagID, _ := uuid.FromString(flagId)
+	data := models.FindEvidenceByFlagIdAndAttachmentId(flagID, userID)
 	c.PureJSON(http.StatusOK, data)
 }

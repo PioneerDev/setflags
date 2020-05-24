@@ -1,6 +1,11 @@
 package models
 
+import (
+	uuid "github.com/gofrs/uuid"
+)
+
 type Witness struct {
-	FlagId  string `json:"flag_id"`
-	PayeeId string `json:"payee_id"`
+	FlagId   uuid.UUID `json:"flag_id"`
+	PayeeId  uuid.UUID `json:"payee_id"`
+	Verified int       `json:"verified"`
 }

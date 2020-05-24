@@ -1,24 +1,26 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	uuid "github.com/gofrs/uuid"
+	"github.com/jinzhu/gorm"
+)
 
 type User struct {
 	gorm.Model
 
-	ID        string `json:"id"`
-	FullName  string `json:"full_name"`
-	AvatarUrl string `json:"avatar_url"`
+	ID             uuid.UUID `json:"id"`
+	IdentityNumber int       `json:"identity_number"`
+	FullName       string    `json:"full_name"`
+	AvatarUrl      string    `json:"avatar_url"`
 }
 
-type Payer struct {
-	gorm.Model
-
-	User User `json:"user"`
-	Paid bool `json:"paid"`
-}
-
-type Payee struct {
-	gorm.Model
-	User     User `json:"user"`
-	Verified bool `json:"verified"`
+func FindUser(userId uuid.UUID) *User {
+	var users []User
+	db.Find(&users)
+	for _, u := range users {
+		if u.ID == userId {
+			return &u
+		}
+	}
+	return nil
 }
