@@ -3,7 +3,6 @@ package models
 import (
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
-	"os"
 	"time"
 )
 
@@ -11,18 +10,19 @@ type Evidence struct {
 	ID           uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
 	AttachmentId string    `json:"attachment_id"`
 	FlagId       uuid.UUID `json:"flag_id"`
-	File         os.File   `gorm:"-" json:"file"`
+	Url          string    `json:"url"`
 	Type         string    `json:"type"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-func CreateEvidence(attachmentId, flagId uuid.UUID, type_ string) bool {
+func CreateEvidence(attachmentId, flagId uuid.UUID, type_, url string) bool {
 
 	db.Create(&Evidence{
 		AttachmentId: attachmentId.String(),
 		FlagId:       flagId,
 		Type:         type_,
+		Url:          url,
 	})
 	return true
 }

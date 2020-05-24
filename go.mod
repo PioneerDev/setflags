@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/MixinNetwork/go-number v0.0.0-20180814121220-f48e2574d9ef
+	github.com/aws/aws-sdk-go v1.31.4
 	github.com/fox-one/mixin-sdk v1.1.9
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3

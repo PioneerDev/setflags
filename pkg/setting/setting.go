@@ -22,6 +22,11 @@ var (
 	SessionID       string
 	PINToken        string
 	SessionKey      string
+	S3AccessKey     string
+	S3SecretKey     string
+	S3EndPoint      string
+	S3Region        string
+	S3Bucket        string
 )
 
 func init() {
@@ -36,6 +41,20 @@ func init() {
 	LoadBot()
 	LoadServer()
 	LoadApp()
+	LoadAWSS3()
+}
+
+func LoadAWSS3() {
+	sec, err := Cfg.GetSection("s3")
+	if err != nil {
+		log.Fatalf("Fail to get section 's3': %v", err)
+	}
+
+	S3AccessKey = sec.Key("access_key").MustString("debug")
+	S3SecretKey = sec.Key("secret_key").MustString("debug")
+	S3EndPoint = sec.Key("end_point").MustString("debug")
+	S3Region = sec.Key("region").MustString("debug")
+	S3Bucket = sec.Key("bucket").MustString("debug")
 }
 
 func LoadBot() {

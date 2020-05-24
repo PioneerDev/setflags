@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"set-flags/models"
+	"set-flags/pkg/cloud/aws"
 )
 
 // list all the flags
@@ -112,11 +113,28 @@ func UploadEvidence(c *gin.Context) {
 	log.Println(file.Filename)
 
 	// Upload the file to specific dst.
-	c.SaveUploadedFile(file, fmt.Sprintf("./%s", file.Filename))
+	dst := fmt.Sprintf("./%s", file.Filename)
+	err = c.SaveUploadedFile(file, dst)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"info": err,
+		})
+		return
+	}
+
+	// todo
+	// upload media to s3, need test in actual environment
+	url, err := aws.S3Upload(dst)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"info": err,
+		})
+		return
+	}
 
 	attachmentID, _ := uuid.FromString(attachmentId)
 	flagID, _ := uuid.FromString(flagId)
-	models.CreateEvidence(attachmentID, flagID, type_)
+	models.CreateEvidence(attachmentID, flagID, type_, url)
 
 	// update flag status to `done`
 	models.UpdateFlagStatus(flagId, "done")
