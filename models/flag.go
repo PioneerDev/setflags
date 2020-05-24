@@ -37,7 +37,7 @@ func CreateFlag(data map[string]interface{}) bool {
 }
 
 func GetAllFlags() (flags []Flag) {
-	db.Find(&flags)
+	db.Order("created_at desc").Find(&flags)
 	return
 }
 

@@ -17,13 +17,10 @@ func ListFlags(c *gin.Context) {
 
 // create a flag
 func CreateFlag(c *gin.Context) {
-	id := c.Param("id")
-	fmt.Println(id)
 
 	var flag map[string]interface{}
 
 	if c.ShouldBind(&flag) == nil {
-		flag["id"] = id
 		models.CreateFlag(flag)
 	}
 	c.JSON(http.StatusCreated, gin.H{
