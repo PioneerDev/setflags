@@ -263,6 +263,8 @@ definitions:
         - "video"
         - "audio"
         - "document"
+      url:
+        type: "string"
       created_at:
         type: "string"
         format: "date-time"

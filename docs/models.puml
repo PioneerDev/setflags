@@ -41,6 +41,7 @@ entity Evidence {
     * flag_id: uuid
     file: file
     type: string
+    url: string
     created_at: datetime
     --
     /flags/:id/done PUT
