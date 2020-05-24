@@ -2,7 +2,7 @@ package setting
 
 import (
 	"github.com/go-ini/ini"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"log"
 	"time"
 )

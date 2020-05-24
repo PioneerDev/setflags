@@ -1,7 +1,7 @@
 package models
 
 import (
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 	"os"
 	"time"

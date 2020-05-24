@@ -3,7 +3,7 @@ package v1
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"log"
 	"net/http"
 	"set-flags/models"
@@ -32,12 +32,40 @@ func CreateFlag(c *gin.Context) {
 
 // Update an existing flag
 func UpdateFlag(c *gin.Context) {
-	//flagId := c.Param("id")
-	//op := c.Param("op")
-	//
-	//if op != "yes" || op != "no" || op != "done" {
-	//
-	//}
+	flagId := c.Param("id")
+
+	_, err := uuid.FromString(flagId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"info": fmt.Sprintf("flagId: %s is not a valid UUID.", flagId),
+		})
+		return
+	}
+
+	op := c.Param("op")
+
+	if op != "yes" && op != "no" && op != "done" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"info": fmt.Sprintf("op: %s is invalid.", op),
+		})
+		return
+	}
+
+	if !models.FLagExists(flagId) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"info": "Flag not found.",
+		})
+		return
+	}
+
+	flag := models.FindFlagByID(flagId)
+
+	if flag.Status != "done" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"info": "not yet upload the evidence.",
+		})
+		return
+	}
 
 }
 
@@ -89,6 +117,9 @@ func UploadEvidence(c *gin.Context) {
 	attachmentID, _ := uuid.FromString(attachmentId)
 	flagID, _ := uuid.FromString(flagId)
 	models.CreateEvidence(attachmentID, flagID, type_)
+
+	// update flag status to `done`
+	models.UpdateFlagStatus(flagId, "done")
 
 	c.JSON(http.StatusOK, gin.H{
 		"info": fmt.Sprintf("'%s' uploaded!", file.Filename),

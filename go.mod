@@ -4,9 +4,6 @@ go 1.14
 
 require (
 	github.com/MixinNetwork/go-number v0.0.0-20180814121220-f48e2574d9ef
-	github.com/MixinNetwork/supergroup.mixin.one v1.1.0
-	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296
-	github.com/fatih/color v1.9.0 // indirect
 	github.com/fox-one/mixin-sdk v1.1.9
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
@@ -16,10 +13,7 @@ require (
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/jinzhu/gorm v1.9.12
-	github.com/json-iterator/go v1.1.9
-	github.com/mvdan/xurls v1.1.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/satori/go.uuid v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	golang.org/x/sys v0.0.0-20200519105757-fe76b779f299 // indirect
 	gopkg.in/ini.v1 v1.56.0 // indirect

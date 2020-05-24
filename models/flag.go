@@ -1,7 +1,7 @@
 package models
 
 import (
-	uuid "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -58,6 +58,16 @@ func FLagExists(flagId string) bool {
 	db.Model(&Flag{}).Where("id = ?", flagId).Count(&count)
 
 	return count == 1
+}
+
+func FindFlagByID(flagId string) (flag Flag) {
+	db.Where("id = ?", flagId).First(&flag)
+	return
+}
+
+func UpdateFlagStatus(flagId, status string) bool {
+	db.Model(&Flag{}).Where("id = ?", flagId).Update("status", status)
+	return true
 }
 
 // BeforeCreate will set a UUID rather than numeric ID.
