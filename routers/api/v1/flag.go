@@ -6,6 +6,7 @@ import (
 	"github.com/gofrs/uuid"
 	"log"
 	"net/http"
+	"os"
 	"set-flags/models"
 	"set-flags/pkg/cloud/aws"
 )
@@ -131,6 +132,8 @@ func UploadEvidence(c *gin.Context) {
 		})
 		return
 	}
+	// delete temperate file
+	defer os.Remove(dst)
 
 	attachmentID, _ := uuid.FromString(attachmentId)
 	flagID, _ := uuid.FromString(flagId)
