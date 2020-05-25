@@ -5,6 +5,8 @@ entity User {
    full_name: string
    avatar_url: string
    --
+   /me: GET
+   /auth: POST
    /users: GET
    /users/:id: PUT
    /myflags/:id: GET

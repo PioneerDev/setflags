@@ -167,6 +167,20 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Evidence"
+  /me:
+    get:
+      description: "Get the current user's information"
+      parameters:
+      - name: "user"
+        description: "Current user from the Messenger"
+        type: "#/definitions/User"
+  /auth:
+    post:
+      description: "Upload the oauth token"
+      parameters:
+      - name: "token"
+        description: "the authentication token"
+        type: "string"
   /users/{user_id}/rewards/{flag_id}:
     get:
       description: "check the total rewards received by the user for the flag"

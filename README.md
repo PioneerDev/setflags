@@ -46,6 +46,8 @@ The following [RESFTful API](https://github.com/PioneerDev/setflags/blob/feature
  `/myflags/{id}`                      | GET    | No    | list all flags of the user                                                                           
  `/attachments/{attachment_id}`       | POST   | No    | upload evidence                                                                                      
  `/flags/{flag_id}/evidences`         | GET    | No    | list all the evidences since yesterday                                                               
+ `/me`                                | GET    | No    | Get the current user's information                                                                   
+ `/auth`                              | POST   | No    | Upload the oauth token                                                                               
  `/users/{user_id}/rewards/{flag_id}` | GET    | No    | check the total rewards received by the user for the flag                                            
  `/assets/{id}`                       | GET    | No    | get the asset information                                                                            
 <!-- /markdown-swagger -->
