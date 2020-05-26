@@ -170,17 +170,26 @@ paths:
   /me:
     get:
       description: "Get the current user's information"
-      parameters:
-      - name: "user"
-        description: "Current user from the Messenger"
-        type: "#/definitions/User"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
   /auth:
     post:
       description: "Upload the oauth token"
       parameters:
       - name: "token"
+        in: "query"
         description: "the authentication token"
         type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "string"
   /users/{user_id}/rewards/{flag_id}:
     get:
       description: "check the total rewards received by the user for the flag"
