@@ -3,7 +3,7 @@ package models
 import (
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
-	v1 "set-flags/routers/api/v1"
+	"set-flags/pkg/utils"
 	"time"
 )
 
@@ -26,12 +26,23 @@ type UserSchema struct {
 	AvatarUrl      string    `json:"avatar_url"`
 }
 
+func FindUser(userId uuid.UUID) *User {
+	var users []User
+	db.Find(&users)
+	for _, u := range users {
+		if u.ID == userId {
+			return &u
+		}
+	}
+	return nil
+}
+
 func FindUserById(userId string) (user *UserSchema) {
 	db.Where("id = ?", userId).First(&user)
 	return
 }
 
-func CreateUser(userInfo *v1.UserInfo, accessToken string) bool {
+func CreateUser(userInfo *utils.UserInfo, accessToken string) bool {
 	db.Create(&User{
 		IdentityNumber: userInfo.IdentityNumber,
 		FullName:       userInfo.Name,
@@ -50,7 +61,7 @@ func UserExist(userId string) bool {
 	return count == 1
 }
 
-func UpdateUser(userInfo *v1.UserInfo, accessToken string) {
+func UpdateUser(userInfo *utils.UserInfo, accessToken string) {
 	db.Model(&User{}).
 		Updates(map[string]interface{}{"full_name": userInfo.Name, "access_token": accessToken})
 }

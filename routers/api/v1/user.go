@@ -11,6 +11,7 @@ import (
 	"set-flags/models"
 	"set-flags/pkg/e"
 	"set-flags/pkg/setting"
+	"set-flags/pkg/utils"
 )
 
 // check the total rewards received by the user for the flag
@@ -29,8 +30,8 @@ func Me(c *gin.Context) {
 	user := models.FindUserById(userId)
 
 	data := map[string]string{
-		"id": user.ID.String(),
-		"full_name": user.FullName,
+		"id":         user.ID.String(),
+		"full_name":  user.FullName,
 		"avatar_url": user.AvatarUrl,
 	}
 
@@ -73,7 +74,6 @@ func Auth(c *gin.Context) {
 		})
 		return
 	}
-
 
 	// update user info and access token
 	if models.UserExist(userInfo.UserId) {
@@ -124,15 +124,8 @@ func FetchAccessToken(client *http.Client, code string) (string, error) {
 	return token, nil
 }
 
-type UserInfo struct {
-	Type           string `json:"type"`
-	UserId         string `json:"user_id"`
-	Name           string `json:"name"`
-	IdentityNumber string `json:"identity_number"`
-}
-
 // Fetch user info from Mixin
-func FetchUserInfo(client *http.Client, accessToken string) (UserInfo, error) {
+func FetchUserInfo(client *http.Client, accessToken string) (utils.UserInfo, error) {
 	url := fmt.Sprintf("%s/me", setting.MixinAPIDomain)
 
 	req, _ := http.NewRequest("GET", url, nil)
@@ -142,11 +135,11 @@ func FetchUserInfo(client *http.Client, accessToken string) (UserInfo, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return UserInfo{}, err
+		return utils.UserInfo{}, err
 	}
 	defer resp.Body.Close()
 
-	var authResp map[string]UserInfo
+	var authResp map[string]utils.UserInfo
 
 	data, _ := ioutil.ReadAll(resp.Body)
 
