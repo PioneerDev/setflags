@@ -17,8 +17,8 @@ type Asset struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func FindAssetsByID(assetId string) (assets []Asset) {
-	db.Where("id = ?", assetId).Find(&assets)
+func FindAssetByID(assetId string) (asset Asset) {
+	db.Where("id = ?", assetId).First(&asset)
 	return
 }
 

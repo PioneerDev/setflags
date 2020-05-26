@@ -27,6 +27,7 @@ var (
 	S3EndPoint      string
 	S3Region        string
 	S3Bucket        string
+	MixinAPIDomain  string
 )
 
 func init() {
@@ -42,6 +43,16 @@ func init() {
 	LoadServer()
 	LoadApp()
 	LoadAWSS3()
+	LoadMixin()
+}
+
+func LoadMixin() {
+	sec, err := Cfg.GetSection("mixin")
+	if err != nil {
+		log.Fatalf("Fail to get section 'mixin': %v", err)
+	}
+
+	MixinAPIDomain= sec.Key("api_domain").MustString("https://api.mixin.one")
 }
 
 func LoadAWSS3() {

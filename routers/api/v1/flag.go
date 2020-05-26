@@ -9,13 +9,19 @@ import (
 	"os"
 	"set-flags/models"
 	"set-flags/pkg/cloud/aws"
+	"set-flags/pkg/e"
 )
 
 // list all the flags
 func ListFlags(c *gin.Context) {
-
+	code := e.INVALID_PARAMS
 	data := models.GetAllFlags()
-	c.PureJSON(http.StatusOK, data)
+	code = e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg": e.GetMsg(code),
+		"data": data,
+	})
 }
 
 // create a flag
@@ -29,6 +35,7 @@ func CreateFlag(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"code": 1,
 		"msg":  "created flag",
+		"data": make(map[string]interface{}),
 	})
 }
 

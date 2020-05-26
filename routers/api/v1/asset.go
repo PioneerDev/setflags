@@ -9,7 +9,11 @@ import (
 func AssetInfos(c *gin.Context) {
 	assetId := c.Param("id")
 
-	assets := models.FindAssetsByID(assetId)
+	asset := models.FindAssetByID(assetId)
 
-	c.PureJSON(http.StatusOK, assets)
+	c.JSON(http.StatusOK, gin.H{
+		"code" : 200,
+		"msg" : "ok",
+		"data" : asset,
+	})
 }
