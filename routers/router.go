@@ -44,6 +44,10 @@ func InitRouter() *gin.Engine {
 
 	apiv1.GET("/assets/:id", v1.AssetInfos)
 
+	apiv1.GET("/me/:id", v1.Me)
+
+	apiv1.POST("/auth", v1.Auth)
+
 	return r
 }
 
