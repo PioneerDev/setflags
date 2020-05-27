@@ -1,15 +1,18 @@
 package v1
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
+	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
-	"os"
 	"set-flags/models"
-	"set-flags/pkg/cloud/aws"
 	"set-flags/pkg/e"
+	"set-flags/pkg/setting"
 )
 
 // list all the flags
@@ -88,6 +91,7 @@ func FindFlagsByUserID(c *gin.Context) {
 
 // upload evidence
 func UploadEvidence(c *gin.Context) {
+	code := e.INVALID_PARAMS
 	flagId := c.Query("flag_id")
 	attachmentId := c.Param("attachment_id")
 
@@ -109,7 +113,7 @@ func UploadEvidence(c *gin.Context) {
 		return
 	}
 
-	file, err := c.FormFile("file")
+	fileHeader, err := c.FormFile("file")
 	if err != nil {
 		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -118,39 +122,31 @@ func UploadEvidence(c *gin.Context) {
 		return
 	}
 
-	log.Println(file.Filename)
+	log.Println(fileHeader.Filename)
 
-	// Upload the file to specific dst.
-	dst := fmt.Sprintf("./%s", file.Filename)
-	err = c.SaveUploadedFile(file, dst)
+	client := &http.Client{}
+	accessToken := ""
+
+	viewUrl, err := UploadAttachment(client, fileHeader, accessToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"info": err,
+		code = e.ERROR_UPLOAD_ATTACHMENT
+		c.JSON(http.StatusOK, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
-
-	// todo
-	// upload media to s3, need test in actual environment
-	url, err := aws.S3Upload(dst)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"info": err,
-		})
-		return
-	}
-	// delete temperate file
-	defer os.Remove(dst)
 
 	attachmentID, _ := uuid.FromString(attachmentId)
 	flagID, _ := uuid.FromString(flagId)
-	models.CreateEvidence(attachmentID, flagID, type_, url)
+	models.CreateEvidence(attachmentID, flagID, type_, viewUrl)
 
 	// update flag status to `done`
 	models.UpdateFlagStatus(flagId, "done")
 
 	c.JSON(http.StatusOK, gin.H{
-		"info": fmt.Sprintf("'%s' uploaded!", file.Filename),
+		"info": fmt.Sprintf("'%s' uploaded!", fileHeader.Filename),
 	})
 }
 
@@ -160,5 +156,52 @@ func ListEvidences(c *gin.Context) {
 	flagID, _ := uuid.FromString(flagId)
 	data := models.FindEvidencesByFlag(flagID)
 
-	c.PureJSON(http.StatusOK, data)
+	code := 200
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg": e.GetMsg(code),
+		"data": data,
+	})
+}
+
+// https://developers.mixin.one/api/l-messages/create-attachment/
+func UploadAttachment(client *http.Client, fileHeader *multipart.FileHeader, accessToken string) (string, error) {
+
+	f, err := fileHeader.Open()
+	if err != nil {
+		return "", err
+	}
+	size := fileHeader.Size
+
+	buffer := make([]byte, size)
+	_, err = f.Read(buffer)
+
+	if err != nil {
+		return "", err
+	}
+
+
+	url := fmt.Sprintf("%s/attachments", setting.MixinAPIDomain)
+
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(buffer))
+
+	req.Header.Add("Content-Type", http.DetectContentType(buffer))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var authResp map[string]map[string]interface{}
+
+	data, _ := ioutil.ReadAll(resp.Body)
+
+	_ = json.Unmarshal(data, &authResp)
+
+	viewUrl, _ := authResp["data"]["view_url"].(string)
+
+	return viewUrl, nil
 }

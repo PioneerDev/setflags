@@ -8,6 +8,7 @@ var MsgFlags = map[int]string {
 	ERROR_AUTH_CHECK_TOKEN_TIMEOUT : "Token已超时",
 	ERROR_AUTH_TOKEN : "Token获取失败",
 	ERROR_AUTH : "Token错误",
+	ERROR_UPLOAD_ATTACHMENT: "附件上传失败",
 }
 
 func GetMsg(code int) string {
