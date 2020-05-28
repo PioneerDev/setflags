@@ -1,6 +1,6 @@
 # Set Flags
   
-An exemplar project for setting personal goals as verifiable flags to invest in yourself regularly.
+An exemplar project for setting personal goals to invest in yourself as regularly verifiable flags.
 
 ## Introduction
 
