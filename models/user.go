@@ -53,6 +53,12 @@ func CreateUser(userInfo *utils.UserInfo, accessToken string) bool {
 	return true
 }
 
+func FindUserToken(userId string) (string, error) {
+	var user User
+	db.Where("id = ?", userId).First(&user)
+	return user.AccessToken, nil
+}
+
 func UserExist(userId string) bool {
 	var count int
 

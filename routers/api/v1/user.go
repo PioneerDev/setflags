@@ -33,17 +33,30 @@ func CheckRewards(c *gin.Context) {
 }
 
 func Me(c *gin.Context) {
-	userId := c.Param("id")
+	code := e.INVALID_PARAMS
+	userId := c.GetHeader("x-user-id")
+
+	_, err := uuid.FromString(userId)
+
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	user := models.FindUserById(userId)
 
 	data := map[string]string{
-		"id":         user.ID.String(),
+		"id":         userId,
 		"full_name":  user.FullName,
 		"avatar_url": user.AvatarUrl,
 	}
 
-	code := 200
+	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
