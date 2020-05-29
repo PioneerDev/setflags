@@ -16,12 +16,20 @@ import (
 
 // check the total rewards received by the user for the flag
 func CheckRewards(c *gin.Context) {
+	code := e.INVALID_PARAMS
+
 	userId := c.Param("user_id")
 	flagId := c.Param("flag_id")
 	userID, _ := uuid.FromString(userId)
 	flagID, _ := uuid.FromString(flagId)
 	data := models.FindEvidenceByFlagIdAndAttachmentId(flagID, userID)
-	c.PureJSON(http.StatusOK, data)
+
+	code = e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": data,
+	})
 }
 
 func Me(c *gin.Context) {

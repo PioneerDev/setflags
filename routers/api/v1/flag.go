@@ -19,6 +19,7 @@ import (
 func ListFlags(c *gin.Context) {
 	code := e.INVALID_PARAMS
 	data := models.GetAllFlags()
+
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
@@ -29,27 +30,31 @@ func ListFlags(c *gin.Context) {
 
 // create a flag
 func CreateFlag(c *gin.Context) {
-
+	code := e.INVALID_PARAMS
 	var flag map[string]interface{}
 
 	if c.ShouldBind(&flag) == nil {
 		models.CreateFlag(flag)
 	}
+	code = e.SUCCESS
 	c.JSON(http.StatusCreated, gin.H{
-		"code": 1,
-		"msg":  "created flag",
+		"code": code,
+		"msg":  e.GetMsg(code),
 		"data": make(map[string]interface{}),
 	})
 }
 
 // Update an existing flag
 func UpdateFlag(c *gin.Context) {
+	code := e.INVALID_PARAMS
 	flagId := c.Param("id")
 
 	_, err := uuid.FromString(flagId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"info": fmt.Sprintf("flagId: %s is not a valid UUID.", flagId),
+			"code": code,
+			"msg":  err,
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
@@ -58,14 +63,18 @@ func UpdateFlag(c *gin.Context) {
 
 	if op != "yes" && op != "no" && op != "done" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"info": fmt.Sprintf("op: %s is invalid.", op),
+			"code": code,
+			"msg":  fmt.Sprintf("op: %s is invalid.", op),
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
 	if !models.FLagExists(flagId) {
 		c.JSON(http.StatusNotFound, gin.H{
-			"info": "Flag not found.",
+			"code": 404,
+			"msg":  "Flag not found.",
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
@@ -74,19 +83,34 @@ func UpdateFlag(c *gin.Context) {
 
 	if flag.Status != "done" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"info": "not yet upload the evidence.",
+			"code": code,
+			"msg":  "not yet upload the evidence.",
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
+	code = e.SUCCESS
+	c.JSON(http.StatusBadRequest, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": make(map[string]interface{}),
+	})
 }
 
 // list all flags of the user
 func FindFlagsByUserID(c *gin.Context) {
+	code := e.INVALID_PARAMS
 	userId := c.Param("id")
 
 	flags := models.FindFlagsByUserID(userId)
-	c.PureJSON(http.StatusOK, flags)
+
+	code = e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": flags,
+	})
 }
 
 // upload evidence
@@ -101,23 +125,29 @@ func UploadEvidence(c *gin.Context) {
 
 	if type_ != "image" && type_ != "audio" && type_ != "video" && type_ != "document" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"info": fmt.Sprintf("type: %s is invalid.", type_),
+			"code": code,
+			"msg":  fmt.Sprintf("type: %s is invalid.", type_),
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
 	if !models.FLagExists(flagId) {
 		c.JSON(http.StatusNotFound, gin.H{
-			"info": "not found specific flag.",
+			"code": 404,
+			"msg":  "not found specific flag.",
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
-		log.Println(err)
+		code = e.ERROR
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"info": err,
+			"code": code,
+			"msg":  err,
+			"data": make(map[string]interface{}),
 		})
 		return
 	}
@@ -145,8 +175,11 @@ func UploadEvidence(c *gin.Context) {
 	// update flag status to `done`
 	models.UpdateFlagStatus(flagId, "done")
 
+	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
-		"info": fmt.Sprintf("'%s' uploaded!", fileHeader.Filename),
+		"code": code,
+		"msg": fmt.Sprintf("'%s' uploaded!", fileHeader.Filename),
+		"data": make(map[string]interface{}),
 	})
 }
 
