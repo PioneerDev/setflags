@@ -35,7 +35,7 @@ func init() {
 	Cfg, err = ini.Load("secrets/app.ini")
 
 	if err != nil {
-		log.Fatalf("Fail to parse 'conf/app.ini': %v", err)
+		log.Fatalf("Fail to parse 'secrets/app.ini': %v", err)
 	}
 
 	LoadBase()
