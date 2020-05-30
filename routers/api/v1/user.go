@@ -19,9 +19,27 @@ func CheckRewards(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
 	userId := c.Param("user_id")
+	fmt.Println(fmt.Sprintf("userId: %s", userId))
 	flagId := c.Param("flag_id")
-	userID, _ := uuid.FromString(userId)
-	flagID, _ := uuid.FromString(flagId)
+	fmt.Println(fmt.Sprintf("flagId: %s", flagId))
+	userID, err := uuid.FromString(userId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	flagID, err := uuid.FromString(flagId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 	data := models.FindEvidenceByFlagIdAndAttachmentId(flagID, userID)
 
 	code = e.SUCCESS

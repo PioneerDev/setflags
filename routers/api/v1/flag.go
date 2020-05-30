@@ -34,6 +34,7 @@ func CreateFlag(c *gin.Context) {
 	var flag map[string]interface{}
 
 	if c.ShouldBind(&flag) == nil {
+		fmt.Println(flag)
 		payerId, err := uuid.FromString(flag["payer_id"].(string))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -123,7 +124,17 @@ func UpdateFlag(c *gin.Context) {
 // list all flags of the user
 func FindFlagsByUserID(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	userId := c.Param("id")
+	userId := c.GetHeader("x-user-id")
+
+	_, err := uuid.FromString(userId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	flags := models.FindFlagsByUserID(userId)
 
