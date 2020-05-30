@@ -103,7 +103,6 @@ func LoadApp() {
 		log.Fatalf("Fail to get section 'app': %v", err)
 	}
 	Name = sec.Key("NAME").MustString("debug")
-	RunMode = sec.Key("RUN_MODE").MustString("debug")
 	JwtSecret = sec.Key("JWT_SECRET").MustString("!@)*#)!@U#@*!@!)")
 	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
 }
