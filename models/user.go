@@ -21,7 +21,7 @@ type User struct {
 
 type UserSchema struct {
 	ID             uuid.UUID `json:"id"`
-	IdentityNumber int       `json:"identity_number"`
+	IdentityNumber string       `json:"identity_number"`
 	FullName       string    `json:"full_name"`
 	AvatarUrl      string    `json:"avatar_url"`
 }
@@ -37,9 +37,15 @@ func FindUser(userId uuid.UUID) *User {
 	return nil
 }
 
-func FindUserById(userId string) (user *UserSchema) {
-	db.Where("id = ?", userId).First(&user)
-	return
+func FindUserById(userId string) *UserSchema {
+	var dbUser User
+	db.Where("id = ?", userId).First(&dbUser)
+	var user UserSchema
+	user.ID = dbUser.ID
+	user.AvatarUrl = dbUser.AvatarUrl
+	user.FullName = dbUser.FullName
+	user.IdentityNumber = dbUser.IdentityNumber
+	return &user
 }
 
 func CreateUser(userInfo *utils.UserInfo, accessToken string) bool {
@@ -51,6 +57,12 @@ func CreateUser(userInfo *utils.UserInfo, accessToken string) bool {
 	})
 
 	return true
+}
+
+func FindUserToken(userId string) (string, error) {
+	var user User
+	db.Where("id = ?", userId).First(&user)
+	return user.AccessToken, nil
 }
 
 func UserExist(userId string) bool {

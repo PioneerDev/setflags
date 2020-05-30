@@ -19,9 +19,27 @@ func CheckRewards(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
 	userId := c.Param("user_id")
+	fmt.Println(fmt.Sprintf("userId: %s", userId))
 	flagId := c.Param("flag_id")
-	userID, _ := uuid.FromString(userId)
-	flagID, _ := uuid.FromString(flagId)
+	fmt.Println(fmt.Sprintf("flagId: %s", flagId))
+	userID, err := uuid.FromString(userId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	flagID, err := uuid.FromString(flagId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 	data := models.FindEvidenceByFlagIdAndAttachmentId(flagID, userID)
 
 	code = e.SUCCESS
@@ -33,17 +51,30 @@ func CheckRewards(c *gin.Context) {
 }
 
 func Me(c *gin.Context) {
-	userId := c.Param("id")
+	code := e.INVALID_PARAMS
+	userId := c.GetHeader("x-user-id")
+
+	_, err := uuid.FromString(userId)
+
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	user := models.FindUserById(userId)
 
 	data := map[string]string{
-		"id":         user.ID.String(),
+		"id":         userId,
 		"full_name":  user.FullName,
 		"avatar_url": user.AvatarUrl,
 	}
 
-	code := 200
+	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),

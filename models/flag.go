@@ -26,17 +26,15 @@ func CreateFlag(data map[string]interface{}) bool {
 	db.Create(&Flag{
 		PayerId:    data["payer_id"].(uuid.UUID),
 		Task:       data["task"].(string),
-		Days:       int(data["days"].(int)),
-		MaxWitness: int(data["max_witness"].(int)),
+		Days:       int(data["days"].(float64)),
+		MaxWitness: int(data["max_witness"].(float64)),
 		AssetId:    data["asset_id"].(uuid.UUID),
 		Amount:     data["amount"].(float64),
 		Status:     data["status"].(string),
 		// below are derived
 		RemainingAmount: data["amount"].(float64),
-		RemainingDays:   int(data["days"].(int)),
+		RemainingDays:   int(data["days"].(float64)),
 		TimesAchieved:   0,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
 	})
 
 	return true

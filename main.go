@@ -165,7 +165,7 @@ func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag 
 		"app_id":      setting.ClientId.String(),
 		"icon_url":    "https://images.mixin.one/X44V48LK9oEBT3izRGKqdVSPfiH5DtYTzzF0ch5nP-f7tO4v0BTTqVhFEHqd52qUeuVas-BSkLH1ckxEI51-jXmF=s256",
 		"title":       "励志定投群红包",
-		"description": fmt.Sprintf("来自@%d 的红包", payer.IdentityNumber),
+		"description": fmt.Sprintf("来自@%s 的红包", payer.IdentityNumber),
 		"action":      "https://group-redirect.droneidentity.eu" + "/flags/" + flag.ID.String(),
 	})
 	cID := UniqueConversationId(setting.ClientId, userId)

@@ -34,6 +34,29 @@ func CreateFlag(c *gin.Context) {
 	var flag map[string]interface{}
 
 	if c.ShouldBind(&flag) == nil {
+		fmt.Println(flag)
+		payerId, err := uuid.FromString(flag["payer_id"].(string))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code": code,
+				"msg":  err.Error(),
+				"data": make(map[string]interface{}),
+			})
+			return
+		}
+
+		assetId, err := uuid.FromString(flag["asset_id"].(string))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code": code,
+				"msg":  err.Error(),
+				"data": make(map[string]interface{}),
+			})
+			return
+		}
+
+		flag["payer_id"] = payerId
+		flag["asset_id"] = assetId
 		models.CreateFlag(flag)
 	}
 	code = e.SUCCESS
@@ -53,7 +76,7 @@ func UpdateFlag(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg":  err,
+			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -101,7 +124,17 @@ func UpdateFlag(c *gin.Context) {
 // list all flags of the user
 func FindFlagsByUserID(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	userId := c.Param("id")
+	userId := c.GetHeader("x-user-id")
+
+	_, err := uuid.FromString(userId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	flags := models.FindFlagsByUserID(userId)
 
@@ -116,6 +149,7 @@ func FindFlagsByUserID(c *gin.Context) {
 // upload evidence
 func UploadEvidence(c *gin.Context) {
 	code := e.INVALID_PARAMS
+	userId := c.GetHeader("user_id")
 	flagId := c.Query("flag_id")
 	attachmentId := c.Param("attachment_id")
 
@@ -146,7 +180,7 @@ func UploadEvidence(c *gin.Context) {
 		code = e.ERROR
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": code,
-			"msg":  err,
+			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -155,7 +189,8 @@ func UploadEvidence(c *gin.Context) {
 	log.Println(fileHeader.Filename)
 
 	client := &http.Client{}
-	accessToken := ""
+	// read access token from db
+	accessToken, _ := models.FindUserToken(userId)
 
 	viewUrl, err := UploadAttachment(client, fileHeader, accessToken)
 	if err != nil {
