@@ -35,7 +35,7 @@ func init() {
 	Cfg, err = ini.Load("secrets/app.ini")
 
 	if err != nil {
-		log.Fatalf("Fail to parse 'conf/app.ini': %v", err)
+		log.Fatalf("Fail to parse 'secrets/app.ini': %v", err)
 	}
 
 	LoadBase()
@@ -103,6 +103,7 @@ func LoadApp() {
 		log.Fatalf("Fail to get section 'app': %v", err)
 	}
 	Name = sec.Key("NAME").MustString("debug")
+	RunMode = sec.Key("RUN_MODE").MustString("debug")
 	JwtSecret = sec.Key("JWT_SECRET").MustString("!@)*#)!@U#@*!@!)")
 	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
 }

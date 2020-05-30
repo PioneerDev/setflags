@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"set-flags/pkg/setting"
 	v1 "set-flags/routers/api/v1"
 	"time"
 )
@@ -27,7 +28,7 @@ func InitRouter() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	gin.SetMode("debug")
+	gin.SetMode(setting.RunMode)
 
 	apiv1 := r.Group("")
 
