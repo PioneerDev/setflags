@@ -40,13 +40,15 @@ func CreateFlag(data map[string]interface{}) bool {
 	return true
 }
 
-func GetAllFlags() (flags []Flag) {
-	db.Order("created_at desc").Find(&flags)
+func GetAllFlags(pageSize, currentPage int) (flags []Flag) {
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
 	return
 }
 
-func FindFlagsByUserID(userId string) (flags []Flag) {
-	db.Where("payer_id = ?", userId).Find(&flags)
+func FindFlagsByUserID(userId string, currentPage, pageSize int) (flags []Flag) {
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Where("payer_id = ?", userId).Find(&flags)
 	return
 }
 

@@ -28,18 +28,21 @@ func CreateEvidence(attachmentId, flagId uuid.UUID, type_, url string) bool {
 }
 
 // 返回自昨天开始的evidence
-func FindEvidencesByFlag(flagId uuid.UUID) (evidences []Evidence) {
+func FindEvidencesByFlag(flagId uuid.UUID, currentPage, pageSize int) (evidences []Evidence) {
 	// 获取当前时间
 	now := time.Now()
 	// 回到昨天
 	yesterday := now.Add(time.Hour * -24)
 	yesterday = time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, yesterday.Location())
-	db.Where("flag_id = ? and created_at >= ?", flagId, yesterday).Order("created_at desc").Find(&evidences)
+
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and created_at >= ?", flagId, yesterday).Order("created_at desc").Find(&evidences)
 	return
 }
 
-func FindEvidenceByFlagIdAndAttachmentId(flagId, attachmentId uuid.UUID) (evidences []Evidence) {
-	db.Where("flag_id = ? and attachment_id = ?", flagId, attachmentId).Find(&evidences)
+func FindEvidenceByFlagIdAndAttachmentId(flagId, attachmentId uuid.UUID, currentPage, pageSize int) (evidences []Evidence) {
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and attachment_id = ?", flagId, attachmentId).Find(&evidences)
 	return
 }
 

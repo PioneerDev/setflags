@@ -14,7 +14,7 @@ var (
 	ReadTimeout     time.Duration
 	WriteTimeout    time.Duration
 	Name            string
-	PageSize        int
+	PageSize        string
 	JwtSecret       string
 	SessionAssetPIN string
 	ClientId        uuid.UUID
@@ -104,5 +104,5 @@ func LoadApp() {
 	}
 	Name = sec.Key("NAME").MustString("debug")
 	JwtSecret = sec.Key("JWT_SECRET").MustString("!@)*#)!@U#@*!@!)")
-	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
+	PageSize = sec.Key("PAGE_SIZE").MustString("10")
 }
