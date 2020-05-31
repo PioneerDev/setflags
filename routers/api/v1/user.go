@@ -12,6 +12,7 @@ import (
 	"set-flags/pkg/e"
 	"set-flags/pkg/setting"
 	"set-flags/pkg/utils"
+	"strconv"
 )
 
 // check the total rewards received by the user for the flag
@@ -40,7 +41,31 @@ func CheckRewards(c *gin.Context) {
 		})
 		return
 	}
-	data := models.FindEvidenceByFlagIdAndAttachmentId(flagID, userID)
+
+	currentPage_ := c.DefaultQuery("current_page", "1")
+	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
+
+	currentPage, err := strconv.Atoi(currentPage_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	pageSize, err := strconv.Atoi(pageSize_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	data := models.FindEvidenceByFlagIdAndAttachmentId(flagID, userID, currentPage, pageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{

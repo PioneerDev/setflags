@@ -13,12 +13,36 @@ import (
 	"set-flags/models"
 	"set-flags/pkg/e"
 	"set-flags/pkg/setting"
+	"strconv"
 )
 
 // list all the flags
 func ListFlags(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	data := models.GetAllFlags()
+	currentPage_ := c.DefaultQuery("current_page", "1")
+	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
+
+	currentPage, err := strconv.Atoi(currentPage_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	pageSize, err := strconv.Atoi(pageSize_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	data := models.GetAllFlags(pageSize, currentPage)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -126,7 +150,30 @@ func FindFlagsByUserID(c *gin.Context) {
 	code := e.INVALID_PARAMS
 	userId := c.GetHeader("x-user-id")
 
-	_, err := uuid.FromString(userId)
+	currentPage_ := c.DefaultQuery("current_page", "1")
+	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
+
+	currentPage, err := strconv.Atoi(currentPage_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	pageSize, err := strconv.Atoi(pageSize_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	_, err = uuid.FromString(userId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
@@ -136,7 +183,7 @@ func FindFlagsByUserID(c *gin.Context) {
 		return
 	}
 
-	flags := models.FindFlagsByUserID(userId)
+	flags := models.FindFlagsByUserID(userId, currentPage, pageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -220,11 +267,38 @@ func UploadEvidence(c *gin.Context) {
 
 // list all the evidences since yesterday
 func ListEvidences(c *gin.Context) {
+
+	code := e.INVALID_PARAMS
+
 	flagId := c.Param("flag_id")
 	flagID, _ := uuid.FromString(flagId)
-	data := models.FindEvidencesByFlag(flagID)
 
-	code := 200
+	currentPage_ := c.DefaultQuery("current_page", "1")
+	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
+
+	currentPage, err := strconv.Atoi(currentPage_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	pageSize, err := strconv.Atoi(pageSize_)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg": e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	data := models.FindEvidencesByFlag(flagID, currentPage, pageSize)
+
+	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg": e.GetMsg(code),
