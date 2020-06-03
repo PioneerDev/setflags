@@ -9,6 +9,7 @@ import (
 type Flag struct {
 	ID              uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
 	PayerId         uuid.UUID `json:"payer_id"`
+	PayerName       string    `json:"payer_name"`
 	Task            string    `json:"task"`
 	Days            int       `json:"days"`
 	MaxWitness      int       `json:"max_witness"`
@@ -25,6 +26,7 @@ type Flag struct {
 func CreateFlag(data map[string]interface{}) bool {
 	db.Create(&Flag{
 		PayerId:    data["payer_id"].(uuid.UUID),
+		PayerName: data["payer_name"].(string),
 		Task:       data["task"].(string),
 		Days:       int(data["days"].(float64)),
 		MaxWitness: int(data["max_witness"].(float64)),

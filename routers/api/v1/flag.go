@@ -80,6 +80,13 @@ func CreateFlag(c *gin.Context) {
 		}
 
 		flag["payer_id"] = payerId
+
+		// find user
+		user := models.FindUserById(payerId.String())
+		fmt.Println(user)
+		// set payer name
+		flag["payer_name"] = user.FullName
+
 		flag["asset_id"] = assetId
 		models.CreateFlag(flag)
 	}
