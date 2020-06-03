@@ -255,6 +255,8 @@ definitions:
       payer_id:
         type: "string"
         format: "uuid"
+      payer_name:
+        type: "string"
       task:
         type: "string"
       days:
