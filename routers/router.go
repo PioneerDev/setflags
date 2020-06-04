@@ -19,7 +19,7 @@ func InitRouter() *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"PUT", "POST", "GET"},
-		AllowHeaders:     []string{"Origin"},
+		AllowHeaders:     []string{"Origin", "x-user-id", "content-type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		AllowOriginFunc: func(origin string) bool {
