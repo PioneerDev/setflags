@@ -1,2 +1,3 @@
 source secrets/db.sh
-psql
+echo 'select * from "user";' | psql
+#echo "select * from flag;" | psql
