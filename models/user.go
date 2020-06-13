@@ -10,7 +10,6 @@ import (
 type User struct {
 	ID             uuid.UUID `json:"id"`
 	IdentityNumber string    `json:"identity_number"`
-	MixinUserID    string    `json:"mixin_user_id"`
 	FullName       string    `json:"full_name"`
 	AvatarUrl      string    `json:"avatar_url"`
 	AccessToken    string    `json:"access_token"`
