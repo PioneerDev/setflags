@@ -27,7 +27,7 @@ func S3Upload(filePath string) (string, error) {
 
 	file, err := os.Open(filePath)
 	if err != nil {
-		fmt.Sprintf("Unable to open file %q", err)
+		fmt.Printf("Unable to open file %q", err)
 		return "", err
 	}
 
