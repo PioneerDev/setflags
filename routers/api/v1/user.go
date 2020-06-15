@@ -18,9 +18,9 @@ func CheckRewards(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
 	userId := c.Param("user_id")
-	fmt.Println(fmt.Sprintf("userId: %s", userId))
+	fmt.Printf("userId: %s\n", userId)
 	flagId := c.Param("flag_id")
-	fmt.Println(fmt.Sprintf("flagId: %s", flagId))
+	fmt.Printf("flagId: %s\n", flagId)
 	userID, err := uuid.FromString(userId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

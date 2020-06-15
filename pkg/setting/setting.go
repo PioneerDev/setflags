@@ -32,7 +32,7 @@ var (
 
 func init() {
 	var err error
-	Cfg, err = ini.Load("secrets/app.ini")
+	Cfg, err = ini.Load("/home/ubuntu/setflags/secrets/app.ini")
 
 	if err != nil {
 		log.Fatalf("Fail to parse 'secrets/app.ini': %v", err)
