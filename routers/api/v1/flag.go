@@ -207,7 +207,7 @@ func UploadEvidence(c *gin.Context) {
 	flagId := c.Query("flag_id")
 	attachmentId := c.Param("attachment_id")
 
-	fmt.Sprintf("attachmentId: %s, flagId: %s", attachmentId, flagId)
+	fmt.Printf("attachmentId: %s, flagId: %s", attachmentId, flagId)
 
 	type_ := c.Query("type")
 
