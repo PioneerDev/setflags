@@ -1,9 +1,9 @@
 package models
 
 import (
+	"github.com/fox-one/mixin-sdk"
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
-	"set-flags/pkg/utils"
 	"time"
 )
 
@@ -47,11 +47,11 @@ func FindUserById(userId string) *UserSchema {
 	return &user
 }
 
-func CreateUser(userInfo *utils.UserInfo, accessToken string) bool {
+func CreateUser(userProfile *mixin.Profile, accessToken string) bool {
 	db.Create(&User{
-		IdentityNumber: userInfo.IdentityNumber,
-		FullName:       userInfo.Name,
-		AvatarUrl:      "",
+		IdentityNumber: userProfile.IdentityNumber,
+		FullName:       userProfile.FullName,
+		AvatarUrl:      userProfile.AvatarURL,
 		AccessToken:    accessToken,
 	})
 
@@ -72,9 +72,9 @@ func UserExist(userId string) bool {
 	return count == 1
 }
 
-func UpdateUser(userInfo *utils.UserInfo, accessToken string) {
+func UpdateUser(userProfile *mixin.Profile, accessToken string) {
 	db.Model(&User{}).
-		Updates(map[string]interface{}{"full_name": userInfo.Name, "access_token": accessToken})
+		Updates(map[string]interface{}{"full_name": userProfile.FullName, "access_token": accessToken})
 }
 
 // BeforeCreate will set a UUID rather than numeric ID.

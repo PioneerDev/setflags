@@ -2,7 +2,6 @@ package setting
 
 import (
 	"github.com/go-ini/ini"
-	"github.com/gofrs/uuid"
 	"log"
 	"time"
 )
@@ -17,11 +16,12 @@ var (
 	PageSize        string
 	JwtSecret       string
 	SessionAssetPIN string
-	ClientId        uuid.UUID
+	ClientId        string
 	ClientSecret    string
 	SessionID       string
 	PINToken        string
 	SessionKey      string
+	CodeVerifier    string
 	S3AccessKey     string
 	S3SecretKey     string
 	S3EndPoint      string
@@ -52,7 +52,7 @@ func LoadMixin() {
 		log.Fatalf("Fail to get section 'mixin': %v", err)
 	}
 
-	MixinAPIDomain= sec.Key("api_domain").MustString("https://api.mixin.one")
+	MixinAPIDomain = sec.Key("api_domain").MustString("https://api.mixin.one")
 }
 
 func LoadAWSS3() {
@@ -73,12 +73,13 @@ func LoadBot() {
 	if err != nil {
 		log.Fatalf("Fail to get section 'bot': %v", err)
 	}
-	ClientId, _ = uuid.FromString(sec.Key("client_id").MustString("debug"))
+	ClientId = sec.Key("client_id").MustString("debug")
 	SessionAssetPIN = sec.Key("session_asset_pin").MustString("debug")
 	ClientSecret = sec.Key("client_secret").MustString("debug")
 	SessionID = sec.Key("session_id").MustString("debug")
 	PINToken = sec.Key("pin_token").MustString("debug")
 	SessionKey = sec.Key("session_key").MustString("debug")
+	CodeVerifier = sec.Key("code_verifier").MustString("debug")
 }
 
 func LoadBase() {
