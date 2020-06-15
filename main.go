@@ -255,10 +255,12 @@ func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 }
 
 func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
+	/*
 	cron.AddFunc("0 * * * * ?", func() {
 		log.Println("Sceduled every minute to test")
 		Reminder(ctx, bot, false)
 	})
+	*/
 	cron.AddFunc("0 0 8 * * ?", func() {
 		Reminder(ctx, bot, false)
 	})
