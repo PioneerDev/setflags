@@ -1,14 +1,16 @@
 package routers
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"set-flags/pkg/setting"
 	v1 "set-flags/routers/api/v1"
 	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
+// InitRouter gin router
 func InitRouter() *gin.Engine {
 	r := gin.New()
 
@@ -49,24 +51,3 @@ func InitRouter() *gin.Engine {
 
 	return r
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,11 +1,13 @@
 package models
 
 import (
+	"time"
+
 	uuid "github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
-	"time"
 )
 
+// Asset entity
 type Asset struct {
 	ID       uuid.UUID  `gorm:"type:uuid;primary_key;" json:"id"`
 	Symbol   string     `json:"symbol"`
@@ -17,29 +19,32 @@ type Asset struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func FindAssetByID(assetId string) (asset Asset) {
-	db.Where("id = ?", assetId).First(&asset)
+// FindAssetByID find asset by id
+func FindAssetByID(assetID uuid.UUID) (asset Asset) {
+	db.Where("id = ?", assetID.String()).First(&asset)
 	return
 }
 
 // BeforeCreate will set a UUID rather than numeric ID.
 func (a *Asset) BeforeCreate(scope *gorm.Scope) error {
-	uuid_, _ := uuid.NewV4()
-	scope.SetColumn("ID", uuid_)
+	// uuid_, _ := uuid.NewV4()
+	// scope.SetColumn("ID", uuid_)
 	scope.SetColumn("CreatedAt", time.Now())
 	return nil
 }
 
+// BeforeUpdate set field updateAt
 func (a *Asset) BeforeUpdate(scope *gorm.Scope) error {
 	scope.SetColumn("UpdatedAt", time.Now())
 	return nil
 }
 
-func FindAsset(assetId uuid.UUID) *Asset {
+// FindAsset find asset by id
+func FindAsset(assetID uuid.UUID) *Asset {
 	var assets []Asset
 	db.Find(&assets)
 	for _, a := range assets {
-		if a.ID == assetId {
+		if a.ID == assetID {
 			return &a
 		}
 	}

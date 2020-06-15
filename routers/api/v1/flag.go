@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gofrs/uuid"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -14,29 +12,30 @@ import (
 	"set-flags/pkg/e"
 	"set-flags/pkg/setting"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 )
 
-// list all the flags
+// ListFlags list all the flags
 func ListFlags(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	currentPage_ := c.DefaultQuery("current_page", "1")
-	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
 
-	currentPage, err := strconv.Atoi(currentPage_)
+	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	pageSize, err := strconv.Atoi(pageSize_)
+	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -47,19 +46,19 @@ func ListFlags(c *gin.Context) {
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
-		"msg": e.GetMsg(code),
+		"msg":  e.GetMsg(code),
 		"data": data,
 	})
 }
 
-// create a flag
+// CreateFlag create a flag
 func CreateFlag(c *gin.Context) {
 	code := e.INVALID_PARAMS
 	var flag map[string]interface{}
 
 	if c.ShouldBind(&flag) == nil {
 		fmt.Println(flag)
-		payerId, err := uuid.FromString(flag["payer_id"].(string))
+		payerID, err := uuid.FromString(flag["payer_id"].(string))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code": code,
@@ -69,7 +68,7 @@ func CreateFlag(c *gin.Context) {
 			return
 		}
 
-		assetId, err := uuid.FromString(flag["asset_id"].(string))
+		assetID, err := uuid.FromString(flag["asset_id"].(string))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code": code,
@@ -79,15 +78,18 @@ func CreateFlag(c *gin.Context) {
 			return
 		}
 
-		flag["payer_id"] = payerId
+		flag["payer_id"] = payerID
 
 		// find user
-		user := models.FindUserById(payerId.String())
+		user := models.FindUserByID(payerID)
 		fmt.Println(user)
 		// set payer name
 		flag["payer_name"] = user.FullName
 
-		flag["asset_id"] = assetId
+		// set payer avatar url
+		flag["payer_avatar_url"] = user.AvatarURL
+
+		flag["asset_id"] = assetID
 		models.CreateFlag(flag)
 	}
 	code = e.SUCCESS
@@ -98,12 +100,11 @@ func CreateFlag(c *gin.Context) {
 	})
 }
 
-// Update an existing flag
+// UpdateFlag Update an existing flag
 func UpdateFlag(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	flagId := c.Param("id")
 
-	_, err := uuid.FromString(flagId)
+	flagID, err := uuid.FromString(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
@@ -124,7 +125,7 @@ func UpdateFlag(c *gin.Context) {
 		return
 	}
 
-	if !models.FLagExists(flagId) {
+	if !models.FlagExists(flagID) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code": 404,
 			"msg":  "Flag not found.",
@@ -133,7 +134,7 @@ func UpdateFlag(c *gin.Context) {
 		return
 	}
 
-	flag := models.FindFlagByID(flagId)
+	flag := models.FindFlagByID(flagID)
 
 	if flag.Status != "done" {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -152,35 +153,31 @@ func UpdateFlag(c *gin.Context) {
 	})
 }
 
-// list all flags of the user
+// FindFlagsByUserID list all flags of the user
 func FindFlagsByUserID(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	userId := c.GetHeader("x-user-id")
 
-	currentPage_ := c.DefaultQuery("current_page", "1")
-	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
-
-	currentPage, err := strconv.Atoi(currentPage_)
+	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	pageSize, err := strconv.Atoi(pageSize_)
+	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	_, err = uuid.FromString(userId)
+	userID, err := uuid.FromString(c.GetHeader("x-user-id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
@@ -190,7 +187,7 @@ func FindFlagsByUserID(c *gin.Context) {
 		return
 	}
 
-	flags := models.FindFlagsByUserID(userId, currentPage, pageSize)
+	flags := models.FindFlagsByUserID(userID, currentPage, pageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -200,27 +197,44 @@ func FindFlagsByUserID(c *gin.Context) {
 	})
 }
 
-// upload evidence
+// UploadEvidence upload evidence
 func UploadEvidence(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	userId := c.GetHeader("user_id")
-	flagId := c.Query("flag_id")
-	attachmentId := c.Param("attachment_id")
+	userID := c.GetHeader("user_id")
 
-	fmt.Printf("attachmentId: %s, flagId: %s", attachmentId, flagId)
-
-	type_ := c.Query("type")
-
-	if type_ != "image" && type_ != "audio" && type_ != "video" && type_ != "document" {
+	attachmentID, err := uuid.FromString(c.Param("attachment_id"))
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg":  fmt.Sprintf("type: %s is invalid.", type_),
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	flagID, err := uuid.FromString(c.Query("flag_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	if !models.FLagExists(flagId) {
+	fmt.Printf("attachmentId: %s, flagId: %s", attachmentID, flagID)
+
+	mediaType := c.Query("type")
+
+	if mediaType != "image" && mediaType != "audio" && mediaType != "video" && mediaType != "document" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("type: %s is invalid.", mediaType),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	if !models.FlagExists(flagID) {
 		c.JSON(http.StatusNotFound, gin.H{
 			"code": 404,
 			"msg":  "not found specific flag.",
@@ -244,60 +258,54 @@ func UploadEvidence(c *gin.Context) {
 
 	client := &http.Client{}
 	// read access token from db
-	accessToken, _ := models.FindUserToken(userId)
+	accessToken, _ := models.FindUserToken(userID)
 
-	viewUrl, err := UploadAttachment(client, fileHeader, accessToken)
+	viewURL, err := UploadAttachment(client, fileHeader, accessToken)
 	if err != nil {
 		code = e.ERROR_UPLOAD_ATTACHMENT
 		c.JSON(http.StatusOK, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	attachmentID, _ := uuid.FromString(attachmentId)
-	flagID, _ := uuid.FromString(flagId)
-	models.CreateEvidence(attachmentID, flagID, type_, viewUrl)
+	models.CreateEvidence(attachmentID, flagID, mediaType, viewURL)
 
 	// update flag status to `done`
-	models.UpdateFlagStatus(flagId, "done")
+	models.UpdateFlagStatus(flagID, "done")
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
-		"msg": fmt.Sprintf("'%s' uploaded!", fileHeader.Filename),
+		"msg":  fmt.Sprintf("'%s' uploaded!", fileHeader.Filename),
 		"data": make(map[string]interface{}),
 	})
 }
 
-// list all the evidences since yesterday
+// ListEvidences list all the evidences since yesterday
 func ListEvidences(c *gin.Context) {
 
 	code := e.INVALID_PARAMS
 
-	flagId := c.Param("flag_id")
-	flagID, _ := uuid.FromString(flagId)
+	flagID, _ := uuid.FromString(c.Param("flag_id"))
 
-	currentPage_ := c.DefaultQuery("current_page", "1")
-	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
-
-	currentPage, err := strconv.Atoi(currentPage_)
+	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	pageSize, err := strconv.Atoi(pageSize_)
+	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -308,12 +316,12 @@ func ListEvidences(c *gin.Context) {
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
-		"msg": e.GetMsg(code),
+		"msg":  e.GetMsg(code),
 		"data": data,
 	})
 }
 
-// https://developers.mixin.one/api/l-messages/create-attachment/
+// UploadAttachment https://developers.mixin.one/api/l-messages/create-attachment/
 func UploadAttachment(client *http.Client, fileHeader *multipart.FileHeader, accessToken string) (string, error) {
 
 	f, err := fileHeader.Open()
@@ -328,7 +336,6 @@ func UploadAttachment(client *http.Client, fileHeader *multipart.FileHeader, acc
 	if err != nil {
 		return "", err
 	}
-
 
 	url := fmt.Sprintf("%s/attachments", setting.MixinAPIDomain)
 
@@ -350,7 +357,7 @@ func UploadAttachment(client *http.Client, fileHeader *multipart.FileHeader, acc
 
 	_ = json.Unmarshal(data, &authResp)
 
-	viewUrl, _ := authResp["data"]["view_url"].(string)
+	viewURL, _ := authResp["data"]["view_url"].(string)
 
-	return viewUrl, nil
+	return viewURL, nil
 }

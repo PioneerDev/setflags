@@ -298,6 +298,8 @@ definitions:
         format: "uuid"
       payer_name:
         type: "string"
+      payer_avatar_url:
+        type: "string"
       task:
         type: "string"
       days:

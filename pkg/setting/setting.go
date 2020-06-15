@@ -1,9 +1,11 @@
 package setting
 
 import (
-	"github.com/go-ini/ini"
 	"log"
 	"time"
+
+	"github.com/go-ini/ini"
+	"github.com/gofrs/uuid"
 )
 
 var (
@@ -16,7 +18,7 @@ var (
 	PageSize        string
 	JwtSecret       string
 	SessionAssetPIN string
-	ClientId        string
+	ClientID        uuid.UUID
 	ClientSecret    string
 	SessionID       string
 	PINToken        string
@@ -42,38 +44,29 @@ func init() {
 	LoadBot()
 	LoadServer()
 	LoadApp()
-	LoadAWSS3()
-	LoadMixin()
+	// LoadAWSS3()
 }
 
-func LoadMixin() {
-	sec, err := Cfg.GetSection("mixin")
-	if err != nil {
-		log.Fatalf("Fail to get section 'mixin': %v", err)
-	}
+// func LoadAWSS3() {
+// 	sec, err := Cfg.GetSection("s3")
+// 	if err != nil {
+// 		log.Fatalf("Fail to get section 's3': %v", err)
+// 	}
 
-	MixinAPIDomain = sec.Key("api_domain").MustString("https://api.mixin.one")
-}
+// 	S3AccessKey = sec.Key("access_key").MustString("debug")
+// 	S3SecretKey = sec.Key("secret_key").MustString("debug")
+// 	S3EndPoint = sec.Key("end_point").MustString("debug")
+// 	S3Region = sec.Key("region").MustString("debug")
+// 	S3Bucket = sec.Key("bucket").MustString("debug")
+// }
 
-func LoadAWSS3() {
-	sec, err := Cfg.GetSection("s3")
-	if err != nil {
-		log.Fatalf("Fail to get section 's3': %v", err)
-	}
-
-	S3AccessKey = sec.Key("access_key").MustString("debug")
-	S3SecretKey = sec.Key("secret_key").MustString("debug")
-	S3EndPoint = sec.Key("end_point").MustString("debug")
-	S3Region = sec.Key("region").MustString("debug")
-	S3Bucket = sec.Key("bucket").MustString("debug")
-}
-
+// LoadBot load bot config
 func LoadBot() {
 	sec, err := Cfg.GetSection("bot")
 	if err != nil {
 		log.Fatalf("Fail to get section 'bot': %v", err)
 	}
-	ClientId = sec.Key("client_id").MustString("debug")
+	ClientID, _ = uuid.FromString(sec.Key("client_id").MustString("debug"))
 	SessionAssetPIN = sec.Key("session_asset_pin").MustString("debug")
 	ClientSecret = sec.Key("client_secret").MustString("debug")
 	SessionID = sec.Key("session_id").MustString("debug")
@@ -82,10 +75,12 @@ func LoadBot() {
 	CodeVerifier = sec.Key("code_verifier").MustString("debug")
 }
 
+// LoadBase load base config
 func LoadBase() {
 	RunMode = Cfg.Section("").Key("RUN_MODE").MustString("debug")
 }
 
+// LoadServer load service config
 func LoadServer() {
 	sec, err := Cfg.GetSection("server")
 
@@ -98,6 +93,7 @@ func LoadServer() {
 	WriteTimeout = time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60)) * time.Second
 }
 
+// LoadApp load app config
 func LoadApp() {
 	sec, err := Cfg.GetSection("app")
 	if err != nil {

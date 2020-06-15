@@ -1,19 +1,22 @@
 package models
 
 import (
+	"time"
+
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
-	"time"
 )
 
+// Flag entity
 type Flag struct {
 	ID              uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
-	PayerId         uuid.UUID `json:"payer_id"`
+	PayerID         uuid.UUID `json:"payer_id"`
 	PayerName       string    `json:"payer_name"`
+	PayerAvatarURL  string    `json:"payer_avatar_url"`
 	Task            string    `json:"task"`
 	Days            int       `json:"days"`
 	MaxWitness      int       `json:"max_witness"`
-	AssetId         uuid.UUID `json:"asset_id"`
+	AssetID         uuid.UUID `json:"asset_id"`
 	Amount          float64   `json:"amount"`
 	TimesAchieved   int       `json:"times_achieved"`
 	Status          string    `json:"status"`
@@ -23,16 +26,18 @@ type Flag struct {
 	UpdatedAt       time.Time `json:"updated_at"`
 }
 
+// CreateFlag create flag
 func CreateFlag(data map[string]interface{}) bool {
 	db.Create(&Flag{
-		PayerId:    data["payer_id"].(uuid.UUID),
-		PayerName: data["payer_name"].(string),
-		Task:       data["task"].(string),
-		Days:       int(data["days"].(float64)),
-		MaxWitness: int(data["max_witness"].(float64)),
-		AssetId:    data["asset_id"].(uuid.UUID),
-		Amount:     data["amount"].(float64),
-		Status:     data["status"].(string),
+		PayerID:        data["payer_id"].(uuid.UUID),
+		PayerName:      data["payer_name"].(string),
+		PayerAvatarURL: data["payer_avatar_url"].(string),
+		Task:           data["task"].(string),
+		Days:           int(data["days"].(float64)),
+		MaxWitness:     int(data["max_witness"].(float64)),
+		AssetID:        data["asset_id"].(uuid.UUID),
+		Amount:         data["amount"].(float64),
+		Status:         data["status"].(string),
 		// below are derived
 		RemainingAmount: data["amount"].(float64),
 		RemainingDays:   int(data["days"].(float64)),
@@ -42,55 +47,63 @@ func CreateFlag(data map[string]interface{}) bool {
 	return true
 }
 
+// GetAllFlags fetch all flags
 func GetAllFlags(pageSize, currentPage int) (flags []Flag) {
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
 	return
 }
 
-func FindFlagsByUserID(userId string, currentPage, pageSize int) (flags []Flag) {
+// FindFlagsByUserID find current user's flags
+func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flags []Flag) {
 	skip := (currentPage - 1) * pageSize
-	db.Offset(skip).Limit(pageSize).Where("payer_id = ?", userId).Find(&flags)
+	db.Offset(skip).Limit(pageSize).Where("payer_id = ?", userID.String()).Find(&flags)
 	return
 }
 
-func FLagExists(flagId string) bool {
+// FlagExists check flag exist
+func FlagExists(flagID uuid.UUID) bool {
 	var count int
 
-	db.Model(&Flag{}).Where("id = ?", flagId).Count(&count)
+	db.Model(&Flag{}).Where("id = ?", flagID.String()).Count(&count)
 
 	return count == 1
 }
 
-func FindFlagByID(flagId string) (flag Flag) {
-	db.Where("id = ?", flagId).First(&flag)
+// FindFlagByID find flag by it's id
+func FindFlagByID(flagID uuid.UUID) (flag Flag) {
+	db.Where("id = ?", flagID.String()).First(&flag)
 	return
 }
 
-func UpdateFlagStatus(flagId, status string) bool {
-	db.Model(&Flag{}).Where("id = ?", flagId).Update("status", status)
+// UpdateFlagStatus update flag's status
+func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
+	db.Model(&Flag{}).Where("id = ?", flagID.String()).Update("status", status)
 	return true
 }
 
 // BeforeCreate will set a UUID rather than numeric ID.
 func (flag *Flag) BeforeCreate(scope *gorm.Scope) error {
-	uuid_, _ := uuid.NewV4()
-	scope.SetColumn("ID", uuid_)
+	uuid, _ := uuid.NewV4()
+	scope.SetColumn("ID", uuid)
 	scope.SetColumn("CreatedAt", time.Now())
 	return nil
 }
 
+// BeforeUpdate will set field udpate time.
 func (flag *Flag) BeforeUpdate(scope *gorm.Scope) error {
 	scope.SetColumn("UpdatedAt", time.Now())
 	return nil
 }
 
+// Witnesses fetch flag's witness.
 func (flag *Flag) Witnesses() []*Witness {
 	var witnesses []*Witness
 	db.Where("flag_id = ?", flag.ID).Find(&witnesses)
 	return witnesses
 }
 
+// ListActiveFlags fetch active flags
 func ListActiveFlags(paid bool) []*Flag {
 	var flags []*Flag
 	if paid {

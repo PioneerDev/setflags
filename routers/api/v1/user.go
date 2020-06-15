@@ -3,25 +3,22 @@ package v1
 import (
 	"context"
 	"fmt"
-	"github.com/fox-one/mixin-sdk"
-	"github.com/gin-gonic/gin"
-	"github.com/gofrs/uuid"
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
 	"set-flags/pkg/setting"
 	"strconv"
+
+	"github.com/fox-one/mixin-sdk"
+	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 )
 
-// check the total rewards received by the user for the flag
+// CheckRewards check the total rewards received by the user for the flag
 func CheckRewards(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	userId := c.Param("user_id")
-	fmt.Printf("userId: %s\n", userId)
-	flagId := c.Param("flag_id")
-	fmt.Printf("flagId: %s\n", flagId)
-	userID, err := uuid.FromString(userId)
+	userID, err := uuid.FromString(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
@@ -30,7 +27,7 @@ func CheckRewards(c *gin.Context) {
 		})
 		return
 	}
-	flagID, err := uuid.FromString(flagId)
+	flagID, err := uuid.FromString(c.Param("flag_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
@@ -40,30 +37,27 @@ func CheckRewards(c *gin.Context) {
 		return
 	}
 
-	currentPage_ := c.DefaultQuery("current_page", "1")
-	pageSize_ := c.DefaultQuery("page_size", setting.PageSize)
-
-	currentPage, err := strconv.Atoi(currentPage_)
+	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	pageSize, err := strconv.Atoi(pageSize_)
+	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg": e.GetMsg(code),
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	data := models.FindEvidenceByFlagIdAndAttachmentId(flagID, userID, currentPage, pageSize)
+	data := models.FindEvidenceByFlagIDAndAttachmentID(flagID, userID, currentPage, pageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -73,11 +67,11 @@ func CheckRewards(c *gin.Context) {
 	})
 }
 
+// Me current user profile
 func Me(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	userId := c.GetHeader("x-user-id")
 
-	_, err := uuid.FromString(userId)
+	userID, err := uuid.FromString(c.GetHeader("x-user-id"))
 
 	if err != nil {
 		fmt.Println(err)
@@ -89,12 +83,12 @@ func Me(c *gin.Context) {
 		return
 	}
 
-	user := models.FindUserById(userId)
+	user := models.FindUserByID(userID)
 
 	data := map[string]string{
-		"id":         userId,
+		"id":         userID.String(),
 		"full_name":  user.FullName,
-		"avatar_url": user.AvatarUrl,
+		"avatar_url": user.AvatarURL,
 	}
 
 	code = e.SUCCESS
@@ -105,13 +99,14 @@ func Me(c *gin.Context) {
 	})
 }
 
+// Auth auth
 func Auth(c *gin.Context) {
 
 	authorizationCode := c.Query("token")
 
 	ctx := context.Background()
 
-	accessToken, _, err := mixin.AuthorizeToken(ctx, setting.ClientId, setting.ClientSecret, authorizationCode, setting.CodeVerifier)
+	accessToken, _, err := mixin.AuthorizeToken(ctx, setting.ClientID.String(), setting.ClientSecret, authorizationCode, setting.CodeVerifier)
 
 	profile, err := mixin.FetchProfile(ctx, accessToken)
 
