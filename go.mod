@@ -6,6 +6,7 @@ require (
 	github.com/MixinNetwork/go-number v0.0.0-20180814121220-f48e2574d9ef
 	github.com/aws/aws-sdk-go v1.31.4
 	github.com/fox-one/mixin-sdk v1.1.9
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ini/ini v1.56.0
