@@ -21,6 +21,17 @@ paths:
       operationId: "listFlags"
       produces:
         - "application/json"
+      parameters:
+        - name: "current_page"
+          in: "query"
+          description: "current page number"
+          required: false
+          type: "integer"
+        - name: "page_size"
+          in: "query"
+          description: "per page size"
+          required: false
+          type: "integer"
       responses:
         "200":
           description: "successful operation"
@@ -95,6 +106,16 @@ paths:
           required: true
           type: "string"
           format: "uuid"
+        - name: "current_page"
+          in: "query"
+          description: "current page number"
+          required: false
+          type: "integer"
+        - name: "page_size"
+          in: "query"
+          description: "per page size"
+          required: false
+          type: "integer"
       responses:
         "200":
           description: "successful operation"
@@ -161,6 +182,16 @@ paths:
           required: true
           type: "string"
           format: "uuid"
+        - name: "current_page"
+          in: "query"
+          description: "current page number"
+          required: false
+          type: "integer"
+        - name: "page_size"
+          in: "query"
+          description: "per page size"
+          required: false
+          type: "integer"
       responses:
         "200":
           description: "successful operation"
@@ -214,6 +245,16 @@ paths:
           required: true
           type: "string"
           format: "uuid"
+        - name: "current_page"
+          in: "query"
+          description: "current page number"
+          required: false
+          type: "integer"
+        - name: "page_size"
+          in: "query"
+          description: "per page size"
+          required: false
+          type: "integer"
       responses:
         "200":
           description: "successful operation"
@@ -256,6 +297,8 @@ definitions:
         type: "string"
         format: "uuid"
       payer_name:
+        type: "string"
+      payer_avatar_url:
         type: "string"
       task:
         type: "string"

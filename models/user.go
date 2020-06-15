@@ -1,90 +1,106 @@
 package models
 
 import (
+	"time"
+
+	"github.com/fox-one/mixin-sdk"
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
-	"set-flags/pkg/utils"
-	"time"
 )
 
+// User entity
 type User struct {
-	ID             uuid.UUID `json:"id"`
+	ID             uuid.UUID `json:"id" gorm:"Column:user_id"`
 	IdentityNumber string    `json:"identity_number"`
 	FullName       string    `json:"full_name"`
-	AvatarUrl      string    `json:"avatar_url"`
+	AvatarURL      string    `json:"avatar_url"`
 	AccessToken    string    `json:"access_token"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// UserSchema return to front end
 type UserSchema struct {
 	ID             uuid.UUID `json:"id"`
-	IdentityNumber string       `json:"identity_number"`
+	IdentityNumber string    `json:"identity_number"`
 	FullName       string    `json:"full_name"`
-	AvatarUrl      string    `json:"avatar_url"`
+	AvatarURL      string    `json:"avatar_url"`
 }
 
-func FindUser(userId uuid.UUID) *User {
+// FindUser find user by id
+func FindUser(userID uuid.UUID) *User {
 	var users []User
 	db.Find(&users)
 	for _, u := range users {
-		if u.ID == userId {
+		if u.ID == userID {
 			return &u
 		}
 	}
 	return nil
 }
 
-func FindUserById(userId string) *UserSchema {
+// FindUserByID find user by id
+// no return access token to front end
+func FindUserByID(userID uuid.UUID) *UserSchema {
 	var dbUser User
-	db.Where("id = ?", userId).First(&dbUser)
+	db.Where("user_id = ?", userID.String()).First(&dbUser)
 	var user UserSchema
 	user.ID = dbUser.ID
-	user.AvatarUrl = dbUser.AvatarUrl
+	user.AvatarURL = dbUser.AvatarURL
 	user.FullName = dbUser.FullName
 	user.IdentityNumber = dbUser.IdentityNumber
 	return &user
 }
 
-func CreateUser(userInfo *utils.UserInfo, accessToken string) bool {
+// CreateUser create user
+func CreateUser(userProfile *mixin.Profile, accessToken string) bool {
+
+	userID, _ := uuid.FromString(userProfile.UserID)
 	db.Create(&User{
-		IdentityNumber: userInfo.IdentityNumber,
-		FullName:       userInfo.Name,
-		AvatarUrl:      "",
+		ID:             userID,
+		IdentityNumber: userProfile.IdentityNumber,
+		FullName:       userProfile.FullName,
+		AvatarURL:      userProfile.AvatarURL,
 		AccessToken:    accessToken,
 	})
 
 	return true
 }
 
-func FindUserToken(userId string) (string, error) {
+// FindUserToken find user's access token
+func FindUserToken(userID string) (string, error) {
 	var user User
-	db.Where("id = ?", userId).First(&user)
+	db.Where("user_id = ?", userID).First(&user)
 	return user.AccessToken, nil
 }
 
-func UserExist(userId string) bool {
+// UserExist check user exist.
+func UserExist(userID string) bool {
 	var count int
 
-	db.Model(&User{}).Where("mixin_user_id = ?", userId).Count(&count)
+	db.Model(&User{}).Where("user_id = ?", userID).Count(&count)
 
 	return count == 1
 }
 
-func UpdateUser(userInfo *utils.UserInfo, accessToken string) {
-	db.Model(&User{}).
-		Updates(map[string]interface{}{"full_name": userInfo.Name, "access_token": accessToken})
+// UpdateUser update user's access token.
+func UpdateUser(userProfile *mixin.Profile, accessToken string) {
+	db.Model(&User{}).Where("user_id = ?", userProfile.UserID).
+		Updates(map[string]interface{}{
+			"full_name":    userProfile.FullName,
+			"avatar_url":   userProfile.AvatarURL,
+			"access_token": accessToken,
+		})
 }
 
-// BeforeCreate will set a UUID rather than numeric ID.
+// BeforeCreate will set field CreatedAt.
 func (u *User) BeforeCreate(scope *gorm.Scope) error {
-	uuid_, _ := uuid.NewV4()
-	scope.SetColumn("ID", uuid_)
 	scope.SetColumn("CreatedAt", time.Now())
 	return nil
 }
 
+// BeforeUpdate will set field update time.
 func (u *User) BeforeUpdate(scope *gorm.Scope) error {
 	scope.SetColumn("UpdatedAt", time.Now())
 	return nil

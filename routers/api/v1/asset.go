@@ -1,22 +1,34 @@
 package v1
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gofrs/uuid"
 )
 
+// AssetInfos asset info
 func AssetInfos(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	assetId := c.Param("id")
+	assetID, err := uuid.FromString(c.Param("id"))
 
-	asset := models.FindAssetByID(assetId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	asset := models.FindAssetByID(assetID)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
-		"code" : code,
-		"msg" : e.GetMsg(code),
-		"data" : asset,
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": asset,
 	})
 }
