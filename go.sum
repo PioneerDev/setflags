@@ -35,6 +35,8 @@ github.com/fox-one/mixin-sdk v1.1.9/go.mod h1:2WYrF99CbJuEOS9HqV7JhZwejF9vg334B9
 github.com/fox-one/pkg v1.1.14 h1:q+s8ED1EWZymAgQZW9Kbb6G/WFCm1jeIK9/bWjULeak=
 github.com/fox-one/pkg v1.1.14/go.mod h1://wvQ3V/0n3TOg8a58ZQ4JrFf2qH6A4CSAKl884WELM=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
+github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 h1:6VSn3hB5U5GeA6kQw4TwWIWbOhtvR2hmbBJnTOtqTWc=
+github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6/go.mod h1:YxOVT5+yHzKvwhsiSIWmbAYM3Dr9AEEbER2dVayfBkg=
 github.com/gin-contrib/cors v1.3.1 h1:doAsuITavI4IOcd0Y19U4B+O0dNWihRyX//nn4sEmgA=
 github.com/gin-contrib/cors v1.3.1/go.mod h1:jjEJ4268OPZUcU7k9Pm653S7lXUGcqMADzFA61xsmDk=
 github.com/gin-contrib/sse v0.0.0-20190301062529-5545eab6dad3/go.mod h1:VJ0WA2NBN22VlZ2dKZQPAPnyWw5XTlK1KymzLKsr59s=
