@@ -125,6 +125,7 @@ func Auth(c *gin.Context) {
 	// update user info and access token
 	if models.UserExist(profile.UserID) {
 		models.UpdateUser(profile, accessToken)
+		models.UpdateFlagUserInfo(profile)
 	} else {
 		// create user
 		models.CreateUser(profile, accessToken)
