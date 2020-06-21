@@ -108,6 +108,13 @@ func (flag *Flag) BeforeUpdate(scope *gorm.Scope) error {
 }
 
 // Witnesses fetch flag's witness.
+func (flag *Flag) Witnesses() []*Witness {
+	var witnesses []*Witness
+	db.Where("flag_id = ?", flag.ID).Find(&witnesses)
+	return witnesses
+}
+
+// GetWitnesses fetch the witness of the flag by its ID and page number.
 func GetWitnesses(flagID uuid.UUID, pageSize, currentPage int) []*Witness {
 	var witnesses []*Witness
 	skip := (currentPage - 1) * pageSize
