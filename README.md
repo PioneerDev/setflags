@@ -41,10 +41,11 @@ The following [RESFTful API](https://github.com/PioneerDev/setflags/blob/feature
  Endpoint                             | Method | Auth? | Description                                                                                          
  ------------------------------------ | ------ | ----- | -----------------------------------------------------------------------------------------------------
  `/flags`                             | GET    | No    | list all the flags                                                                                   
- `/flags/{id}`                        | POST   | No    | create a flag                                                                                        
+ `/flag`                              | POST   | No    | create a flag                                                                                        
  `/flags/{id}/{op}`                   | PUT    | No    | update an existing flag with operations for verification (yes, no) after uploaded the evidence (done)
- `/myflags/{id}`                      | GET    | No    | list all flags of the user                                                                           
+ `/myflags`                           | GET    | No    | list all flags of the user                                                                           
  `/attachments/{attachment_id}`       | POST   | No    | upload evidence                                                                                      
+ `/flags/{flag_id}`                   | GET    | No    | list all the witnesses                                                                               
  `/flags/{flag_id}/evidences`         | GET    | No    | list all the evidences since yesterday                                                               
  `/me`                                | GET    | No    | Get the current user's information                                                                   
  `/auth`                              | POST   | No    | Upload the oauth token                                                                               
