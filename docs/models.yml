@@ -172,6 +172,33 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid tag value"
+  /flags/{flag_id}:
+    get:
+      description: "list all the witnesses"
+      parameters:
+        - name: "flag_id"
+          in: "path"
+          description: "Flag ID"
+          required: true
+          type: "string"
+          format: "uuid"
+        - name: "current_page"
+          in: "query"
+          description: "current page number"
+          required: false
+          type: "integer"
+        - name: "page_size"
+          in: "query"
+          description: "per page size"
+          required: false
+          type: "integer"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Witness"
   /flags/{flag_id}/evidences:
     get:
       description: "list all the evidences since yesterday"
