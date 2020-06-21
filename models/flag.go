@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/fox-one/mixin-sdk"
 	"github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 )
@@ -79,6 +80,16 @@ func FindFlagByID(flagID uuid.UUID) (flag Flag) {
 // UpdateFlagStatus update flag's status
 func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
 	db.Model(&Flag{}).Where("id = ?", flagID.String()).Update("status", status)
+	return true
+}
+
+// UpdateFlagUserInfo update flag's user info
+func UpdateFlagUserInfo(user *mixin.Profile) bool {
+	db.Model(&Flag{}).Where("payer_id = ?", user.UserID).
+		Updates(map[string]interface{}{
+			"payer_name":       user.FullName,
+			"payer_avatar_url": user.AvatarURL,
+		})
 	return true
 }
 
