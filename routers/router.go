@@ -41,6 +41,7 @@ func InitRouter() *gin.Engine {
 	apiv1.GET("/flags", v1.ListFlags)
 	apiv1.POST("/flag", v1.CreateFlag)
 	apiv1.PUT("/flags/:id/:op", v1.UpdateFlag)
+	apiv1.GET("/flags/:id", v1.GetWitnesses)
 	apiv1.GET("/myflags", v1.FindFlagsByUserID)
 	apiv1.POST("/attachments/:attachment_id", v1.UploadEvidence)
 	apiv1.GET("/flags/:flag_id/evidences", v1.ListEvidences)
