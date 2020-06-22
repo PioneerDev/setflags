@@ -1,4 +1,4 @@
-@startuml
+@startuml models
 
 entity User {
    * id: uuid
@@ -48,7 +48,7 @@ entity Evidence {
     --
     /flags/:id/done PUT
     /attachments/:attachment_id: POST
-    /flags/:flag_id/evidences: GET
+    /flags/:id/evidences: GET
 }
 
 entity Witness {
@@ -57,6 +57,7 @@ entity Witness {
     verified: int
     --
     /flags/:id/:op: PUT // yes, no
+    /flags/:id/witnesses: GET
 }
 
 Flag "1" --- "*" Evidence: upload

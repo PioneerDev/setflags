@@ -115,6 +115,14 @@ func (flag *Flag) Witnesses() []*Witness {
 	return witnesses
 }
 
+// GetWitnesses fetch the witness of the flag by its ID and page number.
+func GetWitnesses(flagID uuid.UUID, pageSize, currentPage int) []*Witness {
+	var witnesses []*Witness
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ?", flagID).Find(&witnesses)
+	return witnesses
+}
+
 // ListActiveFlags fetch active flags
 func ListActiveFlags(paid bool) []*Flag {
 	var flags []*Flag

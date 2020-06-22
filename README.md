@@ -41,11 +41,12 @@ The following [RESFTful API](https://github.com/PioneerDev/setflags/blob/feature
  Endpoint                             | Method | Auth? | Description                                                                                          
  ------------------------------------ | ------ | ----- | -----------------------------------------------------------------------------------------------------
  `/flags`                             | GET    | No    | list all the flags                                                                                   
- `/flags/{id}`                        | POST   | No    | create a flag                                                                                        
+ `/flag`                              | POST   | No    | create a flag                                                                                        
  `/flags/{id}/{op}`                   | PUT    | No    | update an existing flag with operations for verification (yes, no) after uploaded the evidence (done)
- `/myflags/{id}`                      | GET    | No    | list all flags of the user                                                                           
+ `/myflags`                           | GET    | No    | list all flags of the user                                                                           
  `/attachments/{attachment_id}`       | POST   | No    | upload evidence                                                                                      
- `/flags/{flag_id}/evidences`         | GET    | No    | list all the evidences since yesterday                                                               
+ `/flags/{id}/witnesses`              | GET    | No    | list all the witnesses                                                                               
+ `/flags/{id}/evidences`              | GET    | No    | list all the evidences since yesterday                                                               
  `/me`                                | GET    | No    | Get the current user's information                                                                   
  `/auth`                              | POST   | No    | Upload the oauth token                                                                               
  `/users/{user_id}/rewards/{flag_id}` | GET    | No    | check the total rewards received by the user for the flag                                            
@@ -54,5 +55,7 @@ The following [RESFTful API](https://github.com/PioneerDev/setflags/blob/feature
 
 * Controller
 
-Front-end
+  * [Front-end development project](https://github.com/PioneerDev/Setflags-website)
+
+  * [SetFlags Website](https://pioneerdev.github.io/Setflags-website)
 
