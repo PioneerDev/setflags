@@ -57,7 +57,7 @@ entity Witness {
     verified: int
     --
     /flags/:id/:op: PUT // yes, no
-    /flags/:id: GET
+    /flags/:id/witnesses: GET
 }
 
 Flag "1" --- "*" Evidence: upload

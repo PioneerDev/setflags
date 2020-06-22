@@ -172,7 +172,7 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid tag value"
-  /flags/{flag_id}:
+  /flags/{flag_id}/witnesses:
     get:
       description: "list all the witnesses"
       parameters:
