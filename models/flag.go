@@ -1,6 +1,7 @@
 package models
 
 import (
+	"set-flags/schemas"
 	"time"
 
 	"github.com/fox-one/mixin-sdk"
@@ -28,20 +29,20 @@ type Flag struct {
 }
 
 // CreateFlag create flag
-func CreateFlag(data map[string]interface{}) bool {
+func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
 	db.Create(&Flag{
-		PayerID:        data["payer_id"].(uuid.UUID),
-		PayerName:      data["payer_name"].(string),
-		PayerAvatarURL: data["payer_avatar_url"].(string),
-		Task:           data["task"].(string),
-		Days:           int(data["days"].(float64)),
-		MaxWitness:     int(data["max_witness"].(float64)),
-		AssetID:        data["asset_id"].(uuid.UUID),
-		Amount:         data["amount"].(float64),
-		Status:         data["status"].(string),
+		PayerID:        flagJSON.PayerID,
+		PayerName:      user.FullName,
+		PayerAvatarURL: user.AvatarURL,
+		Task:           flagJSON.Task,
+		Days:           flagJSON.Days,
+		MaxWitness:     flagJSON.MaxWitness,
+		AssetID:        flagJSON.AssetID,
+		Amount:         flagJSON.Amount,
+		Status:         flagJSON.Status,
 		// below are derived
-		RemainingAmount: data["amount"].(float64),
-		RemainingDays:   int(data["days"].(float64)),
+		RemainingAmount: flagJSON.Amount,
+		RemainingDays:   flagJSON.Days,
 		TimesAchieved:   0,
 	})
 

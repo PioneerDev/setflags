@@ -2,12 +2,15 @@ package models
 
 import (
 	"fmt"
-	"github.com/gofrs/uuid"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"log"
 	"set-flags/pkg/setting"
 	"time"
+
+	"github.com/gofrs/uuid"
+	"github.com/jinzhu/gorm"
+
+	// postgres dirver
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var db *gorm.DB
@@ -20,6 +23,7 @@ type Base struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 }
 
+// InitDB init db
 func InitDB() {
 	var (
 		err                                        error
@@ -57,6 +61,7 @@ func InitDB() {
 	db.AutoMigrate(&Flag{}, &Asset{}, &Evidence{}, &User{})
 }
 
+// CloseDB close db connection
 func CloseDB() {
 	defer db.Close()
 }

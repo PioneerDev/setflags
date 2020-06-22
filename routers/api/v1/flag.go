@@ -11,7 +11,7 @@ import (
 	"set-flags/models"
 	"set-flags/pkg/e"
 	"set-flags/pkg/setting"
-	"strconv"
+	"set-flags/schemas"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
@@ -21,27 +21,19 @@ import (
 func ListFlags(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
 	}
 
-	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.PageSize
 	}
 
-	data := models.GetAllFlags(pageSize, currentPage)
+	data := models.GetAllFlags(pagination.PageSize, pagination.CurrentPage)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -54,44 +46,23 @@ func ListFlags(c *gin.Context) {
 // CreateFlag create a flag
 func CreateFlag(c *gin.Context) {
 	code := e.INVALID_PARAMS
-	var flag map[string]interface{}
 
-	if c.ShouldBind(&flag) == nil {
-		fmt.Println(flag)
-		payerID, err := uuid.FromString(flag["payer_id"].(string))
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"code": code,
-				"msg":  err.Error(),
-				"data": make(map[string]interface{}),
-			})
-			return
-		}
+	var flag schemas.Flag
 
-		assetID, err := uuid.FromString(flag["asset_id"].(string))
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"code": code,
-				"msg":  err.Error(),
-				"data": make(map[string]interface{}),
-			})
-			return
-		}
-
-		flag["payer_id"] = payerID
-
-		// find user
-		user := models.FindUserByID(payerID)
-		fmt.Println(user)
-		// set payer name
-		flag["payer_name"] = user.FullName
-
-		// set payer avatar url
-		flag["payer_avatar_url"] = user.AvatarURL
-
-		flag["asset_id"] = assetID
-		models.CreateFlag(flag)
+	if err := c.ShouldBindJSON(&flag); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
 	}
+
+	// find user
+	user := models.FindUserByID(flag.PayerID)
+
+	models.CreateFlag(&flag, user)
+
 	code = e.SUCCESS
 	c.JSON(http.StatusCreated, gin.H{
 		"code": code,
@@ -157,24 +128,16 @@ func UpdateFlag(c *gin.Context) {
 func FindFlagsByUserID(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
 	}
 
-	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.PageSize
 	}
 
 	userID, err := uuid.FromString(c.GetHeader("x-user-id"))
@@ -187,7 +150,7 @@ func FindFlagsByUserID(c *gin.Context) {
 		return
 	}
 
-	flags := models.FindFlagsByUserID(userID, currentPage, pageSize)
+	flags := models.FindFlagsByUserID(userID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -291,27 +254,19 @@ func ListEvidences(c *gin.Context) {
 
 	flagID, _ := uuid.FromString(c.Param("flag_id"))
 
-	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
 	}
 
-	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.PageSize
 	}
 
-	data := models.FindEvidencesByFlag(flagID, currentPage, pageSize)
+	data := models.FindEvidencesByFlag(flagID, pagination.CurrentPage, setting.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
