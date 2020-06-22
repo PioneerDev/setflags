@@ -172,11 +172,11 @@ paths:
           description: "successful operation"
         "400":
           description: "Invalid tag value"
-  /flags/{flag_id}/witnesses:
+  /flags/{id}/witnesses:
     get:
       description: "list all the witnesses"
       parameters:
-        - name: "flag_id"
+        - name: "id"
           in: "path"
           description: "Flag ID"
           required: true
@@ -199,11 +199,11 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Witness"
-  /flags/{flag_id}/evidences:
+  /flags/{id}/evidences:
     get:
       description: "list all the evidences since yesterday"
       parameters:
-        - name: "flag_id"
+        - name: "id"
           in: "path"
           description: "Flag ID"
           required: true

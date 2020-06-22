@@ -48,7 +48,7 @@ entity Evidence {
     --
     /flags/:id/done PUT
     /attachments/:attachment_id: POST
-    /flags/:flag_id/evidences: GET
+    /flags/:id/evidences: GET
 }
 
 entity Witness {
