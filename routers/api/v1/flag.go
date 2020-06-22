@@ -123,6 +123,7 @@ func UpdateFlag(c *gin.Context) {
 		"data": make(map[string]interface{}),
 	})
 }
+
 // FindFlagsByUserID list all flags of the user
 func FindFlagsByUserID(c *gin.Context) {
 	code := e.INVALID_PARAMS
@@ -159,34 +160,34 @@ func FindFlagsByUserID(c *gin.Context) {
 	})
 }
 
-
 // GetWitnesses list all witnesses of the flag
 func GetWitnesses(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
+	}
+
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.PageSize
+	}
+
 	flagID, err := uuid.FromString(c.Param("id"))
 
-	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg":  e.GetMsg(code),
+			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
 
-	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
-
-	witnesses := models.GetWitnesses(flagID, currentPage, pageSize)
+	witnesses := models.GetWitnesses(flagID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
