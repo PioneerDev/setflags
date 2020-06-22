@@ -9,27 +9,44 @@ import (
 )
 
 var (
-	Cfg             *ini.File
-	RunMode         string
-	HTTPPort        int
-	ReadTimeout     time.Duration
-	WriteTimeout    time.Duration
-	Name            string
-	PageSize        string
-	JwtSecret       string
+	// Cfg config
+	Cfg *ini.File
+	// RunMode debug or release
+	RunMode string
+	// HTTPPort port
+	HTTPPort int
+	// ReadTimeout read timeout
+	ReadTimeout time.Duration
+	// WriteTimeout write timeout
+	WriteTimeout time.Duration
+	// Name app name
+	Name string
+	// PageSize default page size
+	PageSize int
+	// JwtSecret jwt secret
+	JwtSecret string
+	// SessionAssetPIN session asset pin
 	SessionAssetPIN string
-	ClientID        uuid.UUID
-	ClientSecret    string
-	SessionID       string
-	PINToken        string
-	SessionKey      string
-	CodeVerifier    string
-	S3AccessKey     string
-	S3SecretKey     string
-	S3EndPoint      string
-	S3Region        string
-	S3Bucket        string
-	MixinAPIDomain  string
+	// ClientID robot id
+	ClientID uuid.UUID
+	// ClientSecret robot client secret
+	ClientSecret string
+	// SessionID robot session id
+	SessionID string
+	// PINToken robot pin token
+	PINToken string
+	// SessionKey robot session key
+	SessionKey string
+	// CodeVerifier auth code verifier
+	CodeVerifier string
+	// S3AccessKey    string
+	// S3SecretKey    string
+	// S3EndPoint     string
+	// S3Region       string
+	// S3Bucket       string
+
+	// MixinAPIDomain mixin api domain
+	MixinAPIDomain string
 )
 
 func init() {
@@ -101,5 +118,5 @@ func LoadApp() {
 	}
 	Name = sec.Key("NAME").MustString("debug")
 	JwtSecret = sec.Key("JWT_SECRET").MustString("!@)*#)!@U#@*!@!)")
-	PageSize = sec.Key("PAGE_SIZE").MustString("10")
+	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
 }

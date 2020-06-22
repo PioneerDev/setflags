@@ -2,12 +2,11 @@ package v1
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
 	"set-flags/pkg/setting"
-	"strconv"
+	"set-flags/schemas"
 
 	"github.com/fox-one/mixin-sdk"
 	"github.com/gin-gonic/gin"
@@ -18,46 +17,34 @@ import (
 func CheckRewards(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	userID, err := uuid.FromString(c.Param("user_id"))
-	if err != nil {
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
+	}
+
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.PageSize
+	}
+
+	var checkReward schemas.CheckReward
+
+	if err := c.BindUri(&checkReward); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
+			"code": 400,
 			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
-	flagID, err := uuid.FromString(c.Param("flag_id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  err.Error(),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
 
-	currentPage, err := strconv.Atoi(c.DefaultQuery("current_page", "1"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
+	userID, _ := uuid.FromString(checkReward.UserID)
 
-	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", setting.PageSize))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  e.GetMsg(code),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
+	flagID, _ := uuid.FromString(checkReward.FlagID)
 
-	data := models.FindEvidenceByFlagIDAndAttachmentID(flagID, userID, currentPage, pageSize)
+	data := models.FindEvidenceByFlagIDAndAttachmentID(flagID, userID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -71,17 +58,17 @@ func CheckRewards(c *gin.Context) {
 func Me(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	userID, err := uuid.FromString(c.GetHeader("x-user-id"))
+	var header schemas.Header
 
-	if err != nil {
-		fmt.Println(err)
+	if err := c.BindHeader(&header); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
+			"code": 400,
 			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
+	userID, _ := uuid.FromString(header.XUSERID)
 
 	user := models.FindUserByID(userID)
 

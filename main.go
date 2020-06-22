@@ -96,7 +96,7 @@ func countVotes(flag *models.Flag) (int, int, int) {
 	yesVotes = 0
 	noVotes = 0
 	for _, p := range flag.Witnesses() {
-		if p.PayeeId == flag.PayerID {
+		if p.PayeeID == flag.PayerID {
 			continue
 		}
 		if p.Verified == 1 {
@@ -112,9 +112,9 @@ func countVotes(flag *models.Flag) (int, int, int) {
 func payWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, nCorrect, yesVotes, noVotes, remainingDays int) {
 	amount := number.FromFloat(flag.Amount).Div(number.FromFloat(float64(10) * float64(flag.Days) * float64(nCorrect)))
 	for _, p := range flag.Witnesses() {
-		if p.PayeeId != flag.PayerID {
+		if p.PayeeID != flag.PayerID {
 			if yesVotes >= noVotes && p.Verified == 1 || yesVotes <= noVotes && p.Verified == -1 {
-				payFee(ctx, bot, p.PayeeId, flag, amount)
+				payFee(ctx, bot, p.PayeeID, flag, amount)
 			}
 			p.Verified = 0
 		}
@@ -128,8 +128,8 @@ func payWitnessesUnconditionally(ctx context.Context, bot *sdk.User, flag *model
 	}
 	amount = number.FromString(amount.Div(number.FromFloat(float64(flag.Days) * float64(10) * float64(nWitnesses))).PresentFloor())
 	for _, p := range flag.Witnesses() {
-		if p.PayeeId != flag.PayerID {
-			payFee(ctx, bot, p.PayeeId, flag, amount)
+		if p.PayeeID != flag.PayerID {
+			payFee(ctx, bot, p.PayeeID, flag, amount)
 		}
 	}
 	flag.Status = "PAID"
@@ -185,12 +185,12 @@ func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag 
 
 func remindWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, remainingDays int, task string) {
 	for _, p := range flag.Witnesses() {
-		if p.Verified == 0 && p.PayeeId != flag.PayerID {
+		if p.Verified == 0 && p.PayeeID != flag.PayerID {
 			appMsg := "请您验证:@%d第%d天完成%s了吗？"
-			cID := UniqueConversationId(setting.ClientID, p.PayeeId)
+			cID := UniqueConversationId(setting.ClientID, p.PayeeID)
 			payer := models.FindUser(flag.PayerID)
 			sendTextMessage(ctx, bot, cID, fmt.Sprintf(appMsg, payer.IdentityNumber, int(flag.Days)-remainingDays+1, task))
-			sendUserAppCard(ctx, bot, p.PayeeId, flag)
+			sendUserAppCard(ctx, bot, p.PayeeID, flag)
 		}
 	}
 }
@@ -206,7 +206,7 @@ func encouragePayer(ctx context.Context, bot *sdk.User, flag *models.Flag, remai
 func remindPayerForEvidence(ctx context.Context, bot *sdk.User, flag *models.Flag, task string) {
 	done := false
 	for _, p := range flag.Witnesses() {
-		if p.PayeeId == flag.PayerID {
+		if p.PayeeID == flag.PayerID {
 			done = (p.Verified == 2)
 			break
 		}
@@ -231,7 +231,7 @@ func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 		}
 		isVerified := false
 		for _, pp := range flag.Witnesses() {
-			if pp.Verified == 2 && pp.PayeeId == flag.PayerID {
+			if pp.Verified == 2 && pp.PayeeID == flag.PayerID {
 				isVerified = true
 				break
 			}
