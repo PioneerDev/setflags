@@ -55,7 +55,7 @@ The following [RESFTful API](https://github.com/PioneerDev/setflags/blob/feature
 
 * Controller
 
-[Front-end](https://github.com/PioneerDev/Setflags-website)
+  * [Front-end development project](https://github.com/PioneerDev/Setflags-website)
 
-[https://pioneerdev.github.io/Setflags-website/](SetFlags Website)
+  * [SetFlags Website](https://pioneerdev.github.io/Setflags-website)
 
