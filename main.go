@@ -294,8 +294,8 @@ func main() {
 	ctx := context.Background()
 	addTimers(ctx, cron, bot)
 
-	endless.DefaultReadTimeOut = time.Duration(setting.GetConfig().App.ReadTimeOut)
-	endless.DefaultWriteTimeOut = time.Duration(setting.GetConfig().App.WriteTimeOut)
+	endless.DefaultReadTimeOut = time.Duration(setting.GetConfig().App.ReadTimeOut) * time.Second
+	endless.DefaultWriteTimeOut = time.Duration(setting.GetConfig().App.WriteTimeOut) * time.Second
 	endless.DefaultMaxHeaderBytes = 1 << 20
 	endPoint := fmt.Sprintf(":%d", setting.GetConfig().App.HTTPPort)
 
