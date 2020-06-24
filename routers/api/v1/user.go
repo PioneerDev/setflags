@@ -27,7 +27,7 @@ func CheckRewards(c *gin.Context) {
 	}
 
 	if pagination.PageSize == 0 {
-		pagination.PageSize = setting.PageSize
+		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
 	var checkReward schemas.CheckReward
@@ -73,17 +73,18 @@ func Me(c *gin.Context) {
 
 	user := models.FindUserByID(userID)
 
-	data := map[string]string{
-		"id":         userID.String(),
-		"full_name":  user.FullName,
-		"avatar_url": user.AvatarURL,
+	userSchema := models.UserSchema{
+		UserID:         user.UserID,
+		IdentityNumber: user.IdentityNumber,
+		FullName:       user.FullName,
+		AvatarURL:      user.AvatarURL,
 	}
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": data,
+		"data": userSchema,
 	})
 }
 
@@ -96,7 +97,11 @@ func Auth(c *gin.Context) {
 
 	ctx := context.Background()
 
-	accessToken, _, err := mixin.AuthorizeToken(ctx, setting.ClientID.String(), setting.ClientSecret, authorizationCode, setting.CodeVerifier)
+	accessToken, _, err := mixin.AuthorizeToken(ctx,
+		setting.GetConfig().Bot.ClientID.String(),
+		setting.GetConfig().Bot.ClientSecret,
+		authorizationCode,
+		setting.GetConfig().Bot.CodeVerifier)
 
 	if err != nil {
 		code = e.ERROR_AUTH_TOKEN
@@ -127,8 +132,10 @@ func Auth(c *gin.Context) {
 		return
 	}
 
+	userID, _ := uuid.FromString(profile.UserID)
+
 	// update user info and access token
-	if models.UserExist(profile.UserID) {
+	if models.UserExist(userID) {
 		logging.Info("update user")
 		models.UpdateUser(profile, accessToken)
 		models.UpdateFlagUserInfo(profile)

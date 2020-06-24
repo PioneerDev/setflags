@@ -30,7 +30,7 @@ func InitRouter() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	gin.SetMode(setting.RunMode)
+	gin.SetMode(setting.GetConfig().RUNMODE)
 
 	apiv1 := r.Group("")
 

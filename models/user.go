@@ -76,10 +76,10 @@ func FindUserToken(userID string) (string, error) {
 }
 
 // UserExist check user exist.
-func UserExist(userID string) bool {
+func UserExist(userID uuid.UUID) bool {
 	var count int
 
-	db.Model(&User{}).Where("user_id = ?", userID).Count(&count)
+	db.Model(&User{}).Where("user_id = ?", userID.String()).Count(&count)
 
 	return count == 1
 }
