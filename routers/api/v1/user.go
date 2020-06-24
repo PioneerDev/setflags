@@ -73,17 +73,18 @@ func Me(c *gin.Context) {
 
 	user := models.FindUserByID(userID)
 
-	data := map[string]string{
-		"id":         userID.String(),
-		"full_name":  user.FullName,
-		"avatar_url": user.AvatarURL,
+	userSchema := models.UserSchema{
+		UserID:         user.UserID,
+		IdentityNumber: user.IdentityNumber,
+		FullName:       user.FullName,
+		AvatarURL:      user.AvatarURL,
 	}
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": data,
+		"data": userSchema,
 	})
 }
 
@@ -127,8 +128,10 @@ func Auth(c *gin.Context) {
 		return
 	}
 
+	userID, _ := uuid.FromString(profile.UserID)
+
 	// update user info and access token
-	if models.UserExist(profile.UserID) {
+	if models.UserExist(userID) {
 		logging.Info("update user")
 		models.UpdateUser(profile, accessToken)
 		models.UpdateFlagUserInfo(profile)

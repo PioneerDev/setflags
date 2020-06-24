@@ -19,10 +19,10 @@ type Evidence struct {
 }
 
 // CreateEvidence create evidence
-func CreateEvidence(attachmentID, flagID uuid.UUID, mediaType, url string) bool {
+func CreateEvidence(flagID uuid.UUID, attachmentID, mediaType, url string) bool {
 
 	db.Create(&Evidence{
-		AttachmentID: attachmentID.String(),
+		AttachmentID: attachmentID,
 		FlagID:       flagID,
 		Type:         mediaType,
 		URL:          url,
