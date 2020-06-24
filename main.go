@@ -64,8 +64,8 @@ func paySFCPrize(ctx context.Context, bot *sdk.User, userID uuid.UUID, flag *mod
 		AssetID:    "f80b5f5f-8e4d-3072-b618-bd6c0d8ccaa5", // SFC
 		OpponentID: userID.String(),
 		Amount:     number.FromFloat(flag.Amount).Mul(number.FromFloat(price)).Div(number.FromString("10")).Persist(),
-		Memo:       setting.Name,
-	}, setting.SessionAssetPIN)
+		Memo:       setting.GetConfig().App.Name,
+	}, setting.GetConfig().Bot.SessionAssetPIN)
 	return err
 }
 
@@ -75,8 +75,8 @@ func payFee(ctx context.Context, bot *sdk.User, userID uuid.UUID, flag *models.F
 		AssetID:    flag.AssetID.String(),
 		OpponentID: userID.String(),
 		Amount:     amount.Persist(),
-		Memo:       setting.Name,
-	}, setting.SessionAssetPIN)
+		Memo:       setting.GetConfig().App.Name,
+	}, setting.GetConfig().Bot.SessionAssetPIN)
 	return err
 }
 
@@ -164,13 +164,13 @@ func sendTextMessage(ctx context.Context, bot *sdk.User, conversationId uuid.UUI
 func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag *models.Flag) error {
 	payer := models.FindUser(flag.PayerID)
 	card, _ := json.Marshal(map[string]string{
-		"app_id":      setting.ClientID.String(),
+		"app_id":      setting.GetConfig().Bot.ClientID.String(),
 		"icon_url":    "https://images.mixin.one/X44V48LK9oEBT3izRGKqdVSPfiH5DtYTzzF0ch5nP-f7tO4v0BTTqVhFEHqd52qUeuVas-BSkLH1ckxEI51-jXmF=s256",
 		"title":       "励志定投群红包",
 		"description": fmt.Sprintf("来自@%s 的红包", payer.IdentityNumber),
 		"action":      "https://group-redirect.droneidentity.eu" + "/flags/" + flag.ID.String(),
 	})
-	cID := UniqueConversationId(setting.ClientID, userId)
+	cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, userId)
 	err := bot.SendMessage(ctx, &sdk.MessageRequest{
 		ConversationID: cID.String(),
 		MessageID:      uuid.Must(uuid.NewV4()).String(),
@@ -187,7 +187,7 @@ func remindWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, rema
 	for _, p := range flag.Witnesses() {
 		if p.Verified == 0 && p.PayeeID != flag.PayerID {
 			appMsg := "请您验证:@%d第%d天完成%s了吗？"
-			cID := UniqueConversationId(setting.ClientID, p.PayeeID)
+			cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, p.PayeeID)
 			payer := models.FindUser(flag.PayerID)
 			sendTextMessage(ctx, bot, cID, fmt.Sprintf(appMsg, payer.IdentityNumber, int(flag.Days)-remainingDays+1, task))
 			sendUserAppCard(ctx, bot, p.PayeeID, flag)
@@ -197,7 +197,7 @@ func remindWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, rema
 
 func encouragePayer(ctx context.Context, bot *sdk.User, flag *models.Flag, remainingDays int, task string) {
 	payMsg := "谢谢@%d, 收到你第%d天的红包，希望你能够坚持每天完成'%s'，记得分享证据。确定你做到了！"
-	cID := UniqueConversationId(setting.ClientID, flag.PayerID)
+	cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, flag.PayerID)
 	payer := models.FindUser(flag.PayerID)
 	sendTextMessage(ctx, bot, cID, fmt.Sprintf(payMsg, payer.IdentityNumber, int(flag.Days)-remainingDays+1, task))
 	sendUserAppCard(ctx, bot, flag.PayerID, flag)
@@ -212,7 +212,7 @@ func remindPayerForEvidence(ctx context.Context, bot *sdk.User, flag *models.Fla
 		}
 	}
 	if !done {
-		cID := UniqueConversationId(setting.ClientID, flag.PayerID)
+		cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, flag.PayerID)
 		payMsg := "今天@%s, 你完成'%s'了吗？请先上传证据，然后点击确认"
 		payer := models.FindUser(flag.PayerID)
 		sendTextMessage(ctx, bot, cID, fmt.Sprintf(payMsg, payer.IdentityNumber, task))
@@ -278,11 +278,11 @@ func main() {
 
 	models.InitDB()
 	bot := &sdk.User{
-		UserID:    setting.ClientSecret,
-		SessionID: setting.SessionID,
-		PINToken:  setting.PINToken,
+		UserID:    setting.GetConfig().Bot.ClientID.String(),
+		SessionID: setting.GetConfig().Bot.SessionID,
+		PINToken:  setting.GetConfig().Bot.PinToken,
 	}
-	block, _ := pem.Decode([]byte(setting.SessionKey))
+	block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
 	if block != nil {
 		privateKey, _ := x509.ParsePKCS1PrivateKey(block.Bytes)
 		bot.SetPrivateKey(privateKey)
@@ -294,10 +294,10 @@ func main() {
 	ctx := context.Background()
 	addTimers(ctx, cron, bot)
 
-	endless.DefaultReadTimeOut = setting.ReadTimeout
-	endless.DefaultWriteTimeOut = setting.WriteTimeout
+	endless.DefaultReadTimeOut = time.Duration(setting.GetConfig().App.ReadTimeOut)
+	endless.DefaultWriteTimeOut = time.Duration(setting.GetConfig().App.WriteTimeOut)
 	endless.DefaultMaxHeaderBytes = 1 << 20
-	endPoint := fmt.Sprintf(":%d", setting.HTTPPort)
+	endPoint := fmt.Sprintf(":%d", setting.GetConfig().App.HTTPPort)
 
 	server := endless.NewServer(endPoint, routers.InitRouter())
 	server.BeforeBegin = func(add string) {

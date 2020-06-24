@@ -27,7 +27,7 @@ func CheckRewards(c *gin.Context) {
 	}
 
 	if pagination.PageSize == 0 {
-		pagination.PageSize = setting.PageSize
+		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
 	var checkReward schemas.CheckReward
@@ -97,7 +97,11 @@ func Auth(c *gin.Context) {
 
 	ctx := context.Background()
 
-	accessToken, _, err := mixin.AuthorizeToken(ctx, setting.ClientID.String(), setting.ClientSecret, authorizationCode, setting.CodeVerifier)
+	accessToken, _, err := mixin.AuthorizeToken(ctx,
+		setting.GetConfig().Bot.ClientID.String(),
+		setting.GetConfig().Bot.ClientSecret,
+		authorizationCode,
+		setting.GetConfig().Bot.CodeVerifier)
 
 	if err != nil {
 		code = e.ERROR_AUTH_TOKEN

@@ -76,15 +76,13 @@ func UploadEvidence(c *gin.Context) {
 
 	// upload attachment
 	user := &mixin.User{
-		UserID:    setting.ClientID.String(),
-		SessionID: setting.SessionID,
-		PINToken:  setting.PINToken,
+		UserID:    setting.GetConfig().Bot.ClientID.String(),
+		SessionID: setting.GetConfig().Bot.SessionID,
+		PINToken:  setting.GetConfig().Bot.PinToken,
 	}
 
-	block, _ := pem.Decode([]byte(setting.SessionKey))
+	block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
 	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	user.SetPrivateKey(privateKey)
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 500,
@@ -93,6 +91,8 @@ func UploadEvidence(c *gin.Context) {
 		})
 		return
 	}
+
+	user.SetPrivateKey(privateKey)
 
 	ctx := context.Background()
 	attachment, err := user.CreateAttachment(ctx)

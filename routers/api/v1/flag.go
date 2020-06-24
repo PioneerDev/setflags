@@ -25,7 +25,7 @@ func ListFlags(c *gin.Context) {
 	}
 
 	if pagination.PageSize == 0 {
-		pagination.PageSize = setting.PageSize
+		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
 	data := models.GetAllFlags(pagination.PageSize, pagination.CurrentPage)
@@ -132,7 +132,7 @@ func FindFlagsByUserID(c *gin.Context) {
 	}
 
 	if pagination.PageSize == 0 {
-		pagination.PageSize = setting.PageSize
+		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
 	userID, err := uuid.FromString(c.GetHeader("x-user-id"))
@@ -168,7 +168,7 @@ func GetWitnesses(c *gin.Context) {
 	}
 
 	if pagination.PageSize == 0 {
-		pagination.PageSize = setting.PageSize
+		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
 	flagID, err := uuid.FromString(c.Param("id"))
@@ -208,10 +208,10 @@ func ListEvidences(c *gin.Context) {
 	}
 
 	if pagination.PageSize == 0 {
-		pagination.PageSize = setting.PageSize
+		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
-	data := models.FindEvidencesByFlag(flagID, pagination.CurrentPage, setting.PageSize)
+	data := models.FindEvidencesByFlag(flagID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
