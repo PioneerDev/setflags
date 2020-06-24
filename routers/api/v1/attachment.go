@@ -73,7 +73,7 @@ func UploadEvidence(c *gin.Context) {
 	}
 
 	// upload attachment
-	user, err := mixin.NewUser(userID.String(), setting.SessionID, setting.SessionKey, setting.PINToken)
+	user, err := mixin.NewUser(setting.ClientID.String(), setting.SessionID, setting.SessionKey, setting.PINToken)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
