@@ -2,6 +2,8 @@ package v1
 
 import (
 	"context"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"net/http"
 	"set-flags/models"
@@ -73,7 +75,15 @@ func UploadEvidence(c *gin.Context) {
 	}
 
 	// upload attachment
-	user, err := mixin.NewUser(setting.ClientID.String(), setting.SessionID, setting.SessionKey, setting.PINToken)
+	user := &mixin.User{
+		UserID:    setting.ClientID.String(),
+		SessionID: setting.SessionID,
+		PINToken:  setting.PINToken,
+	}
+
+	block, _ := pem.Decode([]byte(setting.SessionKey))
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	user.SetPrivateKey(privateKey)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
