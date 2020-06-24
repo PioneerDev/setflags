@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
+	"set-flags/pkg/logging"
 	"set-flags/pkg/setting"
 	"set-flags/schemas"
 
@@ -88,22 +89,39 @@ func Me(c *gin.Context) {
 
 // Auth auth
 func Auth(c *gin.Context) {
+	code := e.INVALID_PARAMS
 
-	authorizationCode := c.Query("token")
+	authorizationCode := c.Query("code")
+	logging.Info("authorizationCode", authorizationCode)
 
 	ctx := context.Background()
 
 	accessToken, _, err := mixin.AuthorizeToken(ctx, setting.ClientID.String(), setting.ClientSecret, authorizationCode, setting.CodeVerifier)
 
-	profile, err := mixin.FetchProfile(ctx, accessToken)
-
-	code := e.INVALID_PARAMS
-
 	if err != nil {
 		code = e.ERROR_AUTH_TOKEN
+
+		logging.Info("fetch access token failed", err.Error())
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": code,
-			"msg":  e.GetMsg(code),
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	profile, err := mixin.FetchProfile(ctx, accessToken)
+
+	if err != nil {
+
+		code = e.ERROR_AUTH_TOKEN
+
+		logging.Info("fetch user profile failed", err.Error())
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": code,
+			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -111,17 +129,26 @@ func Auth(c *gin.Context) {
 
 	// update user info and access token
 	if models.UserExist(profile.UserID) {
+		logging.Info("update user")
 		models.UpdateUser(profile, accessToken)
 		models.UpdateFlagUserInfo(profile)
 	} else {
 		// create user
+		logging.Info("create user")
 		models.CreateUser(profile, accessToken)
+	}
+
+	userSchema := models.UserSchema{
+		UserID:         profile.UserID,
+		IdentityNumber: profile.IdentityNumber,
+		FullName:       profile.FullName,
+		AvatarURL:      profile.AvatarURL,
 	}
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": make(map[string]interface{}),
+		"data": userSchema,
 	})
 }

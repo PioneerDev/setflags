@@ -10,7 +10,7 @@ import (
 
 // User entity
 type User struct {
-	ID             uuid.UUID `json:"id" gorm:"Column:user_id"`
+	UserID         uuid.UUID `json:"id" gorm:"Column:user_id"`
 	IdentityNumber string    `json:"identity_number"`
 	FullName       string    `json:"full_name"`
 	AvatarURL      string    `json:"avatar_url"`
@@ -22,10 +22,10 @@ type User struct {
 
 // UserSchema return to front end
 type UserSchema struct {
-	ID             uuid.UUID `json:"id"`
-	IdentityNumber string    `json:"identity_number"`
-	FullName       string    `json:"full_name"`
-	AvatarURL      string    `json:"avatar_url"`
+	UserID         string `json:"user_id"`
+	IdentityNumber string `json:"identity_number"`
+	FullName       string `json:"full_name"`
+	AvatarURL      string `json:"avatar_url"`
 }
 
 // FindUser find user by id
@@ -33,7 +33,7 @@ func FindUser(userID uuid.UUID) *User {
 	var users []User
 	db.Find(&users)
 	for _, u := range users {
-		if u.ID == userID {
+		if u.UserID == userID {
 			return &u
 		}
 	}
@@ -46,7 +46,7 @@ func FindUserByID(userID uuid.UUID) *UserSchema {
 	var dbUser User
 	db.Where("user_id = ?", userID.String()).First(&dbUser)
 	var user UserSchema
-	user.ID = dbUser.ID
+	user.UserID = dbUser.UserID.String()
 	user.AvatarURL = dbUser.AvatarURL
 	user.FullName = dbUser.FullName
 	user.IdentityNumber = dbUser.IdentityNumber
@@ -58,7 +58,7 @@ func CreateUser(userProfile *mixin.Profile, accessToken string) bool {
 
 	userID, _ := uuid.FromString(userProfile.UserID)
 	db.Create(&User{
-		ID:             userID,
+		UserID:         userID,
 		IdentityNumber: userProfile.IdentityNumber,
 		FullName:       userProfile.FullName,
 		AvatarURL:      userProfile.AvatarURL,
