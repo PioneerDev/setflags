@@ -240,22 +240,20 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/User"
+            $ref: "#/definitions/User"
   /auth:
-    post:
-      description: "Upload the oauth token"
+    get:
+      description: "auth callback url, mixin auth server call this uri"
       parameters:
-        - name: "token"
+        - name: "code"
           in: "query"
-          description: "the authentication token"
+          description: "authorization code"
           type: "string"
       responses:
         "200":
           description: "successful operation"
           schema:
-            type: "string"
+            $ref: "#/definitions/User"
   /users/{user_id}/rewards/{flag_id}:
     get:
       description: "check the total rewards received by the user for the flag"
@@ -374,9 +372,11 @@ definitions:
   User:
     type: "object"
     properties:
-      id:
+      user_id:
         type: "string"
         format: "uuid"
+      identity_number:
+        type: "string"
       full_name:
         type: "string"
       avatar_url:
