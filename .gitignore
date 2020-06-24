@@ -5,3 +5,4 @@ package-lock.json
 out
 secrets
 runtime
+pkg/setting/setting.go
