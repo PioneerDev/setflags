@@ -138,10 +138,17 @@ func Auth(c *gin.Context) {
 		models.CreateUser(profile, accessToken)
 	}
 
+	userSchema := models.UserSchema{
+		UserID:         profile.UserID,
+		IdentityNumber: profile.IdentityNumber,
+		FullName:       profile.FullName,
+		AvatarURL:      profile.AvatarURL,
+	}
+
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": make(map[string]interface{}),
+		"data": userSchema,
 	})
 }
