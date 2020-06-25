@@ -12,9 +12,9 @@ import (
 Config is used in user system.
 */
 type Config struct {
-	RUNMODE string `yaml:"run_mode"`
-
-	App struct {
+	RUNMODE   string `yaml:"run_mode"`
+	JWTSecret string `yaml:"jwt_secret"`
+	App       struct {
 		Name         string `yaml:"name"`
 		PageSize     int    `yaml:"page_size"`
 		HTTPPort     int    `yaml:"http_port"`

@@ -253,7 +253,7 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/AuthToken"
   /users/{user_id}/rewards/{flag_id}:
     get:
       description: "check the total rewards received by the user for the flag"
@@ -415,6 +415,13 @@ definitions:
       paid_at:
         type: "string"
         format: "date-time"
+  AuthToken:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+      user_id:
+        type: "string"
 externalDocs:
   description: "Find out more about Set Flags"
   url: "http://group-mixin.droneidentity.eu"
