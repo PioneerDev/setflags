@@ -65,7 +65,7 @@ func paySFCPrize(ctx context.Context, bot *sdk.User, userID uuid.UUID, flag *mod
 		OpponentID: userID.String(),
 		Amount:     number.FromFloat(flag.Amount).Mul(number.FromFloat(price)).Div(number.FromString("10")).Persist(),
 		Memo:       setting.GetConfig().App.Name,
-	}, setting.GetConfig().Bot.SessionAssetPIN)
+	}, setting.GetConfig().Bot.Pin)
 	return err
 }
 
@@ -76,7 +76,7 @@ func payFee(ctx context.Context, bot *sdk.User, userID uuid.UUID, flag *models.F
 		OpponentID: userID.String(),
 		Amount:     amount.Persist(),
 		Memo:       setting.GetConfig().App.Name,
-	}, setting.GetConfig().Bot.SessionAssetPIN)
+	}, setting.GetConfig().Bot.Pin)
 	return err
 }
 
