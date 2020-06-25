@@ -31,14 +31,13 @@ type Config struct {
 		Name     string `yaml:"name"`
 	}
 	Bot struct {
-		ClientID        uuid.UUID `yaml:"client_id"`
-		ClientSecret    string    `yaml:"client_secret"`
-		SessionID       string    `yaml:"session_id"`
-		Pin             string    `yaml:"pin"`
-		PinToken        string    `yaml:"pin_token"`
-		PrivateKey      string    `yaml:"private_key"`
-		SessionAssetPIN string    `yaml:"session_asset_pin"`
-		CodeVerifier    string    `yaml:"code_verifier"`
+		ClientID     uuid.UUID `yaml:"client_id"`
+		ClientSecret string    `yaml:"client_secret"`
+		SessionID    string    `yaml:"session_id"`
+		Pin          string    `yaml:"pin"`
+		PinToken     string    `yaml:"pin_token"`
+		PrivateKey   string    `yaml:"private_key"`
+		CodeVerifier string    `yaml:"code_verifier"`
 	}
 }
 
