@@ -7,7 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtSecret = []byte(setting.GetConfig().JWTSecret)
+var jwtSecret = []byte(setting.GetConfig().App.JWTSecret)
 
 // Claims Claims
 type Claims struct {
@@ -18,7 +18,8 @@ type Claims struct {
 // GenerateToken GenerateToken
 func GenerateToken(userID string) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(3 * time.Hour)
+
+	expireTime := nowTime.Add(time.Duration(setting.GetConfig().App.JWTTokenExpireTime) * time.Hour)
 
 	claims := Claims{
 		userID,

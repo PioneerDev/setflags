@@ -12,14 +12,17 @@ import (
 Config is used in user system.
 */
 type Config struct {
-	RUNMODE   string `yaml:"run_mode"`
-	JWTSecret string `yaml:"jwt_secret"`
-	App       struct {
+	RUNMODE string `yaml:"run_mode"`
+
+	App struct {
 		Name         string `yaml:"name"`
 		PageSize     int    `yaml:"page_size"`
 		HTTPPort     int    `yaml:"http_port"`
 		ReadTimeOut  int    `yaml:"read_timeout"`
 		WriteTimeOut int    `yaml:"write_timeout"`
+		JWTSecret    string `yaml:"jwt_secret"`
+		// hour
+		JWTTokenExpireTime int `yaml:"jwt_token_expire_time"`
 	}
 
 	DataBase struct {
