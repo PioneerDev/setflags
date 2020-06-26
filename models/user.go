@@ -53,6 +53,13 @@ func FindUserByID(userID uuid.UUID) *UserSchema {
 	return &user
 }
 
+// FindUserAccessToken FindUserAccessToken
+func FindUserAccessToken(userID uuid.UUID) string {
+	var user User
+	db.Select("access_token").Where("user_id = ?", userID.String()).First(&user)
+	return user.AccessToken
+}
+
 // CreateUser create user
 func CreateUser(userProfile *mixin.Profile, accessToken string) bool {
 

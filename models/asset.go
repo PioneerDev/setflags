@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/fox-one/mixin-sdk"
 	uuid "github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
 )
@@ -49,4 +50,32 @@ func FindAsset(assetID uuid.UUID) *Asset {
 		}
 	}
 	return nil
+}
+
+// UpsertAsset UpsertAsset
+func UpsertAsset(asset *mixin.Asset) {
+
+	assetID, _ := uuid.FromString(asset.AssetID)
+	priceUSD, _ := asset.PriceUsd.Float64()
+	balance, _ := asset.Balance.Float64()
+
+	dbAsset := Asset{
+		ID:       assetID,
+		Symbol:   asset.Symbol,
+		PriceUSD: priceUSD,
+		Balance:  balance,
+	}
+
+	if err := db.Where("id = ?", asset.AssetID).First(&dbAsset).Error; err != nil {
+		// error handling...
+		if gorm.IsRecordNotFoundError(err) {
+			db.Create(&dbAsset)
+		}
+	} else {
+		db.Model(&Asset{}).Where("id = ?", asset.AssetID).Updates(map[string]interface{}{
+			"symbol":    asset.Symbol,
+			"price_usd": priceUSD,
+			"balance":   balance,
+		})
+	}
 }

@@ -220,6 +220,15 @@ func remindPayerForEvidence(ctx context.Context, bot *sdk.User, flag *models.Fla
 	}
 }
 
+func upsertAsset(ctx context.Context, bot *sdk.User) {
+	assets, _ := bot.ReadAssets(ctx)
+
+	for _, asset := range assets {
+		models.UpsertAsset(asset)
+	}
+}
+
+// Reminder Reminder
 func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 	flags := models.ListActiveFlags(true)
 	for _, flag := range flags {
@@ -271,6 +280,10 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 	})
 	cron.AddFunc("0 0 23 * * ?", func() {
 		Reminder(ctx, bot, true)
+	})
+
+	cron.AddFunc("0 * * * * ?", func() {
+		upsertAsset(ctx, bot)
 	})
 }
 
