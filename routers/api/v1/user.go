@@ -72,13 +72,40 @@ func Me(c *gin.Context) {
 	}
 	userID, _ := uuid.FromString(header.XUSERID)
 
-	user := models.FindUserByID(userID)
+	if !models.UserExist(userID) {
+		code = http.StatusForbidden
+		c.JSON(code, gin.H{
+			"code": code,
+			"msg":  "current user not exist.",
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	accessToken := models.FindUserAccessToken(userID)
+
+	ctx := context.Background()
+	profile, err := mixin.FetchProfile(ctx, accessToken)
+
+	if err != nil {
+
+		code = e.ERROR_AUTH_TOKEN
+
+		logging.Info("fetch user profile failed", err.Error())
+
+		c.JSON(http.StatusForbidden, gin.H{
+			"code": http.StatusForbidden,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	userSchema := models.UserSchema{
-		UserID:         user.UserID,
-		IdentityNumber: user.IdentityNumber,
-		FullName:       user.FullName,
-		AvatarURL:      user.AvatarURL,
+		UserID:         profile.UserID,
+		IdentityNumber: profile.IdentityNumber,
+		FullName:       profile.FullName,
+		AvatarURL:      profile.AvatarURL,
 	}
 
 	code = e.SUCCESS
