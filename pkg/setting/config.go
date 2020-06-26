@@ -20,6 +20,9 @@ type Config struct {
 		HTTPPort     int    `yaml:"http_port"`
 		ReadTimeOut  int    `yaml:"read_timeout"`
 		WriteTimeOut int    `yaml:"write_timeout"`
+		JWTSecret    string `yaml:"jwt_secret"`
+		// hour
+		JWTTokenExpireTime int `yaml:"jwt_token_expire_time"`
 	}
 
 	DataBase struct {

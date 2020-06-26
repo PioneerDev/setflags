@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/MixinNetwork/go-number v0.0.0-20180814121220-f48e2574d9ef
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fox-one/mixin-sdk v1.1.9
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-contrib/cors v1.3.1

@@ -7,6 +7,7 @@ import (
 	"set-flags/pkg/e"
 	"set-flags/pkg/logging"
 	"set-flags/pkg/setting"
+	"set-flags/pkg/utils"
 	"set-flags/schemas"
 
 	"github.com/fox-one/mixin-sdk"
@@ -144,18 +145,28 @@ func Auth(c *gin.Context) {
 		logging.Info("create user")
 		models.CreateUser(profile, accessToken)
 	}
+	// mixin auth success
+	// generate app Bearer token
+	token, err := utils.GenerateToken(profile.UserID)
+	if err != nil {
+		code = e.ERROR_AUTH_TOKEN
+		c.JSON(http.StatusOK, gin.H{
+			"code": code,
+			"msg":  e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
-	userSchema := models.UserSchema{
-		UserID:         profile.UserID,
-		IdentityNumber: profile.IdentityNumber,
-		FullName:       profile.FullName,
-		AvatarURL:      profile.AvatarURL,
+	authToken := schemas.AuthToken{
+		Token:  token,
+		UserID: profile.UserID,
 	}
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": userSchema,
+		"data": authToken,
 	})
 }

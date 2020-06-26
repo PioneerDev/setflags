@@ -22,6 +22,11 @@ paths:
       produces:
         - "application/json"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "current_page"
           in: "query"
           description: "current page number"
@@ -51,6 +56,11 @@ paths:
       produces:
         - "application/json"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - in: "body"
           name: "data"
           description: "Details of the flag"
@@ -70,6 +80,11 @@ paths:
       produces:
         - "application/json"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "id"
           in: "path"
           description: "The flag to update"
@@ -100,6 +115,11 @@ paths:
       produces:
         - "application/json"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "x-user-id"
           in: "header"
           description: "The user's ID"
@@ -135,6 +155,11 @@ paths:
       produces:
         - "application/json"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "x-user-id"
           in: "header"
           description: "The user's ID"
@@ -176,6 +201,11 @@ paths:
     get:
       description: "list all the witnesses"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "id"
           in: "path"
           description: "Flag ID"
@@ -203,6 +233,11 @@ paths:
     get:
       description: "list all the evidences since yesterday"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "id"
           in: "path"
           description: "Flag ID"
@@ -230,6 +265,11 @@ paths:
     get:
       description: "Get the current user's information"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "x-user-id"
           in: "header"
           description: "The user's ID"
@@ -253,11 +293,16 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/AuthToken"
   /users/{user_id}/rewards/{flag_id}:
     get:
       description: "check the total rewards received by the user for the flag"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "user_id"
           in: "path"
           description: "Attachment ID from Messenger"
@@ -291,6 +336,11 @@ paths:
     get:
       description: "get the asset information"
       parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
         - name: "id"
           in: "path"
           description: "Asset ID"
@@ -415,6 +465,13 @@ definitions:
       paid_at:
         type: "string"
         format: "date-time"
+  AuthToken:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+      user_id:
+        type: "string"
 externalDocs:
   description: "Find out more about Set Flags"
   url: "http://group-mixin.droneidentity.eu"
