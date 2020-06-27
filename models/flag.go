@@ -50,16 +50,18 @@ func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
 }
 
 // GetAllFlags fetch all flags
-func GetAllFlags(pageSize, currentPage int) (flags []Flag) {
+func GetAllFlags(pageSize, currentPage int) (flags []Flag, count int) {
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
+	db.Model(&Flag{}).Count(&count)
 	return
 }
 
 // FindFlagsByUserID find current user's flags
-func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flags []Flag) {
+func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flags []Flag, total int) {
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Where("payer_id = ?", userID.String()).Find(&flags)
+	db.Model(&Flag{}).Where("payer_id = ?", userID.String()).Count(&total)
 	return
 }
 

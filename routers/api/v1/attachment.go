@@ -17,8 +17,31 @@ import (
 )
 
 // UploadEvidence upload evidence
+// only payer can upload evidence
 func UploadEvidence(c *gin.Context) {
 	code := e.INVALID_PARAMS
+
+	// check user id
+	var header schemas.Header
+	if err := c.BindHeader(&header); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	userID, _ := uuid.FromString(header.XUSERID)
+
+	// check flag exist.
+	if !models.UserExist(userID) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code": code,
+			"msg":  "not found specific user.",
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	// check document type
 	mediaType := c.Query("type")
@@ -52,23 +75,12 @@ func UploadEvidence(c *gin.Context) {
 		return
 	}
 
-	// check user id
-	var header schemas.Header
-	if err := c.BindHeader(&header); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": 400,
-			"msg":  err.Error(),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
-	userID, _ := uuid.FromString(header.XUSERID)
+	flag := models.FindFlagByID(flagID)
 
-	// check flag exist.
-	if !models.UserExist(userID) {
-		c.JSON(http.StatusNotFound, gin.H{
+	if flag.PayerID != userID {
+		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg":  "not found specific user.",
+			"msg":  "current user not this flag's creator.",
 			"data": make(map[string]interface{}),
 		})
 		return
