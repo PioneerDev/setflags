@@ -12,6 +12,7 @@ import (
 	"log"
 	"math"
 	"set-flags/models"
+	"set-flags/pkg/logging"
 	"set-flags/pkg/setting"
 	"set-flags/routers"
 	"strings"
@@ -288,7 +289,7 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 }
 
 func main() {
-
+	logging.Setup()
 	models.InitDB()
 	bot := &sdk.User{
 		UserID:    setting.GetConfig().Bot.ClientID.String(),
@@ -314,11 +315,13 @@ func main() {
 
 	server := endless.NewServer(endPoint, routers.InitRouter())
 	server.BeforeBegin = func(add string) {
+		logging.Info(fmt.Sprintf("Actual pid is %d", syscall.Getpid()))
 		log.Printf("Actual pid is %d", syscall.Getpid())
 	}
 
 	err := server.ListenAndServe()
 	if err != nil {
+		logging.Info(fmt.Sprintf("Server err: %v", err))
 		log.Printf("Server err: %v", err)
 	}
 }

@@ -1,0 +1,74 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {},
+        "license": {}
+    },
+    "paths": {
+        "/flag": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建Flag",
+                "parameters": [
+                    {
+                        "description": "创建者的name",
+                        "name": "payer_name",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "任务名称",
+                        "name": "task",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"data\":{},\"msg\":\"ok\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/flags": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取全部Flag",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "CurrentPage",
+                        "name": "current_page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "PageSize",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"data\":{},\"msg\":\"ok\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

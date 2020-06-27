@@ -12,6 +12,12 @@ import (
 )
 
 // ListFlags list all the flags
+// @Summary 获取全部Flag
+// @Produce  json
+// @Param current_page query int false "CurrentPage"
+// @Param page_size query int false "PageSize"
+// @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
+// @Router /flags [get]
 func ListFlags(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
@@ -39,6 +45,12 @@ func ListFlags(c *gin.Context) {
 }
 
 // CreateFlag create a flag
+// @Summary 创建Flag
+// @Produce json
+// @Param payer_name body string false "创建者的name"
+// @Param task body string true "任务名称"
+// @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
+// @Router /flag [post]
 func CreateFlag(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
