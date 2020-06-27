@@ -1,6 +1,7 @@
 package models
 
 import (
+	"set-flags/schemas"
 	"time"
 
 	"github.com/fox-one/mixin-sdk"
@@ -78,4 +79,22 @@ func UpsertAsset(asset *mixin.Asset) {
 			"balance":   balance,
 		})
 	}
+}
+
+// ReadAssets ReadAssets
+func ReadAssets(pageSize, currentPage int) (assets []schemas.AssetSchema, count int) {
+	var dbAssets []Asset
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&dbAssets)
+	db.Model(&Asset{}).Count(&count)
+
+	for _, a := range dbAssets {
+
+		assets = append(assets, schemas.AssetSchema{
+			AssetID:  a.ID.String(),
+			Symbol:   a.Symbol,
+			PriceUSD: a.PriceUSD,
+		})
+	}
+	return
 }
