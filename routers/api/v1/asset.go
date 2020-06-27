@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
-	"set-flags/pkg/setting"
 	"set-flags/schemas"
 
 	"github.com/fox-one/mixin-sdk"
@@ -41,17 +40,17 @@ func AssetInfos(c *gin.Context) {
 func ReadUserAssets(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	var pagination schemas.Pagination
+	// var pagination schemas.Pagination
 
-	c.ShouldBindQuery(&pagination)
+	// c.ShouldBindQuery(&pagination)
 
-	if pagination.CurrentPage == 0 {
-		pagination.CurrentPage = 1
-	}
+	// if pagination.CurrentPage == 0 {
+	// 	pagination.CurrentPage = 1
+	// }
 
-	if pagination.PageSize == 0 {
-		pagination.PageSize = setting.GetConfig().App.PageSize
-	}
+	// if pagination.PageSize == 0 {
+	// 	pagination.PageSize = setting.GetConfig().App.PageSize
+	// }
 
 	var header schemas.Header
 
