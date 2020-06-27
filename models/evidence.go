@@ -40,7 +40,7 @@ func FindEvidencesByFlag(flagID uuid.UUID, currentPage, pageSize int) (evidences
 
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and created_at >= ?", flagID.String(), yesterday).Order("created_at desc").Find(&evidences)
-	db.Model(&Flag{}).Where("flag_id = ? and created_at >= ?", flagID.String(), yesterday).Count(&total)
+	db.Model(&Evidence{}).Where("flag_id = ? and created_at >= ?", flagID.String(), yesterday).Count(&total)
 	return
 }
 

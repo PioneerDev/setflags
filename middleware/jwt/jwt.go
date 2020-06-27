@@ -20,7 +20,7 @@ func JWT() gin.HandlerFunc {
 
 		code = e.SUCCESS
 		token := c.Request.Header.Get("Authorization")
-		if token == "" {
+		if token == "" || token == "null" || len(strings.Fields(token)) != 2 {
 			code = e.INVALID_PARAMS
 		} else {
 			authToken := strings.Fields(token)[1]

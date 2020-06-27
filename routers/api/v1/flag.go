@@ -222,7 +222,15 @@ func ListEvidences(c *gin.Context) {
 
 	code := e.INVALID_PARAMS
 
-	flagID, _ := uuid.FromString(c.Param("flag_id"))
+	flagID, err := uuid.FromString(c.Param("flag_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	var pagination schemas.Pagination
 
