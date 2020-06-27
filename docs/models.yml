@@ -354,7 +354,7 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Asset"
-  /assets/me:
+  /myassets:
     get:
       description: "get current user's asset information"
       parameters:
