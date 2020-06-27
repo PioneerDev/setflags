@@ -31,7 +31,7 @@ func CreateEvidence(flagID uuid.UUID, attachmentID, mediaType, url string) bool 
 }
 
 // FindEvidencesByFlag 返回自昨天开始的evidence
-func FindEvidencesByFlag(flagID uuid.UUID, currentPage, pageSize int) (evidences []Evidence) {
+func FindEvidencesByFlag(flagID uuid.UUID, currentPage, pageSize int) (evidences []Evidence, total int) {
 	// 获取当前时间
 	now := time.Now()
 	// 回到昨天
@@ -40,16 +40,18 @@ func FindEvidencesByFlag(flagID uuid.UUID, currentPage, pageSize int) (evidences
 
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and created_at >= ?", flagID.String(), yesterday).Order("created_at desc").Find(&evidences)
+	db.Model(&Flag{}).Where("flag_id = ? and created_at >= ?", flagID.String(), yesterday).Count(&total)
 	return
 }
 
 // FindEvidenceByFlagIDAndAttachmentID find evidence by flagID
-func FindEvidenceByFlagIDAndAttachmentID(flagID, attachmentID uuid.UUID, currentPage, pageSize int) (evidences []Evidence) {
+func FindEvidenceByFlagIDAndAttachmentID(flagID, attachmentID uuid.UUID, currentPage, pageSize int) (evidences []Evidence, total int) {
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).
 		Limit(pageSize).
 		Where("flag_id = ? and attachment_id = ?", flagID.String(), attachmentID.String()).
 		Find(&evidences)
+	db.Model(&Evidence{}).Where("flag_id = ? and attachment_id = ?", flagID.String(), attachmentID.String()).Count(&total)
 	return
 }
 

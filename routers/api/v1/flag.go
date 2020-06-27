@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
@@ -28,13 +27,14 @@ func ListFlags(c *gin.Context) {
 		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
-	data := models.GetAllFlags(pagination.PageSize, pagination.CurrentPage)
+	data, total := models.GetAllFlags(pagination.PageSize, pagination.CurrentPage)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": data,
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  data,
+		"total": total,
 	})
 }
 
@@ -67,25 +67,27 @@ func CreateFlag(c *gin.Context) {
 }
 
 // UpdateFlag Update an existing flag
+// only witness can update flag
 func UpdateFlag(c *gin.Context) {
 	code := e.INVALID_PARAMS
+
+	var header schemas.Header
+
+	if err := c.BindHeader(&header); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	userID, _ := uuid.FromString(header.XUSERID)
 
 	flagID, err := uuid.FromString(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
 			"msg":  err.Error(),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
-
-	op := c.Param("op")
-
-	if op != "yes" && op != "no" && op != "done" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  fmt.Sprintf("op: %s is invalid.", op),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -99,24 +101,31 @@ func UpdateFlag(c *gin.Context) {
 		})
 		return
 	}
-
 	flag := models.FindFlagByID(flagID)
 
-	if flag.Status != "done" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  "not yet upload the evidence.",
-			"data": make(map[string]interface{}),
-		})
-		return
+	op := c.Param("op")
+
+	if flag.PayerID == userID && op == "done" {
+		code = e.SUCCESS
+		models.UpdateFlagStatus(flagID, op)
+	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
+		code = e.SUCCESS
+		models.UpsertWitness(flagID, userID)
 	}
 
-	code = e.SUCCESS
-	c.JSON(http.StatusBadRequest, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": make(map[string]interface{}),
-	})
+	if code != e.SUCCESS {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"code": code,
+			"msg":  e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+	}
 }
 
 // FindFlagsByUserID list all flags of the user
@@ -135,23 +144,26 @@ func FindFlagsByUserID(c *gin.Context) {
 		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
-	userID, err := uuid.FromString(c.GetHeader("x-user-id"))
-	if err != nil {
+	var header schemas.Header
+
+	if err := c.BindHeader(&header); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
+			"code": 400,
 			"msg":  err.Error(),
 			"data": make(map[string]interface{}),
 		})
 		return
 	}
+	userID, _ := uuid.FromString(header.XUSERID)
 
-	flags := models.FindFlagsByUserID(userID, pagination.CurrentPage, pagination.PageSize)
+	flags, total := models.FindFlagsByUserID(userID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": flags,
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  flags,
+		"total": total,
 	})
 }
 
@@ -182,13 +194,14 @@ func GetWitnesses(c *gin.Context) {
 		return
 	}
 
-	witnesses := models.GetWitnesses(flagID, pagination.CurrentPage, pagination.PageSize)
+	witnesses, total := models.GetWitnessSchema(flagID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": witnesses,
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  witnesses,
+		"total": total,
 	})
 }
 
@@ -211,12 +224,13 @@ func ListEvidences(c *gin.Context) {
 		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
-	data := models.FindEvidencesByFlag(flagID, pagination.CurrentPage, pagination.PageSize)
+	data, total := models.FindEvidencesByFlag(flagID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": data,
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  data,
+		"total": total,
 	})
 }

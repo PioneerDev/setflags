@@ -46,13 +46,14 @@ func CheckRewards(c *gin.Context) {
 
 	flagID, _ := uuid.FromString(checkReward.FlagID)
 
-	data := models.FindEvidenceByFlagIDAndAttachmentID(flagID, userID, pagination.CurrentPage, pagination.PageSize)
+	data, total := models.FindEvidenceByFlagIDAndAttachmentID(flagID, userID, pagination.CurrentPage, pagination.PageSize)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  e.GetMsg(code),
-		"data": data,
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  data,
+		"total": total,
 	})
 }
 
