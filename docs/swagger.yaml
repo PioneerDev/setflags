@@ -1,0 +1,46 @@
+info:
+  contact: {}
+  license: {}
+paths:
+  /flag:
+    post:
+      parameters:
+      - description: 创建者的name
+        in: body
+        name: payer_name
+        schema:
+          type: string
+      - description: 任务名称
+        in: body
+        name: task
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{},"msg":"ok"}'
+          schema:
+            type: string
+      summary: 创建Flag
+  /flags:
+    get:
+      parameters:
+      - description: CurrentPage
+        in: query
+        name: current_page
+        type: integer
+      - description: PageSize
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{},"msg":"ok"}'
+          schema:
+            type: string
+      summary: 获取全部Flag
+swagger: "2.0"

@@ -2,6 +2,7 @@ package routers
 
 import (
 	"net/http"
+	_ "set-flags/docs"
 	"set-flags/middleware/jwt"
 	"set-flags/pkg/setting"
 	v1 "set-flags/routers/api/v1"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 // InitRouter gin router
@@ -22,7 +25,7 @@ func InitRouter() *gin.Engine {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"PUT", "POST", "GET"},
-		AllowHeaders:     []string{"Origin", "x-user-id", "content-type"},
+		AllowHeaders:     []string{"Origin", "x-user-id", "content-type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		AllowOriginFunc: func(origin string) bool {
@@ -32,6 +35,8 @@ func InitRouter() *gin.Engine {
 	}))
 
 	gin.SetMode(setting.GetConfig().RUNMODE)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	apiv1 := r.Group("")
 	apiv1.GET("/ping", func(c *gin.Context) {
