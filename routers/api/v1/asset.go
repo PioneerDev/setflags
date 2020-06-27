@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
+	"set-flags/pkg/setting"
+	"set-flags/schemas"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
@@ -30,5 +32,32 @@ func AssetInfos(c *gin.Context) {
 		"code": code,
 		"msg":  e.GetMsg(code),
 		"data": asset,
+	})
+}
+
+// ReadAssets ReadAssets
+func ReadAssets(c *gin.Context) {
+	code := e.INVALID_PARAMS
+
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
+	}
+
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.GetConfig().App.PageSize
+	}
+
+	assets, total := models.ReadAssets(pagination.PageSize, pagination.CurrentPage)
+
+	code = e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  assets,
+		"total": total,
 	})
 }

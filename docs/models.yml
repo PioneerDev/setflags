@@ -294,7 +294,7 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/AuthToken"
-  /users/{user_id}/rewards/{flag_id}:
+  /users/rewards/{flag_id}:
     get:
       description: "check the total rewards received by the user for the flag"
       parameters:
@@ -303,9 +303,9 @@ paths:
           required: true
           type: "string"
           default: "Bearer token"
-        - name: "user_id"
-          in: "path"
-          description: "Attachment ID from Messenger"
+        - name: "x-user-id"
+          in: "header"
+          description: "user id"
           required: true
           type: "string"
           format: "uuid"
@@ -347,6 +347,32 @@ paths:
           required: true
           type: "string"
           format: "uuid"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Asset"
+  /assets:
+    get:
+      description: "get current user's asset information"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
+        - name: "current_page"
+          in: "query"
+          description: "current page number"
+          required: false
+          type: "integer"
+        - name: "page_size"
+          in: "query"
+          description: "per page size"
+          required: false
+          type: "integer"
       responses:
         "200":
           description: "successful operation"
@@ -453,7 +479,7 @@ definitions:
   Asset:
     type: "object"
     properties:
-      id:
+      asset_id:
         type: "string"
         format: "uuid"
       symbol:
@@ -462,9 +488,6 @@ definitions:
         type: "number"
       price_usd:
         type: "number"
-      paid_at:
-        type: "string"
-        format: "date-time"
   AuthToken:
     type: "object"
     properties:
