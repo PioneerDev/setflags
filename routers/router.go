@@ -56,6 +56,7 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/me", v1.Me)
 		apiv1.GET("/users/:user_id/rewards/:flag_id", v1.CheckRewards)
 		apiv1.GET("/assets/:id", v1.AssetInfos)
+		apiv1.GET("/assets/me", v1.ReadUserAssets)
 	}
 
 	return r

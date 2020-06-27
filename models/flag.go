@@ -39,7 +39,7 @@ func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
 		MaxWitness:     flagJSON.MaxWitness,
 		AssetID:        flagJSON.AssetID,
 		Amount:         flagJSON.Amount,
-		Status:         flagJSON.Status,
+		Status:         "unverified",
 		// below are derived
 		RemainingAmount: flagJSON.Amount,
 		RemainingDays:   flagJSON.Days,
