@@ -354,7 +354,7 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Asset"
-  /myassets:
+  /assets:
     get:
       description: "get current user's asset information"
       parameters:
@@ -363,12 +363,16 @@ paths:
           required: true
           type: "string"
           default: "Bearer token"
-        - name: "x-user-id"
-          in: "header"
-          description: "user id"
-          required: true
-          type: "string"
-          format: "uuid"
+        - name: "current_page"
+          in: "query"
+          description: "current page number"
+          required: false
+          type: "integer"
+        - name: "page_size"
+          in: "query"
+          description: "per page size"
+          required: false
+          type: "integer"
       responses:
         "200":
           description: "successful operation"
