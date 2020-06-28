@@ -4,7 +4,7 @@ import "github.com/gofrs/uuid"
 
 // Flag validate flag json
 type Flag struct {
-	PayerID        uuid.UUID `json:"payer_id"`
+	PayerID        uuid.UUID `json:"payer_id" binding:"required"`
 	PayerName      string    `json:"payer_name"`
 	PayerAvatarURL string    `json:"payer_avatar_url"`
 	Task           string    `json:"task" binding:"required"`
