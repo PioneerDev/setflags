@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
@@ -54,6 +55,27 @@ func ListFlags(c *gin.Context) {
 func CreateFlag(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
+	var header schemas.Header
+
+	if err := c.BindHeader(&header); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	userID, _ := uuid.FromString(header.XUSERID)
+
+	if !models.UserExist(userID) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("not found current user."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
 	var flag schemas.Flag
 
 	if err := c.ShouldBindJSON(&flag); err != nil {
@@ -66,7 +88,8 @@ func CreateFlag(c *gin.Context) {
 	}
 
 	// find user
-	user := models.FindUserByID(flag.PayerID)
+	user := models.FindUserByID(userID)
+	flag.PayerID = userID
 
 	models.CreateFlag(&flag, user)
 
