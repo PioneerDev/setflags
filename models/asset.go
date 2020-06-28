@@ -85,7 +85,7 @@ func UpsertAsset(asset *mixin.Asset) {
 func ReadAssets(pageSize, currentPage int) (assets []schemas.AssetSchema, count int) {
 	var dbAssets []Asset
 	skip := (currentPage - 1) * pageSize
-	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&dbAssets)
+	db.Offset(skip).Limit(pageSize).Order("price_usd desc").Find(&dbAssets)
 	db.Model(&Asset{}).Count(&count)
 
 	for _, a := range dbAssets {
