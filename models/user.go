@@ -29,16 +29,16 @@ type UserSchema struct {
 }
 
 // FindUser find user by id
-func FindUser(userID uuid.UUID) *User {
-	var users []User
-	db.Find(&users)
-	for _, u := range users {
-		if u.UserID == userID {
-			return &u
-		}
-	}
-	return nil
-}
+// func FindUser(userID uuid.UUID) *User {
+// 	var users []User
+// 	db.Find(&users)
+// 	for _, u := range users {
+// 		if u.UserID == userID {
+// 			return &u
+// 		}
+// 	}
+// 	return nil
+// }
 
 // FindUserByID find user by id
 // no return access token to front end

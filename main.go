@@ -163,7 +163,7 @@ func sendTextMessage(ctx context.Context, bot *sdk.User, conversationId uuid.UUI
 }
 
 func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag *models.Flag) error {
-	payer := models.FindUser(flag.PayerID)
+	payer := models.FindUserByID(flag.PayerID)
 	card, _ := json.Marshal(map[string]string{
 		"app_id":      setting.GetConfig().Bot.ClientID.String(),
 		"icon_url":    "https://images.mixin.one/X44V48LK9oEBT3izRGKqdVSPfiH5DtYTzzF0ch5nP-f7tO4v0BTTqVhFEHqd52qUeuVas-BSkLH1ckxEI51-jXmF=s256",
@@ -189,7 +189,7 @@ func remindWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, rema
 		if p.Verified == 0 && p.PayeeID != flag.PayerID {
 			appMsg := "请您验证:@%d第%d天完成%s了吗？"
 			cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, p.PayeeID)
-			payer := models.FindUser(flag.PayerID)
+			payer := models.FindUserByID(flag.PayerID)
 			sendTextMessage(ctx, bot, cID, fmt.Sprintf(appMsg, payer.IdentityNumber, int(flag.Days)-remainingDays+1, task))
 			sendUserAppCard(ctx, bot, p.PayeeID, flag)
 		}
@@ -199,7 +199,7 @@ func remindWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, rema
 func encouragePayer(ctx context.Context, bot *sdk.User, flag *models.Flag, remainingDays int, task string) {
 	payMsg := "谢谢@%d, 收到你第%d天的红包，希望你能够坚持每天完成'%s'，记得分享证据。确定你做到了！"
 	cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, flag.PayerID)
-	payer := models.FindUser(flag.PayerID)
+	payer := models.FindUserByID(flag.PayerID)
 	sendTextMessage(ctx, bot, cID, fmt.Sprintf(payMsg, payer.IdentityNumber, int(flag.Days)-remainingDays+1, task))
 	sendUserAppCard(ctx, bot, flag.PayerID, flag)
 }
@@ -273,15 +273,15 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 			Reminder(ctx, bot, false)
 		})
 	*/
-	cron.AddFunc("0 0 8 * * ?", func() {
-		Reminder(ctx, bot, false)
-	})
-	cron.AddFunc("0 0 20 * * ?", func() {
-		Reminder(ctx, bot, false)
-	})
-	cron.AddFunc("0 0 23 * * ?", func() {
-		Reminder(ctx, bot, true)
-	})
+	// cron.AddFunc("0 0 8 * * ?", func() {
+	// 	Reminder(ctx, bot, false)
+	// })
+	// cron.AddFunc("0 0 20 * * ?", func() {
+	// 	Reminder(ctx, bot, false)
+	// })
+	// cron.AddFunc("0 0 23 * * ?", func() {
+	// 	Reminder(ctx, bot, true)
+	// })
 
 	cron.AddFunc("0 * * * * ?", func() {
 		upsertAsset(ctx, bot)
