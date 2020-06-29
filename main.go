@@ -157,7 +157,7 @@ func sendTextMessage(ctx context.Context, bot *sdk.User, conversationId uuid.UUI
 		Data:           base64.StdEncoding.EncodeToString([]byte(message)),
 	})
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
 	}
 	return err
 }
@@ -179,7 +179,7 @@ func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag 
 		Data:           base64.StdEncoding.EncodeToString(card),
 	})
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
 	}
 	return nil
 }
@@ -215,7 +215,7 @@ func remindPayerForEvidence(ctx context.Context, bot *sdk.User, flag *models.Fla
 	if !done {
 		cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, flag.PayerID)
 		payMsg := "今天@%s, 你完成'%s'了吗？请先上传证据，然后点击确认"
-		payer := models.FindUser(flag.PayerID)
+		payer := models.FindUserByID(flag.PayerID)
 		sendTextMessage(ctx, bot, cID, fmt.Sprintf(payMsg, payer.IdentityNumber, task))
 		sendUserAppCard(ctx, bot, flag.PayerID, flag)
 	}
