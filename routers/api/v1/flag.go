@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
+	"set-flags/pkg/logging"
 	"set-flags/pkg/setting"
 	"set-flags/schemas"
 
@@ -245,7 +246,9 @@ func ListEvidences(c *gin.Context) {
 
 	code := e.INVALID_PARAMS
 
-	flagID, err := uuid.FromString(c.Param("flag_id"))
+	flagID, err := uuid.FromString(c.Param("id"))
+
+	logging.Info(fmt.Sprintf("flag_id %v", flagID))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
