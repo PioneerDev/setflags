@@ -35,7 +35,7 @@ func UpsertWitness(flagID, payeeID uuid.UUID, op string) {
 
 	// no found witness, insert witness
 	// found, update witness
-	db.Where(Witness{FlagID: flagID, PayeeID: payeeID}).Attrs(Witness{Verified: verified}).FirstOrCreate(&witness)
+	db.Where(Witness{FlagID: flagID, PayeeID: payeeID}).Assign(Witness{Verified: verified}).FirstOrCreate(&witness)
 }
 
 // GetWitnessSchema GetWitnessSchema
