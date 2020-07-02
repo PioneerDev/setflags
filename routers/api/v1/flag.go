@@ -230,7 +230,7 @@ func GetWitnesses(c *gin.Context) {
 		return
 	}
 
-	witnesses, total := models.GetWitnessSchema(flagID, pagination.CurrentPage, pagination.PageSize)
+	witnesses, total := models.GetWitnessSchema(flagID, pagination.PageSize, pagination.CurrentPage)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
