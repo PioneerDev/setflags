@@ -4,7 +4,6 @@ import (
 	"set-flags/schemas"
 
 	uuid "github.com/gofrs/uuid"
-	"github.com/jinzhu/gorm"
 )
 
 // Witness entity
@@ -15,24 +14,28 @@ type Witness struct {
 }
 
 // UpsertWitness UpsertWitness
-func UpsertWitness(flagID, payeeID uuid.UUID) {
+func UpsertWitness(flagID, payeeID uuid.UUID, op string) {
+
+	var verified int
+	if op == "yes" {
+		verified = 1
+	} else if op == "no" {
+		verified = -1
+	} else if op == "done" {
+		verified = 2
+	} else {
+		verified = 0
+	}
 
 	witness := Witness{
 		FlagID:   flagID,
 		PayeeID:  payeeID,
-		Verified: 1,
+		Verified: verified,
 	}
 
-	if err := db.Where("flag_id = ? and payee_id = ?", flagID.String(), payeeID.String()).First(&witness).Error; err != nil {
-		// error handling...
-		if gorm.IsRecordNotFoundError(err) {
-			db.Create(&witness)
-		}
-	} else {
-		db.Model(&Asset{}).
-			Where("flag_id = ? and payee_id = ?", flagID.String(), payeeID.String()).
-			UpdateColumn("verified", gorm.Expr("verified + ?", 1))
-	}
+	// no found witness, insert witness
+	// found, update witness
+	db.Where(Witness{FlagID: flagID, PayeeID: payeeID}).Attrs(Witness{Verified: verified}).FirstOrCreate(&witness)
 }
 
 // GetWitnessSchema GetWitnessSchema
@@ -58,6 +61,7 @@ func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage int) ([]schemas.Wi
 			PayeeAvatarURL: dbUser.AvatarURL,
 			Symbol:         "BTC",
 			Amount:         1.0,
+			Verified:       witness.Verified,
 		})
 	}
 	return result, count

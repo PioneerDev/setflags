@@ -145,7 +145,7 @@ paths:
               $ref: "#/definitions/Flag"
         "400":
           description: "Invalid status value"
-  /attachments/{attachment_id}:
+  /attachments:
     post:
       summary: "upload evidence"
       description: "upload evidence"
@@ -166,12 +166,6 @@ paths:
           required: true
           type: "string"
           format: "uuid"
-        - name: "attachment_id"
-          in: "path"
-          description: "Attachment ID from Messenger"
-          required: true
-          type: "string"
-          format: "uuid"
         - name: "flag_id"
           in: "query"
           description: "Flag ID"
@@ -187,11 +181,6 @@ paths:
           in: "query"
           description: ""
           type: "string"
-        - name: "created_at"
-          in: "query"
-          description: ""
-          type: "string"
-          format: "date-time"
       responses:
         "200":
           description: "successful operation"
@@ -466,6 +455,19 @@ definitions:
       payee_id:
         type: "string"
         format: "uuid"
+      payee_name:
+        type: "string"
+      payee_avatar_url:
+        type: "string"
+        format: "url"
+      amount:
+        type: "number"
+        format: "float"
+      symbol:
+        type: "string"
+      witnessed_time:
+        type: "string"
+        format: "date-time"
   Payer:
     type: "object"
     properties:
