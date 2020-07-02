@@ -55,7 +55,7 @@ func InitDB() {
 	db.DB().SetMaxOpenConns(100)
 
 	// Migrate the schema
-	db.AutoMigrate(&Flag{}, &Asset{}, &Evidence{}, &User{})
+	db.AutoMigrate(&Flag{}, &Asset{}, &Evidence{}, &User{}, &Witness{})
 }
 
 // CloseDB close db connection
