@@ -2,15 +2,20 @@ package models
 
 import (
 	"set-flags/schemas"
+	"time"
 
 	uuid "github.com/gofrs/uuid"
+	"github.com/jinzhu/gorm"
 )
 
 // Witness entity
 type Witness struct {
-	FlagID   uuid.UUID `json:"flag_id"`
-	PayeeID  uuid.UUID `json:"payee_id"`
-	Verified int       `json:"verified"`
+	FlagID        uuid.UUID `json:"flag_id"`
+	PayeeID       uuid.UUID `json:"payee_id"`
+	Verified      int       `json:"verified"`
+	WitnessedTime time.Time `json:"witnessed_time"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // UpsertWitness UpsertWitness
@@ -62,7 +67,22 @@ func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage int) ([]schemas.Wi
 			Symbol:         "BTC",
 			Amount:         1.0,
 			Verified:       witness.Verified,
+			WitnessedTime:  witness.WitnessedTime,
 		})
 	}
 	return result, count
+}
+
+// BeforeCreate will set field CreatedAt.
+func (w *Witness) BeforeCreate(scope *gorm.Scope) error {
+	scope.SetColumn("CreatedAt", time.Now())
+	scope.SetColumn("WitnessedTime", time.Now())
+	return nil
+}
+
+// BeforeUpdate will set field update time.
+func (w *Witness) BeforeUpdate(scope *gorm.Scope) error {
+	scope.SetColumn("UpdatedAt", time.Now())
+	scope.SetColumn("WitnessedTime", time.Now())
+	return nil
 }
