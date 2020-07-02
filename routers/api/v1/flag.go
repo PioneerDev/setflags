@@ -146,13 +146,13 @@ func UpdateFlag(c *gin.Context) {
 		models.UpdateFlagStatus(flagID, op)
 	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
 		code = e.SUCCESS
-		models.UpsertWitness(flagID, userID)
+		models.UpsertWitness(flagID, userID, op)
 	}
 
 	if code != e.SUCCESS {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg":  e.GetMsg(code),
+			"msg":  "invalid opreration",
 			"data": make(map[string]interface{}),
 		})
 	} else {
