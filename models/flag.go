@@ -55,7 +55,7 @@ func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) bool {
 // GetAllFlags fetch all flags
 func GetAllFlags(pageSize, currentPage int) (flags []Flag, count int) {
 	skip := (currentPage - 1) * pageSize
-	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
+	db.Offset(skip).Limit(pageSize).Order("updated_at desc").Find(&flags)
 	db.Model(&Flag{}).Count(&count)
 	return
 }
@@ -66,7 +66,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 
 	var flags []Flag
 	// first fetch flags
-	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
+	db.Offset(skip).Limit(pageSize).Order("updated_at desc").Find(&flags)
 
 	// then fetch witness according to userID and flagID
 	flagIDs := make([]uuid.UUID, len(flags))
@@ -114,7 +114,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flagSchemas []schemas.FlagSchema, total int) {
 	skip := (currentPage - 1) * pageSize
 	var flags []Flag
-	db.Offset(skip).Limit(pageSize).Where("payer_id = ?", userID.String()).Find(&flags)
+	db.Offset(skip).Limit(pageSize).Where("payer_id = ?", userID.String()).Order("updated_at desc").Find(&flags)
 	db.Model(&Flag{}).Where("payer_id = ?", userID.String()).Count(&total)
 
 	// prepare flagSchema
