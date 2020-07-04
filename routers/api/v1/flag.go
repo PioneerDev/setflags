@@ -90,7 +90,7 @@ func CreateFlag(c *gin.Context) {
 		return
 	}
 
-	var flag schemas.Flag
+	var flag schemas.FlagSchema
 
 	if err := c.ShouldBindJSON(&flag); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

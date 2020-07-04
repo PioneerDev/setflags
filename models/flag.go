@@ -30,7 +30,7 @@ type Flag struct {
 }
 
 // CreateFlag create flag
-func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
+func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) bool {
 	db.Create(&Flag{
 		PayerID:        flagJSON.PayerID,
 		PayerName:      user.FullName,
@@ -60,9 +60,10 @@ func GetAllFlags(pageSize, currentPage int) (flags []Flag, count int) {
 }
 
 // GetFlagsWithVerified update flag status according to witness
-func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flags []Flag, count int) {
+func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSchemas []schemas.FlagSchema, count int) {
 	skip := (currentPage - 1) * pageSize
 
+	var flags []Flag
 	// first fetch flags
 	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
 
@@ -76,25 +77,31 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flags []
 	db.Where("flag_id IN (?) and payee_id = ?", flagIDs, userID).Find(&witnesses)
 
 	for _, flag := range flags {
-		status := ""
+		verified := 0
 		for _, w := range witnesses {
 			if w.FlagID != w.FlagID {
 				continue
 			}
-
-			if w.Verified == 1 {
-				status = "yes"
-			} else if w.Verified == -1 {
-				status = "no"
-			} else if w.Verified == 2 {
-				status = "done"
-			} else {
-				status = "unverified"
-			}
+			verified = w.Verified
 			break
 		}
 
-		flag.Status = status
+		flagSchemas = append(flagSchemas, schemas.FlagSchema{
+			PayerID:         flag.PayerID,
+			PayerName:       flag.PayerName,
+			PayerAvatarURL:  flag.PayerAvatarURL,
+			Task:            flag.Task,
+			Days:            flag.Days,
+			MaxWitness:      flag.MaxWitness,
+			AssetID:         flag.AssetID,
+			Symbol:          flag.Symbol,
+			Amount:          flag.Amount,
+			TimesAchieved:   flag.TimesAchieved,
+			Status:          flag.Status,
+			RemainingAmount: flag.RemainingAmount,
+			RemainingDays:   flag.RemainingDays,
+			Verified:        verified,
+		})
 	}
 
 	db.Model(&Flag{}).Count(&count)
