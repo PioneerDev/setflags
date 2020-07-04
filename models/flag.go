@@ -2,6 +2,7 @@ package models
 
 import (
 	"set-flags/schemas"
+	"strings"
 	"time"
 
 	"github.com/fox-one/mixin-sdk"
@@ -41,7 +42,7 @@ func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) bool {
 		AssetID:        flagJSON.AssetID,
 		Symbol:         flagJSON.Symbol,
 		Amount:         flagJSON.Amount,
-		Status:         "unverified",
+		Status:         strings.ToUpper("unverified"),
 		// below are derived
 		RemainingAmount: flagJSON.Amount,
 		RemainingDays:   flagJSON.Days,
@@ -110,10 +111,31 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 }
 
 // FindFlagsByUserID find current user's flags
-func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flags []Flag, total int) {
+func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flagSchemas []schemas.FlagSchema, total int) {
 	skip := (currentPage - 1) * pageSize
+	var flags []Flag
 	db.Offset(skip).Limit(pageSize).Where("payer_id = ?", userID.String()).Find(&flags)
 	db.Model(&Flag{}).Where("payer_id = ?", userID.String()).Count(&total)
+
+	// prepare flagSchema
+	for _, flag := range flags {
+		flagSchemas = append(flagSchemas, schemas.FlagSchema{
+			ID:              flag.ID,
+			PayerID:         flag.PayerID,
+			PayerName:       flag.PayerName,
+			PayerAvatarURL:  flag.PayerAvatarURL,
+			Task:            flag.Task,
+			Days:            flag.Days,
+			MaxWitness:      flag.MaxWitness,
+			AssetID:         flag.AssetID,
+			Symbol:          flag.Symbol,
+			Amount:          flag.Amount,
+			TimesAchieved:   flag.TimesAchieved,
+			Status:          flag.Status,
+			RemainingAmount: flag.RemainingAmount,
+			RemainingDays:   flag.RemainingDays,
+		})
+	}
 	return
 }
 
@@ -134,7 +156,7 @@ func FindFlagByID(flagID uuid.UUID) (flag Flag) {
 
 // UpdateFlagStatus update flag's status
 func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
-	db.Model(&Flag{}).Where("id = ?", flagID.String()).Update("status", status)
+	db.Model(&Flag{}).Where("id = ?", flagID.String()).Update("status", strings.ToUpper(status))
 	return true
 }
 
