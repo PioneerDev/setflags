@@ -4,6 +4,7 @@ import "github.com/gofrs/uuid"
 
 // FlagSchema validate flag json
 type FlagSchema struct {
+	ID              uuid.UUID `json:"id"`
 	PayerID         uuid.UUID `json:"payer_id"`
 	PayerName       string    `json:"payer_name"`
 	PayerAvatarURL  string    `json:"payer_avatar_url"`

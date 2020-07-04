@@ -87,6 +87,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 		}
 
 		flagSchemas = append(flagSchemas, schemas.FlagSchema{
+			ID:              flag.ID,
 			PayerID:         flag.PayerID,
 			PayerName:       flag.PayerName,
 			PayerAvatarURL:  flag.PayerAvatarURL,
