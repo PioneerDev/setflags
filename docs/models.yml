@@ -401,6 +401,8 @@ definitions:
       asset_id:
         type: "string"
         format: "uuid"
+      symbol:
+        type: "string"
       amount:
         type: "number"
       times_achieved:
@@ -413,6 +415,17 @@ definitions:
           - "unverified"
           - "verified"
           - "closed"
+      verified:
+        type: "integer"
+        enum:
+          - 0
+          - -1
+          - 1
+          - 2
+      remaining_days:
+        type: "integer"
+      remaining_amount:
+        type: "number"
   Evidence:
     type: "object"
     properties:
@@ -465,6 +478,13 @@ definitions:
         format: "float"
       symbol:
         type: "string"
+      verified:
+        type: "integer"
+        enum:
+          - 0
+          - -1
+          - 1
+          - 2
       witnessed_time:
         type: "string"
         format: "date-time"

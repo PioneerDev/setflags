@@ -19,6 +19,7 @@ type Flag struct {
 	Days            int       `json:"days"`
 	MaxWitness      int       `json:"max_witness"`
 	AssetID         uuid.UUID `json:"asset_id"`
+	Symbol          string    `json:"symbol"`
 	Amount          float64   `json:"amount"`
 	TimesAchieved   int       `json:"times_achieved"`
 	Status          string    `json:"status"`
@@ -29,7 +30,7 @@ type Flag struct {
 }
 
 // CreateFlag create flag
-func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
+func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) bool {
 	db.Create(&Flag{
 		PayerID:        flagJSON.PayerID,
 		PayerName:      user.FullName,
@@ -38,6 +39,7 @@ func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
 		Days:           flagJSON.Days,
 		MaxWitness:     flagJSON.MaxWitness,
 		AssetID:        flagJSON.AssetID,
+		Symbol:         flagJSON.Symbol,
 		Amount:         flagJSON.Amount,
 		Status:         "unverified",
 		// below are derived
@@ -53,6 +55,56 @@ func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
 func GetAllFlags(pageSize, currentPage int) (flags []Flag, count int) {
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
+	db.Model(&Flag{}).Count(&count)
+	return
+}
+
+// GetFlagsWithVerified update flag status according to witness
+func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSchemas []schemas.FlagSchema, count int) {
+	skip := (currentPage - 1) * pageSize
+
+	var flags []Flag
+	// first fetch flags
+	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
+
+	// then fetch witness according to userID and flagID
+	flagIDs := make([]uuid.UUID, len(flags))
+	for i := 0; i < len(flags); i++ {
+		flagIDs = append(flagIDs, flags[i].ID)
+	}
+
+	var witnesses []Witness
+	db.Where("flag_id IN (?) and payee_id = ?", flagIDs, userID).Find(&witnesses)
+
+	for _, flag := range flags {
+		verified := 0
+		for _, w := range witnesses {
+			if w.FlagID != w.FlagID {
+				continue
+			}
+			verified = w.Verified
+			break
+		}
+
+		flagSchemas = append(flagSchemas, schemas.FlagSchema{
+			ID:              flag.ID,
+			PayerID:         flag.PayerID,
+			PayerName:       flag.PayerName,
+			PayerAvatarURL:  flag.PayerAvatarURL,
+			Task:            flag.Task,
+			Days:            flag.Days,
+			MaxWitness:      flag.MaxWitness,
+			AssetID:         flag.AssetID,
+			Symbol:          flag.Symbol,
+			Amount:          flag.Amount,
+			TimesAchieved:   flag.TimesAchieved,
+			Status:          flag.Status,
+			RemainingAmount: flag.RemainingAmount,
+			RemainingDays:   flag.RemainingDays,
+			Verified:        verified,
+		})
+	}
+
 	db.Model(&Flag{}).Count(&count)
 	return
 }
