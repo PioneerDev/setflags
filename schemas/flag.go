@@ -11,6 +11,7 @@ type Flag struct {
 	Days           int       `json:"days" binding:"required"`
 	MaxWitness     int       `json:"max_witness" binding:"required"`
 	AssetID        uuid.UUID `json:"asset_id" binding:"required"`
+	Symbol         string    `json:"symbol" binding:"required"`
 	Amount         float64   `json:"amount" binding:"required"`
 	TimesAchieved  int       `json:"times_achieved"`
 	Status         string    `json:"status"`

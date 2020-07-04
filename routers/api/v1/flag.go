@@ -23,6 +23,18 @@ import (
 func ListFlags(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
+	var header schemas.Header
+
+	if err := c.BindHeader(&header); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	userID, _ := uuid.FromString(header.XUSERID)
+
 	var pagination schemas.Pagination
 
 	c.ShouldBindQuery(&pagination)
@@ -35,7 +47,8 @@ func ListFlags(c *gin.Context) {
 		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
-	data, total := models.GetAllFlags(pagination.PageSize, pagination.CurrentPage)
+	// data, total := models.GetAllFlags(pagination.PageSize, pagination.CurrentPage)
+	data, total := models.GetFlagsWithVerified(pagination.PageSize, pagination.CurrentPage, userID)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{

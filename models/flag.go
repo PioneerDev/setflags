@@ -19,6 +19,7 @@ type Flag struct {
 	Days            int       `json:"days"`
 	MaxWitness      int       `json:"max_witness"`
 	AssetID         uuid.UUID `json:"asset_id"`
+	Symbol          string    `json:"symbol"`
 	Amount          float64   `json:"amount"`
 	TimesAchieved   int       `json:"times_achieved"`
 	Status          string    `json:"status"`
@@ -38,6 +39,7 @@ func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
 		Days:           flagJSON.Days,
 		MaxWitness:     flagJSON.MaxWitness,
 		AssetID:        flagJSON.AssetID,
+		Symbol:         flagJSON.Symbol,
 		Amount:         flagJSON.Amount,
 		Status:         "unverified",
 		// below are derived
@@ -53,6 +55,48 @@ func CreateFlag(flagJSON *schemas.Flag, user *UserSchema) bool {
 func GetAllFlags(pageSize, currentPage int) (flags []Flag, count int) {
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
+	db.Model(&Flag{}).Count(&count)
+	return
+}
+
+// GetFlagsWithVerified update flag status according to witness
+func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flags []Flag, count int) {
+	skip := (currentPage - 1) * pageSize
+
+	// first fetch flags
+	db.Offset(skip).Limit(pageSize).Order("created_at desc").Find(&flags)
+
+	// then fetch witness according to userID and flagID
+	flagIDs := make([]uuid.UUID, len(flags))
+	for i := 0; i < len(flags); i++ {
+		flagIDs = append(flagIDs, flags[i].ID)
+	}
+
+	var witnesses []Witness
+	db.Where("flag_id IN (?) and payee_id = ?", flagIDs, userID).Find(&witnesses)
+
+	for _, flag := range flags {
+		status := ""
+		for _, w := range witnesses {
+			if w.FlagID != w.FlagID {
+				continue
+			}
+
+			if w.Verified == 1 {
+				status = "yes"
+			} else if w.Verified == -1 {
+				status = "no"
+			} else if w.Verified == 2 {
+				status = "done"
+			} else {
+				status = "unverified"
+			}
+			break
+		}
+
+		flag.Status = status
+	}
+
 	db.Model(&Flag{}).Count(&count)
 	return
 }
