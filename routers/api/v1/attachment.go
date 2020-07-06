@@ -108,6 +108,15 @@ func UploadEvidence(c *gin.Context) {
 
 	ctx := context.Background()
 	attachment, err := user.CreateAttachment(ctx)
+	if err != nil {
+		code = e.ERROR
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
