@@ -107,7 +107,7 @@ func CreateFlag(c *gin.Context) {
 
 	models.CreateFlag(&flag, user)
 
-	assetID := flag.AssetID.String()
+	// assetID := flag.AssetID.String()
 	traceID, _ := uuid.NewV1()
 	memo := "转账给励志机器人."
 	appID := setting.GetConfig().Bot.ClientID.String()
@@ -116,10 +116,11 @@ func CreateFlag(c *gin.Context) {
 
 	data := map[string]interface{}{
 		"recipient": appID,
-		"asset":     assetID,
-		"amount":    flag.Amount,
-		"trace":     traceID,
-		"memo":      memo,
+		// "asset":     assetID,
+		"asset":  "965e5c6e-434c-3fa9-b780-c50f43cd955c",
+		"amount": flag.Amount,
+		"trace":  traceID,
+		"memo":   memo,
 	}
 
 	code = e.SUCCESS
