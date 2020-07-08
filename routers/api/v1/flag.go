@@ -111,14 +111,22 @@ func CreateFlag(c *gin.Context) {
 	traceID, _ := uuid.NewV1()
 	memo := "转账给励志机器人."
 	appID := setting.GetConfig().Bot.ClientID.String()
-	payURL := fmt.Sprintf("https://mixin.one/pay?recipient=%s&asset=%s&amount=%f&trace=%s&memo=%s",
-		appID, assetID, flag.Amount, traceID, memo)
+	// payURL := fmt.Sprintf("https://mixin.one/pay?recipient=%s&asset=%s&amount=%f&trace=%s&memo=%s",
+	// 	appID, assetID, flag.Amount, traceID, memo)
+
+	data := map[string]interface{}{
+		"recipient": appID,
+		"asset":     assetID,
+		"amount":    flag.Amount,
+		"trace":     traceID,
+		"memo":      memo,
+	}
 
 	code = e.SUCCESS
 	c.JSON(http.StatusCreated, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": payURL,
+		"data": data,
 	})
 }
 
