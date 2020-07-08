@@ -108,11 +108,17 @@ func CreateFlag(c *gin.Context) {
 
 	models.CreateFlag(&flag, user)
 
+	assetID := flag.AssetID.String()
+	traceID, _ := uuid.NewV1()
+	memo := "转账给励志机器人."
+	amount := fmt.Sprintf("%.8f", flag.Amount)
+	appID := setting.GetConfig().Bot.ClientID.String()
+	payURL := mixin.PayURL(assetID, traceID.String(), appID, amount, memo)
 	code = e.SUCCESS
 	c.JSON(http.StatusCreated, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": make(map[string]interface{}),
+		"data": payURL,
 	})
 }
 
@@ -170,16 +176,10 @@ func UpdateFlag(c *gin.Context) {
 			"data": make(map[string]interface{}),
 		})
 	} else {
-		assetID := flag.AssetID.String()
-		traceID, _ := uuid.NewV1()
-		memo := "转账给励志机器人."
-		amount := fmt.Sprintf("%.8f", flag.Amount)
-		appID := setting.GetConfig().Bot.ClientID.String()
-		payURL := mixin.PayURL(assetID, traceID.String(), appID, amount, memo)
 		c.JSON(http.StatusOK, gin.H{
 			"code": code,
 			"msg":  e.GetMsg(code),
-			"data": payURL,
+			"data": make(map[string]interface{}),
 		})
 	}
 }
