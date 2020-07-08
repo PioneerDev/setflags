@@ -9,7 +9,6 @@ import (
 	"set-flags/pkg/setting"
 	"set-flags/schemas"
 
-	"github.com/fox-one/mixin-sdk"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 )
@@ -111,9 +110,10 @@ func CreateFlag(c *gin.Context) {
 	assetID := flag.AssetID.String()
 	traceID, _ := uuid.NewV1()
 	memo := "转账给励志机器人."
-	amount := fmt.Sprintf("%.8f", flag.Amount)
+	// amount := fmt.Sprintf("%.8f", flag.Amount)
 	appID := setting.GetConfig().Bot.ClientID.String()
-	payURL := mixin.PayURL(assetID, traceID.String(), appID, amount, memo)
+	payURL := fmt.Sprintf("https://mixin.one/pay?recipient=%s&asset=%s&amount=%.8f&trace=%s&memo=%s",
+		appID, assetID, flag.Amount, traceID, memo)
 	code = e.SUCCESS
 	c.JSON(http.StatusCreated, gin.H{
 		"code": code,
