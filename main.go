@@ -20,6 +20,7 @@ import (
 	"time"
 
 	number "github.com/MixinNetwork/go-number"
+	"github.com/fox-one/mixin-sdk"
 	sdk "github.com/fox-one/mixin-sdk"
 	"github.com/fvbock/endless"
 	uuid "github.com/gofrs/uuid"
@@ -229,6 +230,22 @@ func upsertAsset(ctx context.Context, bot *sdk.User) {
 	}
 }
 
+type (
+	verifyPaymentInput struct {
+		AssetID    string `json:"asset_id,omitempty"`
+		OpponentID string `json:"opponent_id,omitempty"`
+		Amount     string `json:"amount,omitempty"`
+		TraceID    string `json:"trace_id,omitempty"`
+	}
+
+	verifyPaymentResponse struct {
+		Recipient *mixin.Profile `json:"recipient,omitempty"`
+		Asset     *mixin.Asset   `json:"asset,omitempty"`
+		Amount    string         `json:"amount,omitempty"`
+		Status    string         `json:"status,omitempty"`
+	}
+)
+
 func checkPayment(ctx context.Context, bot *sdk.User) {
 	payments := models.ListNoPaidPayment()
 
@@ -239,17 +256,19 @@ func checkPayment(ctx context.Context, bot *sdk.User) {
 			Amount:     payment.Amount,
 			TraceID:    payment.TraceID.String(),
 		}
-		resp, err := bot.VerifyPayment(ctx, verifyInput)
-		logging.Info(fmt.Sprintf("verified payment status: %v", resp.Statue))
+		// resp, err := bot.VerifyPayment(ctx, verifyInput)
+		var resp verifyPaymentResponse
+		err := bot.Request(ctx, "POST", "/payments", verifyInput, &resp)
+		logging.Info(fmt.Sprintf("verified payment status: %v", resp.Status))
 		logging.Info(fmt.Sprintf("verified payment status: %v", resp))
 		if err != nil {
 			logging.Error(fmt.Sprintf("verified payment err: %v", err))
 			continue
 		}
 
-		if resp.Statue == "paid" {
-			models.UpdatePaymentStatus(payment.TraceID, resp.Statue)
-			models.UpdateFlagStatus(payment.FlagID, resp.Statue)
+		if resp.Status == "paid" {
+			models.UpdatePaymentStatus(payment.TraceID, resp.Status)
+			models.UpdateFlagStatus(payment.FlagID, resp.Status)
 		}
 	}
 }
