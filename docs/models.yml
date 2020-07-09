@@ -70,6 +70,34 @@ paths:
       responses:
         "405":
           description: "Invalid input"
+  /flag/detail:
+    get:
+      summary: "Fetch a flag detail"
+      description: "Fetch flag detail"
+      operationId: "flagDetail"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+          default: "Bearer token"
+        - in: "query"
+          name: "flag_id"
+          description: "flag id"
+          required: true
+          type: "string"
+          format: "uuid"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Flag"
+        "405":
+          description: "Invalid input"
   /flags/{id}/{op}:
     put:
       summary: "Update an existing flag"
