@@ -229,6 +229,30 @@ func upsertAsset(ctx context.Context, bot *sdk.User) {
 	}
 }
 
+func checkPayment(ctx context.Context, bot *sdk.User) {
+	payments := models.ListNoPaidPayment()
+
+	for _, payment := range payments {
+		verifyInput := &sdk.VerifyPaymentInput{
+			AssetID:    payment.AssetID,
+			OpponentID: payment.OpponentID,
+			Amount:     payment.Amount,
+			TraceID:    payment.TraceID.String(),
+		}
+		resp, err := bot.VerifyPayment(ctx, verifyInput)
+
+		if err != nil {
+			logging.Error(fmt.Sprintf("verified payment err: %v", err))
+			continue
+		}
+
+		if resp.Statue == "paid" {
+			models.UpdatePaymentStatus(payment.TraceID, resp.Statue)
+			models.UpdateFlagStatus(payment.FlagID, resp.Statue)
+		}
+	}
+}
+
 // Reminder Reminder
 func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 	flags := models.ListActiveFlags(true)
@@ -283,8 +307,12 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 	// 	Reminder(ctx, bot, true)
 	// })
 
+	// cron.AddFunc("0 * * * * ?", func() {
+	// 	upsertAsset(ctx, bot)
+	// })
+
 	cron.AddFunc("0 * * * * ?", func() {
-		upsertAsset(ctx, bot)
+		checkPayment(ctx, bot)
 	})
 }
 
@@ -321,7 +349,7 @@ func main() {
 
 	err := server.ListenAndServe()
 	if err != nil {
-		logging.Info(fmt.Sprintf("Server err: %v", err))
+		logging.Error(fmt.Sprintf("Server err: %v", err))
 		log.Printf("Server err: %v", err)
 	}
 }

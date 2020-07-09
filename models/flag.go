@@ -31,8 +31,8 @@ type Flag struct {
 }
 
 // CreateFlag create flag
-func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) bool {
-	db.Create(&Flag{
+func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) uuid.UUID {
+	flag := &Flag{
 		PayerID:        flagJSON.PayerID,
 		PayerName:      user.FullName,
 		PayerAvatarURL: user.AvatarURL,
@@ -47,9 +47,10 @@ func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) bool {
 		RemainingAmount: flagJSON.Amount,
 		RemainingDays:   flagJSON.Days,
 		TimesAchieved:   0,
-	})
+	}
+	db.Create(flag)
 
-	return true
+	return flag.ID
 }
 
 // GetAllFlags fetch all flags
@@ -156,7 +157,7 @@ func FindFlagByID(flagID uuid.UUID) (flag Flag) {
 
 // UpdateFlagStatus update flag's status
 func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
-	db.Model(&Flag{}).Where("id = ?", flagID.String()).Update("status", strings.ToUpper(status))
+	db.Model(&Flag{}).Where("id = ?", flagID).Update("status", strings.ToUpper(status))
 	return true
 }
 

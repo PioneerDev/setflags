@@ -104,23 +104,32 @@ func CreateFlag(c *gin.Context) {
 	// find user
 	user := models.FindUserByID(userID)
 	flag.PayerID = userID
-
-	models.CreateFlag(&flag, user)
-
-	// assetID := flag.AssetID.String()
 	traceID, _ := uuid.NewV1()
+
+	flagID := models.CreateFlag(&flag, user)
+
+	assetID := flag.AssetID.String()
+	assetID = "965e5c6e-434c-3fa9-b780-c50f43cd955c"
 	memo := "转账给励志机器人."
 	appID := setting.GetConfig().Bot.ClientID.String()
-	// payURL := fmt.Sprintf("https://mixin.one/pay?recipient=%s&asset=%s&amount=%f&trace=%s&memo=%s",
-	// 	appID, assetID, flag.Amount, traceID, memo)
+
+	payment := models.Payment{
+		TraceID:    traceID,
+		FlagID:     flagID,
+		AssetID:    assetID,
+		OpponentID: appID,
+		Amount:     fmt.Sprintf("%f", flag.Amount),
+		Memo:       memo,
+	}
+
+	models.CreatePayment(payment)
 
 	data := map[string]interface{}{
 		"recipient": appID,
-		// "asset":     assetID,
-		"asset":  "965e5c6e-434c-3fa9-b780-c50f43cd955c",
-		"amount": flag.Amount,
-		"trace":  traceID,
-		"memo":   memo,
+		"asset":     assetID,
+		"amount":    flag.Amount,
+		"trace":     traceID,
+		"memo":      memo,
 	}
 
 	code = e.SUCCESS
@@ -307,5 +316,32 @@ func ListEvidences(c *gin.Context) {
 		"msg":   e.GetMsg(code),
 		"data":  data,
 		"total": total,
+	})
+}
+
+// FlagDetail FlagDetail
+func FlagDetail(c *gin.Context) {
+	code := e.INVALID_PARAMS
+
+	flagID, err := uuid.FromString(c.Param("flag_id"))
+
+	logging.Info(fmt.Sprintf("flag_id %v", flagID))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	flag := models.FindFlagByID(flagID)
+
+	code = e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  e.GetMsg(code),
+		"data": flag,
 	})
 }
