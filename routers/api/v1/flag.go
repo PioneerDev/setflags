@@ -323,7 +323,7 @@ func ListEvidences(c *gin.Context) {
 func FlagDetail(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	flagID, err := uuid.FromString(c.Param("flag_id"))
+	flagID, err := uuid.FromString(c.Query("flag_id"))
 
 	logging.Info(fmt.Sprintf("flag_id %v", flagID))
 
