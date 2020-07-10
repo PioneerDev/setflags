@@ -256,9 +256,7 @@ func checkPayment(ctx context.Context, bot *sdk.User) {
 			Amount:     payment.Amount,
 			TraceID:    payment.TraceID.String(),
 		}
-		// resp, err := bot.VerifyPayment(ctx, verifyInput)
-		var resp verifyPaymentResponse
-		err := bot.Request(ctx, "POST", "/payments", verifyInput, &resp)
+		resp, err := bot.VerifyPayment(ctx, verifyInput)
 		logging.Info(fmt.Sprintf("verified payment status: %v", resp.Status))
 		logging.Info(fmt.Sprintf("verified payment status: %v", resp))
 		if err != nil {
