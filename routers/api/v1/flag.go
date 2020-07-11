@@ -125,6 +125,7 @@ func CreateFlag(c *gin.Context) {
 	models.CreatePayment(payment)
 
 	data := map[string]interface{}{
+		"flag_id":   flagID,
 		"recipient": appID,
 		"asset":     assetID,
 		"amount":    flag.Amount,
