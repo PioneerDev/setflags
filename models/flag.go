@@ -106,6 +106,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 			Amount:          flag.Amount,
 			TimesAchieved:   flag.TimesAchieved,
 			Status:          flag.Status,
+			PeriodStatus:    flag.PeriodStatus,
 			RemainingAmount: flag.RemainingAmount,
 			RemainingDays:   flag.RemainingDays,
 			Verified:        verified,
@@ -137,6 +138,7 @@ func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flagSchemas
 			Amount:          flag.Amount,
 			TimesAchieved:   flag.TimesAchieved,
 			Status:          flag.Status,
+			PeriodStatus:    flag.PeriodStatus,
 			RemainingAmount: flag.RemainingAmount,
 			RemainingDays:   flag.RemainingDays,
 		})
