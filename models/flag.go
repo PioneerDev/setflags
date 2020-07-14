@@ -24,6 +24,7 @@ type Flag struct {
 	Amount          float64   `json:"amount"`
 	TimesAchieved   int       `json:"times_achieved"`
 	Status          string    `json:"status"`
+	PeriodStatus    string    `json:"period_status"`
 	RemainingDays   int       `json:"remaining_days"`
 	RemainingAmount float64   `json:"remaining_amount"`
 	CreatedAt       time.Time `json:"created_at"`
@@ -42,7 +43,8 @@ func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) uuid.UUID {
 		AssetID:        flagJSON.AssetID,
 		Symbol:         flagJSON.Symbol,
 		Amount:         flagJSON.Amount,
-		Status:         strings.ToUpper("unverified"),
+		Status:         strings.ToUpper("pending"),
+		PeriodStatus:   strings.ToUpper("undone"),
 		// below are derived
 		RemainingAmount: flagJSON.Amount,
 		RemainingDays:   flagJSON.Days,
@@ -82,7 +84,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 	db.Where("flag_id IN (?) and payee_id = ?", flagIDs, userID).Find(&witnesses)
 
 	for _, flag := range flags {
-		verified := 0
+		verified := "UNSET"
 		for _, w := range witnesses {
 			if w.FlagID != w.FlagID {
 				continue
@@ -157,9 +159,9 @@ func FindFlagByID(flagID uuid.UUID) (flag Flag) {
 	return
 }
 
-// UpdateFlagStatus update flag's status
-func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
-	db.Model(&Flag{}).Where("id = ?", flagID).Update("status", strings.ToUpper(status))
+// UpdateFlagStatus update flag's period status
+func UpdateFlagStatus(flagID uuid.UUID, periodStatus string) bool {
+	db.Model(&Flag{}).Where("id = ?", flagID).Update("period_status", strings.ToUpper(periodStatus))
 	return true
 }
 
