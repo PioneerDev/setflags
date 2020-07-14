@@ -2,6 +2,7 @@ package models
 
 import (
 	"set-flags/schemas"
+	"strings"
 	"time"
 
 	uuid "github.com/gofrs/uuid"
@@ -12,26 +13,22 @@ import (
 type Witness struct {
 	FlagID        uuid.UUID `json:"flag_id"`
 	PayeeID       uuid.UUID `json:"payee_id"`
-	Verified      int       `json:"verified"`
+	Verified      string    `json:"verified"`
 	WitnessedTime time.Time `json:"witnessed_time"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
+// GetWitnessByFlagIDAndPayeeID GetWitnessByFlagIDAndPayeeID
+func GetWitnessByFlagIDAndPayeeID(flagID, payeeID uuid.UUID) (w Witness) {
+	db.Where("flag_id = ? and payee_id = ?", flagID, payeeID).Find(&w)
+	return
+}
+
 // UpsertWitness UpsertWitness
 func UpsertWitness(flagID, payeeID uuid.UUID, op string) {
 
-	var verified int
-	if op == "yes" {
-		verified = 1
-	} else if op == "no" {
-		verified = -1
-	} else if op == "done" {
-		verified = 2
-	} else {
-		verified = 0
-	}
-
+	verified := strings.ToUpper(op)
 	witness := Witness{
 		FlagID:   flagID,
 		PayeeID:  payeeID,

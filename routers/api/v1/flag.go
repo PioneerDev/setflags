@@ -324,6 +324,18 @@ func ListEvidences(c *gin.Context) {
 func FlagDetail(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
+	var header schemas.Header
+
+	if err := c.BindHeader(&header); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": 400,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+	userID, _ := uuid.FromString(header.XUSERID)
+
 	flagID, err := uuid.FromString(c.Query("flag_id"))
 
 	logging.Info(fmt.Sprintf("flag_id %v", flagID))
@@ -339,10 +351,35 @@ func FlagDetail(c *gin.Context) {
 
 	flag := models.FindFlagByID(flagID)
 
+	flagSchema := schemas.FlagSchema{
+		ID:              flag.ID,
+		PayerID:         flag.PayerID,
+		PayerName:       flag.PayerName,
+		PayerAvatarURL:  flag.PayerAvatarURL,
+		Task:            flag.Task,
+		Days:            flag.Days,
+		MaxWitness:      flag.MaxWitness,
+		AssetID:         flag.AssetID,
+		Symbol:          flag.Symbol,
+		Amount:          flag.Amount,
+		TimesAchieved:   flag.TimesAchieved,
+		Status:          flag.Status,
+		PeriodStatus:    flag.PeriodStatus,
+		Verified:        "UNSET",
+		RemainingAmount: flag.RemainingAmount,
+		RemainingDays:   flag.RemainingDays,
+	}
+	// current user is not flag creator
+	// fetch witness
+	if userID != flag.PayerID {
+		witness := models.GetWitnessByFlagIDAndPayeeID(flagID, userID)
+		flagSchema.Verified = witness.Verified
+	}
+
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  e.GetMsg(code),
-		"data": flag,
+		"data": flagSchema,
 	})
 }

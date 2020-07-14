@@ -15,5 +15,5 @@ type WitnessSchema struct {
 	WitnessedTime  time.Time `json:"witnessed_time"`
 	Amount         float64   `json:"amount"`
 	Symbol         string    `json:"symbol"`
-	Verified       int       `json:"verified"`
+	Verified       string    `json:"verified"`
 }
