@@ -100,10 +100,12 @@ func countVotes(flag *models.Flag) (int, int, int) {
 		if p.PayeeID == flag.PayerID {
 			continue
 		}
-		if p.Verified == 1 {
+		// 1 to yes
+		if p.Verified == "YES" {
 			yesVotes = yesVotes + 1
 		}
-		if p.Verified == -1 {
+		// -1 to no
+		if p.Verified == "NO" {
 			noVotes = noVotes + 1
 		}
 	}
@@ -114,10 +116,12 @@ func payWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, nCorrec
 	amount := number.FromFloat(flag.Amount).Div(number.FromFloat(float64(10) * float64(flag.Days) * float64(nCorrect)))
 	for _, p := range flag.Witnesses() {
 		if p.PayeeID != flag.PayerID {
-			if yesVotes >= noVotes && p.Verified == 1 || yesVotes <= noVotes && p.Verified == -1 {
+			// 1 to yes -1 to no
+			if yesVotes >= noVotes && p.Verified == "YES" || yesVotes <= noVotes && p.Verified == "NO" {
 				payFee(ctx, bot, p.PayeeID, flag, amount)
 			}
-			p.Verified = 0
+			// 0 to unset
+			p.Verified = "UNSET"
 		}
 	}
 }
@@ -186,7 +190,8 @@ func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag 
 
 func remindWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, remainingDays int, task string) {
 	for _, p := range flag.Witnesses() {
-		if p.Verified == 0 && p.PayeeID != flag.PayerID {
+		// 0 to unset
+		if p.Verified == "UNSET" && p.PayeeID != flag.PayerID {
 			appMsg := "请您验证:@%d第%d天完成%s了吗？"
 			cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, p.PayeeID)
 			payer := models.FindUserByID(flag.PayerID)
@@ -208,7 +213,9 @@ func remindPayerForEvidence(ctx context.Context, bot *sdk.User, flag *models.Fla
 	done := false
 	for _, p := range flag.Witnesses() {
 		if p.PayeeID == flag.PayerID {
-			done = (p.Verified == 2)
+			// TODO
+			// 2 to done
+			done = (p.Verified == "DONE")
 			break
 		}
 	}
@@ -266,7 +273,9 @@ func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 		}
 		isVerified := false
 		for _, pp := range flag.Witnesses() {
-			if pp.Verified == 2 && pp.PayeeID == flag.PayerID {
+			// TODO
+			// 2 to done
+			if pp.Verified == "DONE" && pp.PayeeID == flag.PayerID {
 				isVerified = true
 				break
 			}
