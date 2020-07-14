@@ -67,7 +67,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 
 	var flags []Flag
 	// first fetch flags
-	db.Offset(skip).Limit(pageSize).Order("updated_at desc").Find(&flags)
+	db.Offset(skip).Limit(pageSize).Where("status = ?", "PAID").Order("updated_at desc").Find(&flags)
 
 	// then fetch witness according to userID and flagID
 	flagIDs := make([]uuid.UUID, len(flags))

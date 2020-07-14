@@ -20,7 +20,6 @@ import (
 	"time"
 
 	number "github.com/MixinNetwork/go-number"
-	"github.com/fox-one/mixin-sdk"
 	sdk "github.com/fox-one/mixin-sdk"
 	"github.com/fvbock/endless"
 	uuid "github.com/gofrs/uuid"
@@ -229,22 +228,6 @@ func upsertAsset(ctx context.Context, bot *sdk.User) {
 		models.UpsertAsset(asset)
 	}
 }
-
-type (
-	verifyPaymentInput struct {
-		AssetID    string `json:"asset_id,omitempty"`
-		OpponentID string `json:"opponent_id,omitempty"`
-		Amount     string `json:"amount,omitempty"`
-		TraceID    string `json:"trace_id,omitempty"`
-	}
-
-	verifyPaymentResponse struct {
-		Recipient *mixin.Profile `json:"recipient,omitempty"`
-		Asset     *mixin.Asset   `json:"asset,omitempty"`
-		Amount    string         `json:"amount,omitempty"`
-		Status    string         `json:"status,omitempty"`
-	}
-)
 
 func checkPayment(ctx context.Context, bot *sdk.User) {
 	payments := models.ListNoPaidPayment()
