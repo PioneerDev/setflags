@@ -19,6 +19,12 @@ type Witness struct {
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
+// GetWitnessByFlagIDAndPayeeID GetWitnessByFlagIDAndPayeeID
+func GetWitnessByFlagIDAndPayeeID(flagID, payeeID uuid.UUID) (w Witness) {
+	db.Where("flag_id = ? and payee_id = ?", flagID, payeeID).Find(&w)
+	return
+}
+
 // UpsertWitness UpsertWitness
 func UpsertWitness(flagID, payeeID uuid.UUID, op string) {
 
