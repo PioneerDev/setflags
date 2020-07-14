@@ -66,6 +66,9 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 	skip := (currentPage - 1) * pageSize
 
 	var flags []Flag
+
+	db.Model(&Flag{}).Where("status = ?", "PAID").Count(&count)
+
 	// first fetch flags
 	db.Offset(skip).Limit(pageSize).Where("status = ?", "PAID").Order("updated_at desc").Find(&flags)
 
@@ -107,7 +110,6 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 		})
 	}
 
-	db.Model(&Flag{}).Count(&count)
 	return
 }
 
