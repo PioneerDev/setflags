@@ -161,9 +161,15 @@ func FindFlagByID(flagID uuid.UUID) (flag Flag) {
 	return
 }
 
-// UpdateFlagStatus update flag's period status
-func UpdateFlagStatus(flagID uuid.UUID, periodStatus string) bool {
+// UpdateFlagPeriodStatus update flag's period status
+func UpdateFlagPeriodStatus(flagID uuid.UUID, periodStatus string) bool {
 	db.Model(&Flag{}).Where("id = ?", flagID).Update("period_status", strings.ToUpper(periodStatus))
+	return true
+}
+
+// UpdateFlagStatus update flag's status
+func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
+	db.Model(&Flag{}).Where("id = ?", flagID).Update("status", strings.ToUpper(status))
 	return true
 }
 

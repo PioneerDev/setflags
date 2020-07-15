@@ -182,7 +182,7 @@ func UpdateFlag(c *gin.Context) {
 
 	if flag.PayerID == userID && op == "done" {
 		code = e.SUCCESS
-		models.UpdateFlagStatus(flagID, op)
+		models.UpdateFlagPeriodStatus(flagID, op)
 	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
 		code = e.SUCCESS
 		models.UpsertWitness(flagID, userID, op)
