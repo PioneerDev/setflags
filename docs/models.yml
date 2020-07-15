@@ -472,6 +472,9 @@ definitions:
       times_achieved:
         type: "integer"
         format: "int32"
+      period:
+        type: "integer"
+        format: "int32"
       status:
         type: "string"
         enum:
@@ -560,6 +563,9 @@ definitions:
           - "yes"
           # payee flag not complete
           - "no"
+      period:
+        type: "integer"
+        format: "int32"
       witnessed_time:
         type: "string"
         format: "date-time"
