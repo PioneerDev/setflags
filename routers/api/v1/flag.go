@@ -185,7 +185,7 @@ func UpdateFlag(c *gin.Context) {
 		models.UpdateFlagPeriodStatus(flagID, op)
 	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
 		code = e.SUCCESS
-		models.UpsertWitness(flagID, userID, op)
+		models.UpsertWitness(flagID, userID, op, flag.Period)
 	}
 
 	if code != e.SUCCESS {
@@ -269,7 +269,18 @@ func GetWitnesses(c *gin.Context) {
 		return
 	}
 
-	witnesses, total := models.GetWitnessSchema(flagID, pagination.PageSize, pagination.CurrentPage)
+	if !models.FlagExists(flagID) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code": 404,
+			"msg":  "Flag not found.",
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	flag := models.FindFlagByID(flagID)
+
+	witnesses, total := models.GetWitnessSchema(flagID, pagination.PageSize, pagination.CurrentPage, flag.Period)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -368,11 +379,12 @@ func FlagDetail(c *gin.Context) {
 		Verified:        "UNSET",
 		RemainingAmount: flag.RemainingAmount,
 		RemainingDays:   flag.RemainingDays,
+		Period:          flag.Period,
 	}
 	// current user is not flag creator
 	// fetch witness
 	if userID != flag.PayerID {
-		witness := models.GetWitnessByFlagIDAndPayeeID(flagID, userID)
+		witness := models.GetWitnessByFlagIDAndPayeeID(flagID, userID, flag.Period)
 		flagSchema.Verified = witness.Verified
 	}
 

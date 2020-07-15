@@ -23,6 +23,7 @@ type Flag struct {
 	Symbol          string    `json:"symbol"`
 	Amount          float64   `json:"amount"`
 	TimesAchieved   int       `json:"times_achieved"`
+	Period          int       `json:"period"`
 	Status          string    `json:"status"`
 	PeriodStatus    string    `json:"period_status"`
 	RemainingDays   int       `json:"remaining_days"`
@@ -49,6 +50,7 @@ func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) uuid.UUID {
 		RemainingAmount: flagJSON.Amount,
 		RemainingDays:   flagJSON.Days,
 		TimesAchieved:   0,
+		Period:          0,
 	}
 	db.Create(flag)
 
@@ -110,6 +112,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 			RemainingAmount: flag.RemainingAmount,
 			RemainingDays:   flag.RemainingDays,
 			Verified:        verified,
+			Period:          flag.Period,
 		})
 	}
 
@@ -141,6 +144,7 @@ func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flagSchemas
 			PeriodStatus:    flag.PeriodStatus,
 			RemainingAmount: flag.RemainingAmount,
 			RemainingDays:   flag.RemainingDays,
+			Period:          flag.Period,
 		})
 	}
 	return
@@ -163,7 +167,8 @@ func FindFlagByID(flagID uuid.UUID) (flag Flag) {
 
 // UpdateFlagPeriodStatus update flag's period status
 func UpdateFlagPeriodStatus(flagID uuid.UUID, periodStatus string) bool {
-	db.Model(&Flag{}).Where("id = ?", flagID).Update("period_status", strings.ToUpper(periodStatus))
+	// db.Model(&Flag{}).Where("id = ?", flagID).Update("period_status", strings.ToUpper(periodStatus))
+	db.Model(&Flag{}).Where("id = ?", flagID).Updates(Flag{PeriodStatus: strings.ToUpper(periodStatus), Period: 1})
 	return true
 }
 
