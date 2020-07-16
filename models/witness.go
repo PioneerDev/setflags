@@ -15,24 +15,26 @@ type Witness struct {
 	PayeeID       uuid.UUID `json:"payee_id"`
 	Verified      string    `json:"verified"`
 	WitnessedTime time.Time `json:"witnessed_time"`
+	Period        int       `json:"period"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // GetWitnessByFlagIDAndPayeeID GetWitnessByFlagIDAndPayeeID
-func GetWitnessByFlagIDAndPayeeID(flagID, payeeID uuid.UUID) (w Witness) {
-	db.Where("flag_id = ? and payee_id = ?", flagID, payeeID).Find(&w)
+func GetWitnessByFlagIDAndPayeeID(flagID, payeeID uuid.UUID, period int) (w Witness) {
+	db.Where("flag_id = ? and payee_id = ? and period = ?", flagID, payeeID, period).Find(&w)
 	return
 }
 
 // UpsertWitness UpsertWitness
-func UpsertWitness(flagID, payeeID uuid.UUID, op string) {
+func UpsertWitness(flagID, payeeID uuid.UUID, op string, period int) {
 
 	verified := strings.ToUpper(op)
 	witness := Witness{
 		FlagID:   flagID,
 		PayeeID:  payeeID,
 		Verified: verified,
+		Period:   period,
 	}
 
 	// no found witness, insert witness
@@ -41,7 +43,7 @@ func UpsertWitness(flagID, payeeID uuid.UUID, op string) {
 }
 
 // GetWitnessSchema GetWitnessSchema
-func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage int) ([]schemas.WitnessSchema, int) {
+func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage, period int) ([]schemas.WitnessSchema, int) {
 
 	var count int
 
@@ -49,9 +51,9 @@ func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage int) ([]schemas.Wi
 
 	var witnesses []*Witness
 	skip := (currentPage - 1) * pageSize
-	db.Offset(skip).Limit(pageSize).Where("flag_id = ?", flagID).Find(&witnesses)
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and period = ?", flagID, period).Find(&witnesses)
 
-	db.Model(&Witness{}).Where("flag_id = ?", flagID).Count(&count)
+	db.Model(&Witness{}).Where("flag_id = ? and period = ?", flagID, period).Count(&count)
 
 	for _, witness := range witnesses {
 		var dbUser User
@@ -65,6 +67,7 @@ func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage int) ([]schemas.Wi
 			Amount:         1.0,
 			Verified:       witness.Verified,
 			WitnessedTime:  witness.WitnessedTime,
+			Period:         witness.Period,
 		})
 	}
 	return result, count

@@ -182,10 +182,10 @@ func UpdateFlag(c *gin.Context) {
 
 	if flag.PayerID == userID && op == "done" {
 		code = e.SUCCESS
-		models.UpdateFlagStatus(flagID, op)
+		models.UpdateFlagPeriodStatus(flagID, op)
 	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
 		code = e.SUCCESS
-		models.UpsertWitness(flagID, userID, op)
+		models.UpsertWitness(flagID, userID, op, flag.Period)
 	}
 
 	if code != e.SUCCESS {
@@ -269,7 +269,67 @@ func GetWitnesses(c *gin.Context) {
 		return
 	}
 
-	witnesses, total := models.GetWitnessSchema(flagID, pagination.PageSize, pagination.CurrentPage)
+	if !models.FlagExists(flagID) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code": 404,
+			"msg":  "Flag not found.",
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	flag := models.FindFlagByID(flagID)
+
+	witnesses, total := models.GetWitnessSchema(flagID, pagination.PageSize, pagination.CurrentPage, flag.Period)
+
+	code = e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  witnesses,
+		"total": total,
+	})
+}
+
+// GetWitnessesByPeriod GetWitnessesByPeriod
+func GetWitnessesByPeriod(c *gin.Context) {
+	code := e.INVALID_PARAMS
+
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
+	}
+
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.GetConfig().App.PageSize
+	}
+
+	flagID, err := uuid.FromString(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	if !models.FlagExists(flagID) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code": 404,
+			"msg":  "Flag not found.",
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	flag := models.FindFlagByID(flagID)
+
+	witnesses, total := models.GetWitnessSchema(flagID, pagination.PageSize, pagination.CurrentPage, flag.Period)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -285,6 +345,18 @@ func ListEvidences(c *gin.Context) {
 
 	code := e.INVALID_PARAMS
 
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage == 0 {
+		pagination.CurrentPage = 1
+	}
+
+	if pagination.PageSize == 0 {
+		pagination.PageSize = setting.GetConfig().App.PageSize
+	}
+
 	flagID, err := uuid.FromString(c.Param("id"))
 
 	logging.Info(fmt.Sprintf("flag_id %v", flagID))
@@ -296,6 +368,22 @@ func ListEvidences(c *gin.Context) {
 		})
 		return
 	}
+
+	data, total := models.FindEvidencesByFlag(flagID, pagination.CurrentPage, pagination.PageSize)
+
+	code = e.SUCCESS
+	c.JSON(http.StatusOK, gin.H{
+		"code":  code,
+		"msg":   e.GetMsg(code),
+		"data":  data,
+		"total": total,
+	})
+}
+
+// ListEvidencesWithPeriod list the evidences with period
+func ListEvidencesWithPeriod(c *gin.Context) {
+
+	code := e.INVALID_PARAMS
 
 	var pagination schemas.Pagination
 
@@ -309,7 +397,30 @@ func ListEvidences(c *gin.Context) {
 		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 
-	data, total := models.FindEvidencesByFlag(flagID, pagination.CurrentPage, pagination.PageSize)
+	flagID, err := uuid.FromString(c.Param("id"))
+
+	logging.Info(fmt.Sprintf("flag_id %v", flagID))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  err.Error(),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	if !models.FlagExists(flagID) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code": 404,
+			"msg":  "Flag not found.",
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	flag := models.FindFlagByID(flagID)
+
+	data, total := models.FindEvidencesByFlagAndPeriod(flagID, pagination.CurrentPage, pagination.PageSize, flag.Period)
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
@@ -368,11 +479,12 @@ func FlagDetail(c *gin.Context) {
 		Verified:        "UNSET",
 		RemainingAmount: flag.RemainingAmount,
 		RemainingDays:   flag.RemainingDays,
+		Period:          flag.Period,
 	}
 	// current user is not flag creator
 	// fetch witness
 	if userID != flag.PayerID {
-		witness := models.GetWitnessByFlagIDAndPayeeID(flagID, userID)
+		witness := models.GetWitnessByFlagIDAndPayeeID(flagID, userID, flag.Period)
 		flagSchema.Verified = witness.Verified
 	}
 

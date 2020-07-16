@@ -16,4 +16,5 @@ type WitnessSchema struct {
 	Amount         float64   `json:"amount"`
 	Symbol         string    `json:"symbol"`
 	Verified       string    `json:"verified"`
+	Period         int       `json:"period"`
 }

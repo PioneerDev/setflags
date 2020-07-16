@@ -15,6 +15,7 @@ type FlagSchema struct {
 	Symbol          string    `json:"symbol,omitempty" binding:"required"`
 	Amount          float64   `json:"amount,omitempty" binding:"required"`
 	TimesAchieved   int       `json:"times_achieved,omitempty"`
+	Period          int       `json:"period"`
 	Status          string    `json:"status,omitempty"`
 	PeriodStatus    string    `json:"period_status"`
 	Verified        string    `json:"verified"`
