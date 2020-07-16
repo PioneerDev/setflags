@@ -1,9 +1,11 @@
 package models
 
 import (
+	"set-flags/schemas"
 	"strings"
 
 	uuid "github.com/gofrs/uuid"
+	"github.com/jinzhu/gorm"
 )
 
 // Payment entity
@@ -34,4 +36,45 @@ func ListNoPaidPayment() (payments []*Payment) {
 // UpdatePaymentStatus UpdatePaymentStatus
 func UpdatePaymentStatus(traceID uuid.UUID, status string) {
 	db.Model(&Payment{}).Where("trace_id = ?", traceID).Update("status", strings.ToUpper(status))
+}
+
+// UpdatePaymentAndFlag update payment and flag status
+func UpdatePaymentAndFlag(db *gorm.DB, snapshot schemas.AccountSnapshot) error {
+	// 请注意，事务一旦开始，你就应该使用 tx 作为数据库句柄
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	err := tx.Model(&Payment{}).Where("trace_id = ?", snapshot.TraceID).Updates(map[string]interface{}{
+		"amount": snapshot.Amount,
+		"memo":   snapshot.Memo,
+		"status": strings.ToUpper("PAID"),
+	}).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	var payment Payment
+	db.Where("trace_id = ?", snapshot.TraceID).Select("flag_id").First(&payment)
+
+	err = tx.Model(&Flag{}).Where("id = ?", payment.FlagID).Updates(map[string]interface{}{
+		"amount": snapshot.Amount,
+		"period": 1,
+		"status": strings.ToUpper("PAID"),
+	}).Error
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }

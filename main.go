@@ -306,38 +306,28 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 			Reminder(ctx, bot, false)
 		})
 	*/
-	// cron.AddFunc("0 0 8 * * ?", func() {
-	// 	Reminder(ctx, bot, false)
-	// })
-	// cron.AddFunc("0 0 20 * * ?", func() {
-	// 	Reminder(ctx, bot, false)
-	// })
-	// cron.AddFunc("0 0 23 * * ?", func() {
-	// 	Reminder(ctx, bot, true)
-	// })
-
-	// cron.AddFunc("0 * * * * ?", func() {
-	// 	upsertAsset(ctx, bot)
-	// })
+	cron.AddFunc("0 0 8 * * ?", func() {
+		Reminder(ctx, bot, false)
+	})
+	cron.AddFunc("0 0 20 * * ?", func() {
+		Reminder(ctx, bot, false)
+	})
+	cron.AddFunc("0 0 23 * * ?", func() {
+		Reminder(ctx, bot, true)
+	})
 
 	cron.AddFunc("0 * * * * ?", func() {
-		checkPayment(ctx, bot)
+		upsertAsset(ctx, bot)
 	})
+
+	// cron.AddFunc("0 * * * * ?", func() {
+	// 	checkPayment(ctx, bot)
+	// })
 }
 
 func main() {
 	logging.Setup()
 	models.InitDB()
-	// bot := &sdk.User{
-	// 	UserID:    setting.GetConfig().Bot.ClientID.String(),
-	// 	SessionID: setting.GetConfig().Bot.SessionID,
-	// 	PINToken:  setting.GetConfig().Bot.PinToken,
-	// }
-	// block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
-	// if block != nil {
-	// 	privateKey, _ := x509.ParsePKCS1PrivateKey(block.Bytes)
-	// 	bot.SetPrivateKey(privateKey)
-	// }
 	global.BotInit()
 	cron := newWithSeconds()
 	cron.Start()
