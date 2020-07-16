@@ -14,18 +14,20 @@ type Evidence struct {
 	FlagID       uuid.UUID `json:"flag_id"`
 	URL          string    `json:"url"`
 	Type         string    `json:"type"`
+	Period       int       `json:"period"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 // CreateEvidence create evidence
-func CreateEvidence(flagID uuid.UUID, attachmentID, mediaType, url string) bool {
+func CreateEvidence(flagID uuid.UUID, attachmentID, mediaType, url string, period int) bool {
 
 	db.Create(&Evidence{
 		AttachmentID: attachmentID,
 		FlagID:       flagID,
 		Type:         mediaType,
 		URL:          url,
+		Period:       period,
 	})
 	return true
 }
@@ -41,6 +43,15 @@ func FindEvidencesByFlag(flagID uuid.UUID, currentPage, pageSize int) (evidences
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and created_at >= ?", flagID.String(), yesterday).Order("created_at desc").Find(&evidences)
 	db.Model(&Evidence{}).Where("flag_id = ? and created_at >= ?", flagID.String(), yesterday).Count(&total)
+	return
+}
+
+// FindEvidencesByFlagAndPeriod FindEvidencesByFlagAndPeriod
+func FindEvidencesByFlagAndPeriod(flagID uuid.UUID, currentPage, pageSize, period int) (evidences []Evidence, total int) {
+
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and period = ?", flagID, period).Order("created_at desc").Find(&evidences)
+	db.Model(&Evidence{}).Where("flag_id = ? and period = ?", flagID, period).Count(&total)
 	return
 }
 

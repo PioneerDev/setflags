@@ -513,6 +513,9 @@ definitions:
       flag_id:
         type: "string"
         format: "uuid"
+      period:
+        type: "integer"
+        format: "int32"
       type:
         type: "string"
         enum:

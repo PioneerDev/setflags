@@ -2,13 +2,12 @@ package v1
 
 import (
 	"context"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"net/http"
+	"set-flags/global"
 	"set-flags/models"
 	"set-flags/pkg/e"
-	"set-flags/pkg/setting"
+	"set-flags/pkg/logging"
 	"set-flags/schemas"
 
 	"github.com/fox-one/mixin-sdk"
@@ -87,27 +86,27 @@ func UploadEvidence(c *gin.Context) {
 	}
 
 	// upload attachment
-	user := &mixin.User{
-		UserID:    setting.GetConfig().Bot.ClientID.String(),
-		SessionID: setting.GetConfig().Bot.SessionID,
-		PINToken:  setting.GetConfig().Bot.PinToken,
-	}
+	// user := &mixin.User{
+	// 	UserID:    setting.GetConfig().Bot.ClientID.String(),
+	// 	SessionID: setting.GetConfig().Bot.SessionID,
+	// 	PINToken:  setting.GetConfig().Bot.PinToken,
+	// }
 
-	block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  err.Error(),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
+	// block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
+	// privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"code": 500,
+	// 		"msg":  err.Error(),
+	// 		"data": make(map[string]interface{}),
+	// 	})
+	// 	return
+	// }
 
-	user.SetPrivateKey(privateKey)
+	// user.SetPrivateKey(privateKey)
 
 	ctx := context.Background()
-	attachment, err := user.CreateAttachment(ctx)
+	attachment, err := global.Bot.CreateAttachment(ctx)
 	if err != nil {
 		code = e.ERROR
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -164,12 +163,12 @@ func UploadEvidence(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("attachmentId: %s, flagId: %s", attachment.AttachmentID, flagID)
+	logging.Info("attachmentId: %s, flagId: %s", attachment.AttachmentID, flagID)
 
-	models.CreateEvidence(flagID, attachment.AttachmentID, mediaType, attachment.ViewURL)
+	models.CreateEvidence(flagID, attachment.AttachmentID, mediaType, attachment.ViewURL, flag.Period)
 
-	// update flag status to `done`
-	models.UpdateFlagStatus(flagID, "done")
+	// update flag period status to `done`
+	models.UpdateFlagPeriodStatus(flagID, "done")
 
 	code = e.SUCCESS
 	c.JSON(http.StatusOK, gin.H{

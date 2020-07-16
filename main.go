@@ -3,14 +3,13 @@ package main
 import (
 	"context"
 	"crypto/md5"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-	"encoding/pem"
 	"fmt"
 	"io"
 	"log"
 	"math"
+	"set-flags/global"
 	"set-flags/models"
 	"set-flags/pkg/logging"
 	"set-flags/pkg/setting"
@@ -329,22 +328,22 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 func main() {
 	logging.Setup()
 	models.InitDB()
-	bot := &sdk.User{
-		UserID:    setting.GetConfig().Bot.ClientID.String(),
-		SessionID: setting.GetConfig().Bot.SessionID,
-		PINToken:  setting.GetConfig().Bot.PinToken,
-	}
-	block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
-	if block != nil {
-		privateKey, _ := x509.ParsePKCS1PrivateKey(block.Bytes)
-		bot.SetPrivateKey(privateKey)
-	}
-
+	// bot := &sdk.User{
+	// 	UserID:    setting.GetConfig().Bot.ClientID.String(),
+	// 	SessionID: setting.GetConfig().Bot.SessionID,
+	// 	PINToken:  setting.GetConfig().Bot.PinToken,
+	// }
+	// block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
+	// if block != nil {
+	// 	privateKey, _ := x509.ParsePKCS1PrivateKey(block.Bytes)
+	// 	bot.SetPrivateKey(privateKey)
+	// }
+	global.BotInit()
 	cron := newWithSeconds()
 	cron.Start()
 	defer cron.Stop()
 	ctx := context.Background()
-	addTimers(ctx, cron, bot)
+	addTimers(ctx, cron, global.Bot)
 
 	endless.DefaultReadTimeOut = time.Duration(setting.GetConfig().App.ReadTimeOut) * time.Second
 	endless.DefaultWriteTimeOut = time.Duration(setting.GetConfig().App.WriteTimeOut) * time.Second
