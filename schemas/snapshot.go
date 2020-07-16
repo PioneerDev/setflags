@@ -4,7 +4,7 @@ import "time"
 
 // AccountSnapshot AccountSnapshot
 type AccountSnapshot struct {
-	Amount        string    `json:"amount,omitempty"`
+	Amount        float64   `json:"amount,omitempty"`
 	AssetID       string    `json:"asset_id,omitempty"`
 	CounterUserID string    `json:"counter_user_id"`
 	AddressID     string    `json:"address_id,omitempty"`
