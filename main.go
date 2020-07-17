@@ -278,6 +278,12 @@ func updateFlagPeriod() {
 	flags := models.ListPaidFlags()
 
 	for _, flag := range flags {
+
+		// continue old item, it's days per period is zero
+		if flag.DaysPerPeriod == 0 {
+			continue
+		}
+
 		// calculate time gap
 		// now - created / 24
 		timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
