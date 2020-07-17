@@ -475,6 +475,7 @@ func FlagDetail(c *gin.Context) {
 		Amount:          flag.Amount,
 		TimesAchieved:   flag.TimesAchieved,
 		Status:          flag.Status,
+		DaysPerPeriod:   flag.DaysPerPeriod,
 		PeriodStatus:    flag.PeriodStatus,
 		Verified:        "UNSET",
 		RemainingAmount: flag.RemainingAmount,

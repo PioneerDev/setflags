@@ -23,6 +23,7 @@ type Flag struct {
 	Symbol          string    `json:"symbol"`
 	Amount          float64   `json:"amount"`
 	TimesAchieved   int       `json:"times_achieved"`
+	DaysPerPeriod   int       `json:"days_per_period"`
 	Period          int       `json:"period"`
 	Status          string    `json:"status"`
 	PeriodStatus    string    `json:"period_status"`
@@ -34,6 +35,13 @@ type Flag struct {
 
 // CreateFlag create flag
 func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) uuid.UUID {
+
+	dayspPerPeriod := flagJSON.DaysPerPeriod
+
+	if dayspPerPeriod <= 0 {
+		dayspPerPeriod = 1
+	}
+
 	flag := &Flag{
 		PayerID:        flagJSON.PayerID,
 		PayerName:      user.FullName,
@@ -46,6 +54,7 @@ func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) uuid.UUID {
 		Amount:         flagJSON.Amount,
 		Status:         strings.ToUpper("pending"),
 		PeriodStatus:   strings.ToUpper("undone"),
+		DaysPerPeriod:  dayspPerPeriod,
 		// below are derived
 		RemainingAmount: flagJSON.Amount,
 		RemainingDays:   flagJSON.Days,
@@ -108,6 +117,7 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 			Amount:          flag.Amount,
 			TimesAchieved:   flag.TimesAchieved,
 			Status:          flag.Status,
+			DaysPerPeriod:   flag.DaysPerPeriod,
 			PeriodStatus:    flag.PeriodStatus,
 			RemainingAmount: flag.RemainingAmount,
 			RemainingDays:   flag.RemainingDays,
@@ -141,6 +151,7 @@ func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flagSchemas
 			Amount:          flag.Amount,
 			TimesAchieved:   flag.TimesAchieved,
 			Status:          flag.Status,
+			DaysPerPeriod:   flag.DaysPerPeriod,
 			PeriodStatus:    flag.PeriodStatus,
 			RemainingAmount: flag.RemainingAmount,
 			RemainingDays:   flag.RemainingDays,
@@ -175,6 +186,12 @@ func UpdateFlagPeriodStatus(flagID uuid.UUID, periodStatus string) bool {
 // UpdateFlagStatus update flag's status
 func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
 	db.Model(&Flag{}).Where("id = ?", flagID).Update("status", strings.ToUpper(status))
+	return true
+}
+
+// UpdateFlagPeriod UpdateFlagPeriod
+func UpdateFlagPeriod(flagID uuid.UUID, period int) bool {
+	db.Model(&Flag{}).Where("id = ?", flagID).Update("period", period)
 	return true
 }
 
@@ -226,4 +243,10 @@ func ListActiveFlags(paid bool) []*Flag {
 		db.Where("days > 1 and date_part('day', now() - created_at::date) < days and status!='PAID'").Find(&flags)
 	}
 	return flags
+}
+
+// ListPaidFlags ListPaidFlags
+func ListPaidFlags() (flags []*Flag) {
+	db.Where("status = ?", "PAID").Select("id, days_per_period, period, created_at").Find(&flags)
+	return
 }

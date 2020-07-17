@@ -475,6 +475,9 @@ definitions:
       period:
         type: "integer"
         format: "int32"
+      days_per_period:
+        type: "integer"
+        format: "int32"
       status:
         type: "string"
         enum:
@@ -482,6 +485,8 @@ definitions:
           - "paid"
           # payment not complete
           - "pending"
+          # flag life end
+          - "closed"
       period_status:
         type: "string"
         enum:
@@ -489,8 +494,6 @@ definitions:
           - "done"
           # not yet upload evidence
           - "undone"
-          # flag life end
-          - "closed"
       verified:
         type: "string"
         enum:
