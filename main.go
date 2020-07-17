@@ -235,31 +235,6 @@ func upsertAsset(ctx context.Context, bot *sdk.User) {
 	}
 }
 
-func checkPayment(ctx context.Context, bot *sdk.User) {
-	payments := models.ListNoPaidPayment()
-
-	for _, payment := range payments {
-		verifyInput := &sdk.VerifyPaymentInput{
-			AssetID:    payment.AssetID,
-			OpponentID: payment.OpponentID,
-			Amount:     payment.Amount,
-			TraceID:    payment.TraceID.String(),
-		}
-		resp, err := bot.VerifyPayment(ctx, verifyInput)
-		logging.Info(fmt.Sprintf("verified payment status: %v", resp.Status))
-		logging.Info(fmt.Sprintf("verified payment status: %v", resp))
-		if err != nil {
-			logging.Error(fmt.Sprintf("verified payment err: %v", err))
-			continue
-		}
-
-		if resp.Status == "paid" {
-			models.UpdatePaymentStatus(payment.TraceID, resp.Status)
-			models.UpdateFlagStatus(payment.FlagID, resp.Status)
-		}
-	}
-}
-
 // Reminder Reminder
 func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 	flags := models.ListActiveFlags(true)
@@ -299,6 +274,26 @@ func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 	}
 }
 
+func updateFlagPeriod() {
+	flags := models.ListPaidFlags()
+
+	for _, flag := range flags {
+		// calculate time gap
+		// now - created / 24
+		timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
+
+		// calcaulte period
+		// 13 / 7 + 1 = 2
+		period := int(math.Round(timeDelta/float64(flag.DaysPerPeriod))) + 1
+
+		if flag.Period == period {
+			continue
+		}
+
+		models.UpdateFlagPeriod(flag.ID, period)
+	}
+}
+
 func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 	/*
 		cron.AddFunc("0 * * * * ?", func() {
@@ -320,9 +315,9 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 		upsertAsset(ctx, bot)
 	})
 
-	// cron.AddFunc("0 * * * * ?", func() {
-	// 	checkPayment(ctx, bot)
-	// })
+	cron.AddFunc("0 * * * * ?", func() {
+		updateFlagPeriod()
+	})
 }
 
 func main() {
