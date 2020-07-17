@@ -35,9 +35,10 @@ type Flag struct {
 
 // CreateFlag create flag
 func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) uuid.UUID {
-	var dayspPerPeriod int
 
-	if dayspPerPeriod := flagJSON.DaysPerPeriod; dayspPerPeriod <= 0 {
+	dayspPerPeriod := flagJSON.DaysPerPeriod
+
+	if dayspPerPeriod <= 0 {
 		dayspPerPeriod = 1
 	}
 
