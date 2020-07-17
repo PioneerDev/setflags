@@ -284,7 +284,7 @@ func updateFlagPeriod() {
 			continue
 		}
 
-		fmt.Println(flag.DaysPerPeriod, flag.CreatedAt, flag.Period)
+		// fmt.Println(flag.DaysPerPeriod, flag.CreatedAt, flag.Period)
 		// calculate time gap
 		// now - created / 24
 		timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
