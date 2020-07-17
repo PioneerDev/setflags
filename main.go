@@ -284,6 +284,7 @@ func updateFlagPeriod() {
 			continue
 		}
 
+		fmt.Println(flag.DaysPerPeriod, flag.CreatedAt, flag.Period)
 		// calculate time gap
 		// now - created / 24
 		timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
@@ -307,19 +308,19 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 			Reminder(ctx, bot, false)
 		})
 	*/
-	cron.AddFunc("0 0 8 * * ?", func() {
-		Reminder(ctx, bot, false)
-	})
-	cron.AddFunc("0 0 20 * * ?", func() {
-		Reminder(ctx, bot, false)
-	})
-	cron.AddFunc("0 0 23 * * ?", func() {
-		Reminder(ctx, bot, true)
-	})
+	// cron.AddFunc("0 0 8 * * ?", func() {
+	// 	Reminder(ctx, bot, false)
+	// })
+	// cron.AddFunc("0 0 20 * * ?", func() {
+	// 	Reminder(ctx, bot, false)
+	// })
+	// cron.AddFunc("0 0 23 * * ?", func() {
+	// 	Reminder(ctx, bot, true)
+	// })
 
-	cron.AddFunc("0 * * * * ?", func() {
-		upsertAsset(ctx, bot)
-	})
+	// cron.AddFunc("0 * * * * ?", func() {
+	// 	upsertAsset(ctx, bot)
+	// })
 
 	cron.AddFunc("0 * * * * ?", func() {
 		updateFlagPeriod()
