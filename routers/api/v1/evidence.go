@@ -237,11 +237,11 @@ func ListEvidencesWithPeriod(c *gin.Context) {
 
 	if period == -1 {
 		flag := models.FindFlagByID(flagID)
-		evidences, total = models.FindEvidencesByFlagAndPeriod(flagID, pagination.PageSize, pagination.CurrentPage, flag.Period)
+		evidences, total = models.FindEvidencesByFlagAndPeriod(flagID, pagination.CurrentPage, pagination.PageSize, flag.Period)
 	} else if period == 0 {
-		evidences, total = models.GetAllEvidenceByFlagID(flagID, pagination.PageSize, pagination.CurrentPage)
+		evidences, total = models.GetAllEvidenceByFlagID(flagID, pagination.CurrentPage, pagination.PageSize)
 	} else if period > 0 {
-		evidences, total = models.FindEvidencesByFlagAndPeriod(flagID, pagination.PageSize, pagination.CurrentPage, period)
+		evidences, total = models.FindEvidencesByFlagAndPeriod(flagID, pagination.CurrentPage, pagination.PageSize, period)
 	}
 
 	code = e.SUCCESS

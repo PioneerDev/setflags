@@ -47,7 +47,7 @@ func FindEvidencesByFlag(flagID uuid.UUID, currentPage, pageSize int) (evidences
 }
 
 // GetAllEvidenceByFlagID GetAllEvidenceByFlagID
-func GetAllEvidenceByFlagID(flagID uuid.UUID, pageSize, currentPage int) (evidences []Evidence, total int) {
+func GetAllEvidenceByFlagID(flagID uuid.UUID, currentPage, pageSize int) (evidences []Evidence, total int) {
 	skip := (currentPage - 1) * pageSize
 	db.Offset(skip).Limit(pageSize).Where("flag_id = ?", flagID).Order("period desc, updated_at desc").Find(&evidences)
 	db.Model(&Evidence{}).Where("flag_id = ?", flagID).Count(&total)
