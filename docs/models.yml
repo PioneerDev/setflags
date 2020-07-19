@@ -269,6 +269,11 @@ paths:
           description: "per page size"
           required: false
           type: "integer"
+        - name: "period"
+          in: "query"
+          description: "period, 0 means all, missing means current, greater than 0 means specific period"
+          required: false
+          type: "integer"
       responses:
         "200":
           description: "successful operation"
@@ -305,6 +310,11 @@ paths:
         - name: "page_size"
           in: "query"
           description: "per page size"
+          required: false
+          type: "integer"
+        - name: "period"
+          in: "query"
+          description: "period, 0 means all, missing means current,  greater than 0 means specific period"
           required: false
           type: "integer"
       responses:

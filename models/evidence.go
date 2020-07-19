@@ -46,11 +46,20 @@ func FindEvidencesByFlag(flagID uuid.UUID, currentPage, pageSize int) (evidences
 	return
 }
 
+// GetAllEvidenceByFlagID GetAllEvidenceByFlagID
+func GetAllEvidenceByFlagID(flagID uuid.UUID, pageSize, currentPage int) (evidences []Evidence, total int) {
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ?", flagID).Order("period desc, updated_at desc").Find(&evidences)
+	db.Model(&Evidence{}).Where("flag_id = ?", flagID).Count(&total)
+	return
+}
+
 // FindEvidencesByFlagAndPeriod FindEvidencesByFlagAndPeriod
 func FindEvidencesByFlagAndPeriod(flagID uuid.UUID, currentPage, pageSize, period int) (evidences []Evidence, total int) {
 
 	skip := (currentPage - 1) * pageSize
-	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and period = ?", flagID, period).Order("created_at desc").Find(&evidences)
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and period = ?", flagID, period).
+		Order("period desc, updated_at desc").Find(&evidences)
 	db.Model(&Evidence{}).Where("flag_id = ? and period = ?", flagID, period).Count(&total)
 	return
 }

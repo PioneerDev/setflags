@@ -42,8 +42,8 @@ func UpsertWitness(flagID, payeeID uuid.UUID, op string, period int) {
 	db.Where(Witness{FlagID: flagID, PayeeID: payeeID}).Assign(Witness{Verified: verified}).FirstOrCreate(&witness)
 }
 
-// GetWitnessSchema GetWitnessSchema
-func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage, period int) ([]schemas.WitnessSchema, int) {
+// GetAllWitnessByFlagID GetAllWitnessByFlagID
+func GetAllWitnessByFlagID(flagID uuid.UUID, pageSize, currentPage int) ([]schemas.WitnessSchema, int) {
 
 	var count int
 
@@ -51,7 +51,40 @@ func GetWitnessSchema(flagID uuid.UUID, pageSize, currentPage, period int) ([]sc
 
 	var witnesses []*Witness
 	skip := (currentPage - 1) * pageSize
-	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and period = ?", flagID, period).Find(&witnesses)
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ?", flagID).Order("period desc, updated_at desc").Find(&witnesses)
+
+	db.Model(&Witness{}).Where("flag_id = ?", flagID).Count(&count)
+
+	for _, witness := range witnesses {
+		var dbUser User
+		db.Where("user_id = ?", witness.PayeeID.String()).First(&dbUser)
+		result = append(result, schemas.WitnessSchema{
+			FlagID:         flagID,
+			PayeeID:        witness.PayeeID,
+			PayeeName:      dbUser.FullName,
+			PayeeAvatarURL: dbUser.AvatarURL,
+			// todo
+			Symbol:        "BTC",
+			Amount:        1.0,
+			Verified:      witness.Verified,
+			WitnessedTime: witness.WitnessedTime,
+			Period:        witness.Period,
+		})
+	}
+	return result, count
+}
+
+// GetWitnessWithPeriod GetWitnessWithPeriod
+func GetWitnessWithPeriod(flagID uuid.UUID, pageSize, currentPage, period int) ([]schemas.WitnessSchema, int) {
+
+	var count int
+
+	result := make([]schemas.WitnessSchema, 0, 0)
+
+	var witnesses []*Witness
+	skip := (currentPage - 1) * pageSize
+	db.Offset(skip).Limit(pageSize).Where("flag_id = ? and period = ?", flagID, period).
+		Order("period desc, updated_at desc").Find(&witnesses)
 
 	db.Model(&Witness{}).Where("flag_id = ? and period = ?", flagID, period).Count(&count)
 
