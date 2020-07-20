@@ -364,6 +364,7 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 
 func main() {
 	global.BotInit()
+	models.InitDB()
 	cron := newWithSeconds()
 	cron.Start()
 	defer cron.Stop()
