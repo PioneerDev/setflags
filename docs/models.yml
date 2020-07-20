@@ -466,19 +466,24 @@ definitions:
         type: "string"
       task:
         type: "string"
+        description: "required"
       days:
         type: "integer"
         format: "int32"
       max_witness:
         type: "integer"
         format: "int32"
+        description: "required"
       asset_id:
         type: "string"
         format: "uuid"
+        description: "required"
       symbol:
         type: "string"
+        description: "required"
       amount:
         type: "number"
+        description: "required"
       times_achieved:
         type: "integer"
         format: "int32"
@@ -488,6 +493,11 @@ definitions:
       days_per_period:
         type: "integer"
         format: "int32"
+        description: "required"
+      total_period:
+        type: "integer"
+        format: "int32"
+        description: "required"
       status:
         type: "string"
         enum:

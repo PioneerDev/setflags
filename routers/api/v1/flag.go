@@ -101,6 +101,52 @@ func CreateFlag(c *gin.Context) {
 		return
 	}
 
+	if flag.MaxWitness <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("max witness must greater than zero."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	if flag.Amount <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("amount must greater than zero."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	if flag.DaysPerPeriod <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("days per period must greater than zero."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	if flag.TotalPeriod <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("total period must greater than zero."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	// check asset id
+	if !models.ExistAsset(flag.AssetID) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("asset not exist, asset_id: %s, symbol: %s", flag.AssetID, flag.Symbol),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
 	// find user
 	user := models.FindUserByID(userID)
 	flag.PayerID = userID
@@ -185,7 +231,7 @@ func UpdateFlag(c *gin.Context) {
 		models.UpdateFlagPeriodStatus(flagID, op)
 	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
 		code = e.SUCCESS
-		models.UpsertWitness(flagID, userID, op, flag.Period)
+		models.UpsertWitness(flagID, userID, flag.AssetID, op, flag.Symbol, flag.Period)
 	}
 
 	if code != e.SUCCESS {
@@ -292,6 +338,7 @@ func FlagDetail(c *gin.Context) {
 		RemainingAmount: flag.RemainingAmount,
 		RemainingDays:   flag.RemainingDays,
 		Period:          flag.Period,
+		TotalPeriod:     flag.TotalPeriod,
 	}
 	// current user is not flag creator
 	// fetch witness

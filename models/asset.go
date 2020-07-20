@@ -53,6 +53,15 @@ func FindAsset(assetID uuid.UUID) *Asset {
 	return nil
 }
 
+// ExistAsset ExistAsset
+func ExistAsset(assetID uuid.UUID) bool {
+	var count int
+
+	db.Model(&Asset{}).Where("id = ?", assetID).Count(&count)
+
+	return count == 1
+}
+
 // UpsertAsset UpsertAsset
 func UpsertAsset(asset *mixin.Asset) {
 
