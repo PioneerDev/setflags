@@ -369,4 +369,9 @@ func main() {
 	defer cron.Stop()
 	ctx := context.Background()
 	addTimers(ctx, cron, global.Bot)
+
+	select {
+	case <-time.After(time.Second * 10):
+		return
+	}
 }
