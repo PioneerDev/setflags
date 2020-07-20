@@ -24,6 +24,7 @@ type Flag struct {
 	Amount          float64   `json:"amount"`
 	TimesAchieved   int       `json:"times_achieved"`
 	DaysPerPeriod   int       `json:"days_per_period"`
+	TotalPeriod     int       `json:"total_period"`
 	Period          int       `json:"period"`
 	Status          string    `json:"status"`
 	PeriodStatus    string    `json:"period_status"`
@@ -47,17 +48,18 @@ func CreateFlag(flagJSON *schemas.FlagSchema, user *UserSchema) uuid.UUID {
 		PayerName:      user.FullName,
 		PayerAvatarURL: user.AvatarURL,
 		Task:           flagJSON.Task,
-		Days:           flagJSON.Days,
+		Days:           flagJSON.TotalPeriod * flagJSON.DaysPerPeriod,
 		MaxWitness:     flagJSON.MaxWitness,
 		AssetID:        flagJSON.AssetID,
 		Symbol:         flagJSON.Symbol,
 		Amount:         flagJSON.Amount,
 		Status:         strings.ToUpper("pending"),
 		PeriodStatus:   strings.ToUpper("undone"),
+		TotalPeriod:    flagJSON.TotalPeriod,
 		DaysPerPeriod:  dayspPerPeriod,
 		// below are derived
 		RemainingAmount: flagJSON.Amount,
-		RemainingDays:   flagJSON.Days,
+		RemainingDays:   flagJSON.TotalPeriod * flagJSON.DaysPerPeriod,
 		TimesAchieved:   0,
 		Period:          0,
 	}
@@ -165,7 +167,7 @@ func FindFlagsByUserID(userID uuid.UUID, currentPage, pageSize int) (flagSchemas
 func FlagExists(flagID uuid.UUID) bool {
 	var count int
 
-	db.Model(&Flag{}).Where("id = ?", flagID.String()).Count(&count)
+	db.Model(&Flag{}).Where("id = ?", flagID).Count(&count)
 
 	return count == 1
 }

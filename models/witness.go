@@ -11,13 +11,18 @@ import (
 
 // Witness entity
 type Witness struct {
+	ID            uuid.UUID `gorm:"type:uuid;primary_key;" json:"id"`
 	FlagID        uuid.UUID `json:"flag_id"`
 	PayeeID       uuid.UUID `json:"payee_id"`
+	AssetID       uuid.UUID `json:"asset_id"`
 	Verified      string    `json:"verified"`
-	WitnessedTime time.Time `json:"witnessed_time"`
 	Period        int       `json:"period"`
+	Status        string    `json:"status"`
+	Amount        float64   `json:"amount"`
+	Symbol        string    `json:"symbol"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
+	WitnessedTime time.Time `json:"witnessed_time"`
 }
 
 // GetWitnessByFlagIDAndPayeeID GetWitnessByFlagIDAndPayeeID
@@ -27,7 +32,7 @@ func GetWitnessByFlagIDAndPayeeID(flagID, payeeID uuid.UUID, period int) (w Witn
 }
 
 // UpsertWitness UpsertWitness
-func UpsertWitness(flagID, payeeID uuid.UUID, op string, period int) {
+func UpsertWitness(flagID, payeeID, assetID uuid.UUID, op, symbol string, period int) {
 
 	verified := strings.ToUpper(op)
 	witness := Witness{
@@ -35,11 +40,15 @@ func UpsertWitness(flagID, payeeID uuid.UUID, op string, period int) {
 		PayeeID:  payeeID,
 		Verified: verified,
 		Period:   period,
+		AssetID:  assetID,
+		Status:   strings.ToUpper("pending"),
+		Symbol:   strings.ToUpper(symbol),
+		Amount:   0.0,
 	}
 
 	// no found witness, insert witness
 	// found, update witness
-	db.Where(Witness{FlagID: flagID, PayeeID: payeeID}).Assign(Witness{Verified: verified}).FirstOrCreate(&witness)
+	db.Where(Witness{FlagID: flagID, PayeeID: payeeID, Period: period}).Assign(Witness{Verified: verified}).FirstOrCreate(&witness)
 }
 
 // GetAllWitnessByFlagID GetAllWitnessByFlagID
@@ -63,12 +72,11 @@ func GetAllWitnessByFlagID(flagID uuid.UUID, pageSize, currentPage int) ([]schem
 			PayeeID:        witness.PayeeID,
 			PayeeName:      dbUser.FullName,
 			PayeeAvatarURL: dbUser.AvatarURL,
-			// todo
-			Symbol:        "BTC",
-			Amount:        1.0,
-			Verified:      witness.Verified,
-			WitnessedTime: witness.WitnessedTime,
-			Period:        witness.Period,
+			Symbol:         witness.Symbol,
+			Amount:         witness.Amount,
+			Verified:       witness.Verified,
+			WitnessedTime:  witness.WitnessedTime,
+			Period:         witness.Period,
 		})
 	}
 	return result, count
@@ -96,14 +104,35 @@ func GetWitnessWithPeriod(flagID uuid.UUID, pageSize, currentPage, period int) (
 			PayeeID:        witness.PayeeID,
 			PayeeName:      dbUser.FullName,
 			PayeeAvatarURL: dbUser.AvatarURL,
-			Symbol:         "BTC",
-			Amount:         1.0,
+			Symbol:         witness.Symbol,
+			Amount:         witness.Amount,
 			Verified:       witness.Verified,
 			WitnessedTime:  witness.WitnessedTime,
 			Period:         witness.Period,
 		})
 	}
 	return result, count
+}
+
+// GetWitnessByFlagIDAndPeriod GetWitnessByFlagIDAndPeriod
+func GetWitnessByFlagIDAndPeriod(flagID uuid.UUID, period int, status string) (witnesses []Witness) {
+	db.Where("flag_id = ? and period = ? and status = ?", flagID, period, strings.ToUpper(status)).Find(&witnesses)
+	return
+}
+
+// GetErrorWitnessByFlagID GetErrorWitnessByFlagID
+func GetErrorWitnessByFlagID(flagID uuid.UUID, status string) (witnesses []Witness) {
+	db.Where("flag_id = ? and status = ?", flagID, strings.ToUpper(status)).Find(&witnesses)
+	return
+}
+
+// UpdateWitnessStatus update witness's status
+func UpdateWitnessStatus(witnessID uuid.UUID, status string, amount float64) {
+	// db.Model(&Witness{}).Where("id = ?", witnessID).Update("status", strings.ToUpper(status))
+	db.Model(&Witness{}).Where("id = ?", witnessID).Updates(map[string]interface{}{
+		"status": strings.ToUpper(status),
+		"amount": amount,
+	})
 }
 
 // BeforeCreate will set field CreatedAt.
