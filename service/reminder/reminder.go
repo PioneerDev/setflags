@@ -370,8 +370,13 @@ func main() {
 	ctx := context.Background()
 	addTimers(ctx, cron, global.Bot)
 
-	select {
-	case <-time.After(time.Second * 10):
-		return
+	for {
+		select {
+		case <-ctx.Done():
+			break
+
+		default:
+		}
+		time.Sleep(1 * time.Second)
 	}
 }
