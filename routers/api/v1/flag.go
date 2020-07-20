@@ -338,6 +338,7 @@ func FlagDetail(c *gin.Context) {
 		RemainingAmount: flag.RemainingAmount,
 		RemainingDays:   flag.RemainingDays,
 		Period:          flag.Period,
+		TotalPeriod:     flag.TotalPeriod,
 	}
 	// current user is not flag creator
 	// fetch witness
