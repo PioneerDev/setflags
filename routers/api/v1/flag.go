@@ -230,8 +230,17 @@ func UpdateFlag(c *gin.Context) {
 		code = e.SUCCESS
 		models.UpdateFlagPeriodStatus(flagID, op)
 	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
+		err := models.UpsertWitness(flagID, userID, flag.AssetID, op, flag.Symbol, flag.Period, flag.MaxWitness)
+		if err != nil {
+			code = e.ERROR
+			c.JSON(http.StatusOK, gin.H{
+				"code": code,
+				"msg":  err.Error(),
+				"data": make(map[string]interface{}),
+			})
+			return
+		}
 		code = e.SUCCESS
-		models.UpsertWitness(flagID, userID, flag.AssetID, op, flag.Symbol, flag.Period)
 	}
 
 	if code != e.SUCCESS {
