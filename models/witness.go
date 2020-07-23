@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"set-flags/schemas"
 	"strings"
 	"time"
@@ -32,10 +33,13 @@ func GetWitnessByFlagIDAndPayeeID(flagID, payeeID uuid.UUID, period int) (w Witn
 }
 
 // UpsertWitness UpsertWitness
-func UpsertWitness(flagID, payeeID, assetID uuid.UUID, op, symbol string, period int) {
+func UpsertWitness(flagID, payeeID, assetID uuid.UUID, op, symbol string, period, maxWitness int) error {
+	return upsertWitness(db, flagID, payeeID, assetID, op, symbol, period, maxWitness)
+}
 
+func upsertWitness(db *gorm.DB, flagID, payeeID, assetID uuid.UUID, op, symbol string, period, maxWitness int) error {
 	verified := strings.ToUpper(op)
-	witness := Witness{
+	witness := &Witness{
 		FlagID:   flagID,
 		PayeeID:  payeeID,
 		Verified: verified,
@@ -46,9 +50,47 @@ func UpsertWitness(flagID, payeeID, assetID uuid.UUID, op, symbol string, period
 		Amount:   0.0,
 	}
 
-	// no found witness, insert witness
-	// found, update witness
-	db.Where(Witness{FlagID: flagID, PayeeID: payeeID, Period: period}).Assign(Witness{Verified: verified}).FirstOrCreate(&witness)
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+	var exist, count int
+
+	// check if exist
+	if err := tx.Model(&Witness{}).
+		Where("flag_id = ? and payee_id = ? and period = ?", flagID, payeeID, period).
+		Count(&exist).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if exist == 1 {
+		tx.Model(&Witness{}).
+			Where("flag_id = ? and payee_id = ? and period = ?", flagID, payeeID, period).
+			Update("status", strings.ToUpper(verified))
+	} else if exist == 0 {
+		if err := tx.Model(&Witness{}).Where("flag_id = ? and period = ?", flagID, period).Count(&count).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		if count >= maxWitness {
+			return fmt.Errorf("max witness")
+		}
+
+		if err := tx.Create(witness).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
 }
 
 // GetAllWitnessByFlagID GetAllWitnessByFlagID
