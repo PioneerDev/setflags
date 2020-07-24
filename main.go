@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"set-flags/global"
 	"set-flags/models"
 	"set-flags/pkg/logging"
 	"set-flags/pkg/setting"
@@ -16,6 +17,7 @@ import (
 func main() {
 	logging.Setup()
 	models.InitDB()
+	global.BotInit()
 
 	endless.DefaultReadTimeOut = time.Duration(setting.GetConfig().App.ReadTimeOut) * time.Second
 	endless.DefaultWriteTimeOut = time.Duration(setting.GetConfig().App.WriteTimeOut) * time.Second
