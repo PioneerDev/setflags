@@ -35,6 +35,15 @@ func ListFlags(c *gin.Context) {
 	}
 	userID, _ := uuid.FromString(header.XUSERID)
 
+	if !models.UserExist(userID) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("not found current user."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
 	var pagination schemas.Pagination
 
 	c.ShouldBindQuery(&pagination)
@@ -202,7 +211,16 @@ func UpdateFlag(c *gin.Context) {
 		})
 		return
 	}
+
 	userID, _ := uuid.FromString(header.XUSERID)
+	if !models.UserExist(userID) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("not found current user."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	flagID, err := uuid.FromString(c.Param("id"))
 	if err != nil {
@@ -262,18 +280,6 @@ func UpdateFlag(c *gin.Context) {
 func FindFlagsByUserID(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
-	var pagination schemas.Pagination
-
-	c.ShouldBindQuery(&pagination)
-
-	if pagination.CurrentPage < 1 {
-		pagination.CurrentPage = 1
-	}
-
-	if pagination.PageSize < 1 {
-		pagination.PageSize = setting.GetConfig().App.PageSize
-	}
-
 	var header schemas.Header
 
 	if err := c.BindHeader(&header); err != nil {
@@ -285,6 +291,27 @@ func FindFlagsByUserID(c *gin.Context) {
 		return
 	}
 	userID, _ := uuid.FromString(header.XUSERID)
+
+	if !models.UserExist(userID) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("not found current user."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	var pagination schemas.Pagination
+
+	c.ShouldBindQuery(&pagination)
+
+	if pagination.CurrentPage < 1 {
+		pagination.CurrentPage = 1
+	}
+
+	if pagination.PageSize < 1 {
+		pagination.PageSize = setting.GetConfig().App.PageSize
+	}
 
 	flags, total := models.FindFlagsByUserID(userID, pagination.CurrentPage, pagination.PageSize)
 
@@ -311,7 +338,16 @@ func FlagDetail(c *gin.Context) {
 		})
 		return
 	}
+
 	userID, _ := uuid.FromString(header.XUSERID)
+	if !models.UserExist(userID) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("not found current user."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	flagID, err := uuid.FromString(c.Query("flag_id"))
 
