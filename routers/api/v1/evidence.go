@@ -87,26 +87,6 @@ func UploadEvidence(c *gin.Context) {
 		return
 	}
 
-	// upload attachment
-	// user := &mixin.User{
-	// 	UserID:    setting.GetConfig().Bot.ClientID.String(),
-	// 	SessionID: setting.GetConfig().Bot.SessionID,
-	// 	PINToken:  setting.GetConfig().Bot.PinToken,
-	// }
-
-	// block, _ := pem.Decode([]byte(setting.GetConfig().Bot.PrivateKey))
-	// privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{
-	// 		"code": 500,
-	// 		"msg":  err.Error(),
-	// 		"data": make(map[string]interface{}),
-	// 	})
-	// 	return
-	// }
-
-	// user.SetPrivateKey(privateKey)
-
 	ctx := context.Background()
 	attachment, err := global.Bot.CreateAttachment(ctx)
 	if err != nil {
@@ -189,11 +169,11 @@ func ListEvidencesWithPeriod(c *gin.Context) {
 
 	c.ShouldBindQuery(&pagination)
 
-	if pagination.CurrentPage == 0 {
+	if pagination.CurrentPage < 1 {
 		pagination.CurrentPage = 1
 	}
 
-	if pagination.PageSize == 0 {
+	if pagination.PageSize < 1 {
 		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"set-flags/models"
 	"set-flags/pkg/e"
@@ -25,6 +26,15 @@ func AssetInfos(c *gin.Context) {
 		return
 	}
 
+	if !models.ExistAsset(assetID) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code": code,
+			"msg":  fmt.Sprintf("no asset found."),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
 	asset := models.FindAssetByID(assetID)
 
 	code = e.SUCCESS
@@ -43,11 +53,11 @@ func ReadAssets(c *gin.Context) {
 
 	c.ShouldBindQuery(&pagination)
 
-	if pagination.CurrentPage == 0 {
+	if pagination.CurrentPage < 1 {
 		pagination.CurrentPage = 1
 	}
 
-	if pagination.PageSize == 0 {
+	if pagination.PageSize < 1 {
 		pagination.PageSize = setting.GetConfig().App.PageSize
 	}
 

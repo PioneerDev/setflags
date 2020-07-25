@@ -179,6 +179,8 @@ func UpdateWitnessStatus(witnessID uuid.UUID, status string, amount float64) {
 
 // BeforeCreate will set field CreatedAt.
 func (w *Witness) BeforeCreate(scope *gorm.Scope) error {
+	witnessID, _ := uuid.NewV4()
+	scope.SetColumn("ID", witnessID)
 	scope.SetColumn("CreatedAt", time.Now())
 	scope.SetColumn("WitnessedTime", time.Now())
 	return nil
