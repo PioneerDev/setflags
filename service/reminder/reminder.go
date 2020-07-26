@@ -378,7 +378,7 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		if flag.Period == period {
 			continue
 		} else if flag.TotalPeriod < period {
-			models.UpdateFlagStatus(flag.ID, "closed")
+			// models.UpdateFlagStatus(flag.ID, "closed")
 		}
 
 		models.UpdateFlagPeriod(flag.ID, period)
