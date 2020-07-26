@@ -333,6 +333,7 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		var successCount int
 
 		amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
+		fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
 		// amount := 1.024
 		if math.IsNaN(amount) {
 			fmt.Println("amount", amount)

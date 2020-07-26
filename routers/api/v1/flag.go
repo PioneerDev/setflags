@@ -389,7 +389,9 @@ func FlagDetail(c *gin.Context) {
 	// fetch witness
 	if userID != flag.PayerID {
 		witness := models.GetWitnessByFlagIDAndPayeeID(flagID, userID, flag.Period)
-		flagSchema.Verified = witness.Verified
+		if witness.Verified != "" {
+			flagSchema.Verified = witness.Verified
+		}
 	}
 
 	code = e.SUCCESS
