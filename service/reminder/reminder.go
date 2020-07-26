@@ -336,6 +336,74 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 	}
 }
 
+func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
+	flags := models.ListPaidFlags()
+
+	for _, flag := range flags {
+
+		// continue old item, it's days per period is zero
+		if flag.DaysPerPeriod == 0 {
+			continue
+		}
+
+		// fmt.Println(flag.DaysPerPeriod, flag.CreatedAt, flag.Period)
+		// calculate time gap
+		// now - created / 24
+		// timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
+		timeDelta := time.Now().Sub(flag.CreatedAt).Minutes()
+
+		// calcaulte period
+		// 13 / 7 + 1 = 2
+		// period := int(math.Round(timeDelta/float64(flag.DaysPerPeriod))) + 1
+		period := int(math.Round(timeDelta/float64(1))) + 1
+
+		// retry encounter error witness
+		errorWitnesses := models.GetErrorWitnessByFlagID(flag.ID, "error")
+		for _, witness := range errorWitnesses {
+			_, err := bot.Transfer(ctx, &sdk.TransferInput{
+				TraceID:    uuid.Must(uuid.NewV1()).String(),
+				AssetID:    witness.AssetID.String(),
+				OpponentID: witness.PayeeID.String(),
+				Amount:     fmt.Sprintf("%f", witness.Amount),
+				Memo:       setting.GetConfig().App.Name,
+			}, setting.GetConfig().Bot.Pin)
+
+			if err != nil {
+				models.UpdateWitnessStatus(witness.ID, "error", witness.Amount)
+			} else {
+				models.UpdateWitnessStatus(witness.ID, "paid", witness.Amount)
+			}
+		}
+
+		if flag.Period == period {
+			continue
+		}
+
+		models.UpdateFlagPeriod(flag.ID, period)
+
+		// send red packet
+		witnesses := models.GetWitnessByFlagIDAndPeriod(flag.ID, flag.Period, "pending")
+
+		amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
+
+		for _, witness := range witnesses {
+			_, err := bot.Transfer(ctx, &sdk.TransferInput{
+				TraceID:    uuid.Must(uuid.NewV1()).String(),
+				AssetID:    witness.AssetID.String(),
+				OpponentID: witness.PayeeID.String(),
+				Amount:     fmt.Sprintf("%f", amount),
+				Memo:       setting.GetConfig().App.Name,
+			}, setting.GetConfig().Bot.Pin)
+
+			if err != nil {
+				models.UpdateWitnessStatus(witness.ID, "error", amount)
+			} else {
+				models.UpdateWitnessStatus(witness.ID, "paid", amount)
+			}
+		}
+	}
+}
+
 func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 	/*
 		cron.AddFunc("0 * * * * ?", func() {
@@ -358,7 +426,8 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 	// })
 
 	cron.AddFunc("0 * * * * ?", func() {
-		updateFlagPeriod(ctx, bot)
+		// updateFlagPeriod(ctx, bot)
+		debugUpdateFlagPeriod(ctx, bot)
 	})
 }
 
