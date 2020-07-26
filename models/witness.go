@@ -73,7 +73,7 @@ func upsertWitness(db *gorm.DB, flagID, payeeID, assetID uuid.UUID, op, symbol s
 	if exist == 1 {
 		tx.Model(&Witness{}).
 			Where("flag_id = ? and payee_id = ? and period = ?", flagID, payeeID, period).
-			Update("status", strings.ToUpper(verified))
+			Update("verified", strings.ToUpper(verified))
 	} else if exist == 0 {
 		if err := tx.Model(&Witness{}).Where("flag_id = ? and period = ?", flagID, period).Count(&count).Error; err != nil {
 			tx.Rollback()

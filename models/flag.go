@@ -209,6 +209,12 @@ func UpdateFlagUserInfo(user *mixin.Profile) bool {
 	return true
 }
 
+// UpdateFlagRemainingAmount UpdateFlagRemainingAmount
+func UpdateFlagRemainingAmount(flagID uuid.UUID, spendAmount float64) bool {
+	db.Model(&Flag{}).Where("id = ?", flagID).UpdateColumn("remaining_amount", gorm.Expr("remaining_amount - ?", spendAmount))
+	return true
+}
+
 // BeforeCreate will set a UUID rather than numeric ID.
 func (flag *Flag) BeforeCreate(scope *gorm.Scope) error {
 	uuid, _ := uuid.NewV4()
@@ -251,6 +257,6 @@ func ListActiveFlags(paid bool) []*Flag {
 
 // ListPaidFlags ListPaidFlags
 func ListPaidFlags() (flags []*Flag) {
-	db.Where("status = ?", "PAID").Select("id, days_per_period, period, created_at").Find(&flags)
+	db.Where("status = ?", "PAID").Find(&flags)
 	return
 }

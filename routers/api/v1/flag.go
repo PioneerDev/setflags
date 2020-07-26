@@ -8,6 +8,7 @@ import (
 	"set-flags/pkg/logging"
 	"set-flags/pkg/setting"
 	"set-flags/schemas"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
@@ -248,10 +249,20 @@ func UpdateFlag(c *gin.Context) {
 		code = e.SUCCESS
 		models.UpdateFlagPeriodStatus(flagID, op)
 	} else if flag.PayerID != userID && (op == "yes" || op == "no") {
+		// need flag creator upload evidence
+		if flag.PeriodStatus != strings.ToUpper("done") {
+			code = e.NOT_UPLOAD_EVIDENCE
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code": code,
+				"msg":  "current period not upload evidence.",
+				"data": make(map[string]interface{}),
+			})
+			return
+		}
 		err := models.UpsertWitness(flagID, userID, flag.AssetID, op, flag.Symbol, flag.Period, flag.MaxWitness)
 		if err != nil {
 			code = e.ERROR
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"code": code,
 				"msg":  err.Error(),
 				"data": make(map[string]interface{}),
@@ -362,6 +373,16 @@ func FlagDetail(c *gin.Context) {
 		return
 	}
 
+	if !models.FlagExists(flagID) {
+		code = e.ERROR_NOT_FOUND_FLAG
+		c.JSON(http.StatusNotFound, gin.H{
+			"code": code,
+			"msg":  e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
 	flag := models.FindFlagByID(flagID)
 
 	flagSchema := schemas.FlagSchema{
@@ -389,7 +410,9 @@ func FlagDetail(c *gin.Context) {
 	// fetch witness
 	if userID != flag.PayerID {
 		witness := models.GetWitnessByFlagIDAndPayeeID(flagID, userID, flag.Period)
-		flagSchema.Verified = witness.Verified
+		if witness.Verified != "" {
+			flagSchema.Verified = witness.Verified
+		}
 	}
 
 	code = e.SUCCESS
