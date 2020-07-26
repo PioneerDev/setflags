@@ -356,6 +356,7 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// 13 / 7 + 1 = 2
 		// period := int(math.Round(timeDelta/float64(flag.DaysPerPeriod))) + 1
 		period := int(math.Round(timeDelta/float64(1))) + 1
+		fmt.Println("period", period)
 
 		// retry encounter error witness
 		errorWitnesses := models.GetErrorWitnessByFlagID(flag.ID, "error")
@@ -375,6 +376,7 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 			}
 		}
 
+		fmt.Println("flag.Period", flag.Period)
 		if flag.Period == period {
 			continue
 		} else if flag.TotalPeriod < period {
@@ -395,6 +397,7 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 
 		// amount := flag.RemainingAmount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
 		amount := 1.024
+		fmt.Println("amount", amount, "isnan", math.IsNaN(amount))
 
 		for _, witness := range witnesses {
 			_, err := bot.Transfer(ctx, &sdk.TransferInput{
