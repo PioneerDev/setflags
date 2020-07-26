@@ -209,6 +209,12 @@ func UpdateFlagUserInfo(user *mixin.Profile) bool {
 	return true
 }
 
+// UpdateFlagRemainingAmount UpdateFlagRemainingAmount
+func UpdateFlagRemainingAmount(flagID uuid.UUID, spendAmount float64) bool {
+	db.Model(&Flag{}).Where("id = ?", flagID).UpdateColumn("remaining_amount", gorm.Expr("remaining_amount - ?", spendAmount))
+	return true
+}
+
 // BeforeCreate will set a UUID rather than numeric ID.
 func (flag *Flag) BeforeCreate(scope *gorm.Scope) error {
 	uuid, _ := uuid.NewV4()

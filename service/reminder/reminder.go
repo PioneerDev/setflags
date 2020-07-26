@@ -377,6 +377,8 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 
 		if flag.Period == period {
 			continue
+		} else if flag.TotalPeriod < period {
+			models.UpdateFlagStatus(flag.ID, "closed")
 		}
 
 		models.UpdateFlagPeriod(flag.ID, period)
@@ -384,7 +386,14 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// send red packet
 		witnesses := models.GetWitnessByFlagIDAndPeriod(flag.ID, flag.Period, "pending")
 
-		amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
+		// current period no witness
+		if len(witnesses) == 0 {
+			continue
+		}
+
+		var successCount int
+
+		amount := flag.RemainingAmount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
 
 		for _, witness := range witnesses {
 			_, err := bot.Transfer(ctx, &sdk.TransferInput{
@@ -396,11 +405,16 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 			}, setting.GetConfig().Bot.Pin)
 
 			if err != nil {
+				fmt.Printf("%v", err)
 				models.UpdateWitnessStatus(witness.ID, "error", amount)
 			} else {
+				successCount++
 				models.UpdateWitnessStatus(witness.ID, "paid", amount)
 			}
 		}
+
+		// update flag's remaining amount
+		models.UpdateFlagRemainingAmount(flag.ID, amount*float64(successCount))
 	}
 }
 
