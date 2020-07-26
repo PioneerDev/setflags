@@ -393,7 +393,8 @@ func debugUpdateFlagPeriod(ctx context.Context, bot *sdk.User) {
 
 		var successCount int
 
-		amount := flag.RemainingAmount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
+		// amount := flag.RemainingAmount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
+		amount := 1.024
 
 		for _, witness := range witnesses {
 			_, err := bot.Transfer(ctx, &sdk.TransferInput{
