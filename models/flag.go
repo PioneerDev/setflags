@@ -257,6 +257,6 @@ func ListActiveFlags(paid bool) []*Flag {
 
 // ListPaidFlags ListPaidFlags
 func ListPaidFlags() (flags []*Flag) {
-	db.Where("status = ?", "PAID").Select("id, days_per_period, period, created_at").Find(&flags)
+	db.Where("status = ?", "PAID").Find(&flags)
 	return
 }
