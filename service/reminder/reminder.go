@@ -283,19 +283,24 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// fmt.Println(flag.DaysPerPeriod, flag.CreatedAt, flag.Period)
 		// calculate time gap
 		// now - created / 24
-		// timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
-		timeDelta := time.Now().Sub(flag.CreatedAt).Minutes()
+		timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
+		// timeDelta := time.Now().Sub(flag.CreatedAt).Minutes()
 
 		// calcaulte period
 		// 13 / 7 + 1 = 2
-		// period := int(math.Round(timeDelta/float64(flag.DaysPerPeriod))) + 1
-		period := int(math.Round(timeDelta/float64(5))) + 1
+		period := int(math.Round(timeDelta/float64(flag.DaysPerPeriod))) + 1
+		// period := int(math.Round(timeDelta/float64(5))) + 1
 		fmt.Println("period", period)
 
 		var retryAmount float64
 		// retry encounter error witness
 		errorWitnesses := models.GetErrorWitnessByFlagID(flag.ID, "error")
 		for _, witness := range errorWitnesses {
+
+			if math.IsNaN(witness.Amount) || math.IsInf(witness.Amount, 0) {
+				continue
+			}
+
 			_, err := bot.Transfer(ctx, &sdk.TransferInput{
 				TraceID:    uuid.Must(uuid.NewV1()).String(),
 				AssetID:    witness.AssetID.String(),
@@ -322,7 +327,7 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 
 		models.UpdateFlagPeriod(flag.ID, period)
 
-		// send red packet
+		// fetch witness according to period and status = pending
 		witnesses := models.GetWitnessByFlagIDAndPeriod(flag.ID, flag.Period, "pending")
 
 		// current period no witness
@@ -333,7 +338,7 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		var successCount int
 
 		amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
-		fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
+		// fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
 		// amount := 1.024
 		if math.IsNaN(amount) {
 			fmt.Println("amount", amount)
@@ -368,6 +373,19 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// period > total period means flag closed
 		if period > flag.TotalPeriod {
 			models.UpdateFlagStatus(flag.ID, "closed")
+			// closedFlag := models.FindFlagByID(flag.ID)
+
+			// if closedFlag.Status == strings.ToUpper("closed") {
+			// 	// send remaining amount to flag creator
+			// 	memo := fmt.Sprintf("来自立志: %s 的红包余额.", flag.Task)
+			// 	_, err := bot.Transfer(ctx, &sdk.TransferInput{
+			// 		TraceID:    uuid.Must(uuid.NewV1()).String(),
+			// 		AssetID:    flag.AssetID.String(),
+			// 		OpponentID: flag.PayerID.String(),
+			// 		Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
+			// 		Memo:       memo,
+			// 	}, setting.GetConfig().Bot.Pin)
+			// }
 		}
 	}
 }
