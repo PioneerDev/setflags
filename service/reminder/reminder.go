@@ -283,7 +283,7 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// fmt.Println(flag.DaysPerPeriod, flag.CreatedAt, flag.Period)
 		// calculate time gap
 		// now - created / 24
-		timeDelta := time.Now().Sub(flag.CreatedAt).Hours() / 24
+		timeDelta := time.Now().UTC().Sub(flag.CreatedAt).Hours() / 24
 		// timeDelta := time.Now().Sub(flag.CreatedAt).Minutes()
 
 		// calcaulte period
@@ -321,11 +321,12 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		models.UpdateFlagRemainingAmount(flag.ID, retryAmount)
 
 		fmt.Println("flag.Period", flag.Period)
-		if flag.Period == period {
+		if flag.Period >= period {
 			continue
 		}
 
-		models.UpdateFlagPeriod(flag.ID, period)
+		// update flag's period and reset period status undone
+		models.UpdateFlagPeriodAndPeriodStatus(flag.ID, period, "undone")
 
 		// fetch witness according to period and status = pending
 		witnesses := models.GetWitnessByFlagIDAndPeriod(flag.ID, flag.Period, "pending")
@@ -334,8 +335,6 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		if len(witnesses) == 0 {
 			continue
 		}
-
-		var successCount int
 
 		amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
 		// fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
@@ -346,6 +345,7 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		}
 
 		fmt.Println("amount", amount)
+		var successAmount float64
 
 		for _, witness := range witnesses {
 			memo := fmt.Sprintf("来自@%s 的红包, 立志: %s, 周期: %d", flag.PayerName, flag.Task, flag.Period)
@@ -361,14 +361,16 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 				fmt.Printf("%v", err)
 				models.UpdateWitnessStatus(witness.ID, "error", amount)
 			} else {
-				successCount++
+				successAmount += amount
 				models.UpdateWitnessStatus(witness.ID, "paid", amount)
 				sendUserAppCard(ctx, bot, witness.PayeeID, flag)
 			}
 		}
 
 		// update flag's remaining amount
-		models.UpdateFlagRemainingAmount(flag.ID, amount*float64(successCount))
+		if successAmount != 0 {
+			models.UpdateFlagRemainingAmount(flag.ID, successAmount)
+		}
 
 		// period > total period means flag closed
 		if period > flag.TotalPeriod {

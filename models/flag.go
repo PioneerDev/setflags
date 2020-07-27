@@ -193,9 +193,10 @@ func UpdateFlagStatus(flagID uuid.UUID, status string) bool {
 	return true
 }
 
-// UpdateFlagPeriod UpdateFlagPeriod
-func UpdateFlagPeriod(flagID uuid.UUID, period int) bool {
-	db.Model(&Flag{}).Where("id = ?", flagID).Update("period", period)
+// UpdateFlagPeriodAndPeriodStatus UpdateFlagPeriodAndPeriodStatus
+func UpdateFlagPeriodAndPeriodStatus(flagID uuid.UUID, period int, periodStatus string) bool {
+	// db.Model(&Flag{}).Where("id = ?", flagID).Update("period", period)
+	db.Model(&Flag{}).Where("id = ?", flagID).Updates(Flag{PeriodStatus: strings.ToUpper(periodStatus), Period: period})
 	return true
 }
 

@@ -1,11 +1,14 @@
 package e
 
 const (
-	SUCCESS              = 200
-	ERROR                = 500
-	INVALID_PARAMS       = 400
-	NOT_UPLOAD_EVIDENCE  = 4001
-	ERROR_NOT_FOUND_FLAG = 4002
+	SUCCESS                       = 200
+	ERROR                         = 500
+	INVALID_PARAMS                = 400
+	NOT_UPLOAD_EVIDENCE           = 4001
+	ERROR_NOT_FOUND_FLAG          = 4002
+	ERROR_NOT_FOUND_USER          = 4003
+	ERROR_FLAGER_NOT_CURRENT_USER = 4004
+	ERROR_NO_PAID                 = 4005
 
 	ERROR_UPLOAD_ATTACHMENT = 10003
 

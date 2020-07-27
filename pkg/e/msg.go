@@ -10,6 +10,8 @@ var MsgFlags = map[int]string{
 	ERROR_AUTH:                     "Token错误",
 	ERROR_UPLOAD_ATTACHMENT:        "附件上传失败",
 	ERROR_NOT_FOUND_FLAG:           "未找到指定立志",
+	ERROR_NOT_FOUND_USER:           "未找到当前用户",
+	ERROR_FLAGER_NOT_CURRENT_USER:  "当前用户非当前立志者",
 }
 
 func GetMsg(code int) string {
