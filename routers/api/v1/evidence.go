@@ -36,9 +36,10 @@ func UploadEvidence(c *gin.Context) {
 
 	// check flag exist.
 	if !models.UserExist(userID) {
+		code = e.ERROR_NOT_FOUND_USER
 		c.JSON(http.StatusNotFound, gin.H{
 			"code": code,
-			"msg":  "not found specific user.",
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -68,9 +69,10 @@ func UploadEvidence(c *gin.Context) {
 
 	// check flag exist.
 	if !models.FlagExists(flagID) {
+		code = e.ERROR_NOT_FOUND_FLAG
 		c.JSON(http.StatusNotFound, gin.H{
 			"code": code,
-			"msg":  "not found specific flag.",
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -79,9 +81,21 @@ func UploadEvidence(c *gin.Context) {
 	flag := models.FindFlagByID(flagID)
 
 	if flag.PayerID != userID {
+		code = e.ERROR_FLAGER_NOT_CURRENT_USER
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,
-			"msg":  "current user not this flag's creator.",
+			"msg":  e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
+
+	// flag's creator not yet paid.
+	if flag.Period == 0 {
+		code = e.ERROR_NO_PAID
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  e.GetMsg(code),
 			"data": make(map[string]interface{}),
 		})
 		return
@@ -201,7 +215,7 @@ func ListEvidencesWithPeriod(c *gin.Context) {
 	// 0 means all,
 	// -1 missing means current,
 	// greater than 0 means specific period
-	period, err := strconv.Atoi(c.DefaultQuery("period", "-1"))
+	period, err := strconv.Atoi(c.DefaultQuery("period", "0"))
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
