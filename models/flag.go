@@ -30,6 +30,7 @@ type Flag struct {
 	PeriodStatus    string    `json:"period_status"`
 	RemainingDays   int       `json:"remaining_days"`
 	RemainingAmount float64   `json:"remaining_amount"`
+	PaidTime        time.Time `json:"paid_time"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
 }

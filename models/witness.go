@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"math"
 	"set-flags/schemas"
 	"strings"
 	"time"
@@ -109,13 +110,19 @@ func GetAllWitnessByFlagID(flagID uuid.UUID, pageSize, currentPage int) ([]schem
 	for _, witness := range witnesses {
 		var dbUser User
 		db.Where("user_id = ?", witness.PayeeID.String()).First(&dbUser)
+
+		var amount float64
+		if !math.IsNaN(witness.Amount) {
+			amount = witness.Amount
+		}
+
 		result = append(result, schemas.WitnessSchema{
 			FlagID:         flagID,
 			PayeeID:        witness.PayeeID,
 			PayeeName:      dbUser.FullName,
 			PayeeAvatarURL: dbUser.AvatarURL,
 			Symbol:         witness.Symbol,
-			Amount:         witness.Amount,
+			Amount:         amount,
 			Verified:       witness.Verified,
 			WitnessedTime:  witness.WitnessedTime,
 			Period:         witness.Period,
@@ -141,13 +148,17 @@ func GetWitnessWithPeriod(flagID uuid.UUID, pageSize, currentPage, period int) (
 	for _, witness := range witnesses {
 		var dbUser User
 		db.Where("user_id = ?", witness.PayeeID.String()).First(&dbUser)
+		var amount float64
+		if !math.IsNaN(witness.Amount) {
+			amount = witness.Amount
+		}
 		result = append(result, schemas.WitnessSchema{
 			FlagID:         flagID,
 			PayeeID:        witness.PayeeID,
 			PayeeName:      dbUser.FullName,
 			PayeeAvatarURL: dbUser.AvatarURL,
 			Symbol:         witness.Symbol,
-			Amount:         witness.Amount,
+			Amount:         amount,
 			Verified:       witness.Verified,
 			WitnessedTime:  witness.WitnessedTime,
 			Period:         witness.Period,

@@ -3,6 +3,7 @@ package models
 import (
 	"set-flags/schemas"
 	"strings"
+	"time"
 
 	uuid "github.com/gofrs/uuid"
 	"github.com/jinzhu/gorm"
@@ -66,9 +67,10 @@ func UpdatePaymentAndFlag(db *gorm.DB, snapshot schemas.AccountSnapshot) error {
 	db.Where("trace_id = ?", snapshot.TraceID).Select("flag_id").First(&payment)
 
 	err = tx.Model(&Flag{}).Where("id = ?", payment.FlagID).Updates(map[string]interface{}{
-		"amount": snapshot.Amount,
-		"period": 1,
-		"status": strings.ToUpper("PAID"),
+		"amount":    snapshot.Amount,
+		"period":    1,
+		"status":    strings.ToUpper("PAID"),
+		"paid_time": time.Now(),
 	}).Error
 
 	if err != nil {
