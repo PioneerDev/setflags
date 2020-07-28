@@ -280,11 +280,11 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 			continue
 		}
 
-		// fmt.Println(flag.DaysPerPeriod, flag.CreatedAt, flag.Period)
+		// fmt.Println(flag.DaysPerPeriod, flag.PaidTime, flag.Period)
 		// calculate time gap
 		// now - created / 24
-		timeDelta := time.Now().UTC().Sub(flag.CreatedAt).Hours() / 24
-		// timeDelta := time.Now().Sub(flag.CreatedAt).Minutes()
+		timeDelta := time.Now().UTC().Sub(flag.PaidTime).Hours() / 24
+		// timeDelta := time.Now().Sub(flag.PaidTime).Minutes()
 
 		// calcaulte period
 		// 13 / 7 + 1 = 2
