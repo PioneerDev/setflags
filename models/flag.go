@@ -86,25 +86,17 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 	db.Model(&Flag{}).Where("status = ?", "PAID").Count(&count)
 
 	// first fetch flags
-	db.Offset(skip).Limit(pageSize).Where("status = ?", "PAID").Order("updated_at desc").Find(&flags)
-
-	// then fetch witness according to userID and flagID
-	flagIDs := make([]uuid.UUID, len(flags))
-	for i := 0; i < len(flags); i++ {
-		flagIDs = append(flagIDs, flags[i].ID)
-	}
-
-	var witnesses []Witness
-	db.Where("flag_id IN (?) and payee_id = ?", flagIDs, userID).Find(&witnesses)
+	db.Offset(skip).Limit(pageSize).Where("status = ?", "PAID").Order("created_at desc").Find(&flags)
 
 	for _, flag := range flags {
 		verified := "UNSET"
-		for _, w := range witnesses {
-			if w.FlagID != w.FlagID {
-				continue
-			}
-			verified = w.Verified
-			break
+
+		// then fetch witness according to userID, flagID, period
+		var witness Witness
+		db.Where("flag_id = ? and payee_id = ? and period = ?", flag.ID, userID, flag.Period).Select("verified").First(&witness)
+
+		if witness.Verified != "" {
+			verified = witness.Verified
 		}
 
 		flagSchemas = append(flagSchemas, schemas.FlagSchema{
