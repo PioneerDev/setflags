@@ -181,7 +181,6 @@ func GetErrorWitnessByFlagID(flagID uuid.UUID, status string) (witnesses []Witne
 
 // UpdateWitnessStatus update witness's status
 func UpdateWitnessStatus(witnessID uuid.UUID, status string, amount float64) {
-	// db.Model(&Witness{}).Where("id = ?", witnessID).Update("status", strings.ToUpper(status))
 	db.Model(&Witness{}).Where("id = ?", witnessID).Updates(map[string]interface{}{
 		"status": strings.ToUpper(status),
 		"amount": amount,
