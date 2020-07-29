@@ -327,25 +327,6 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 			continue
 		}
 
-		// period > total period means flag closed
-		if period > flag.TotalPeriod {
-			models.UpdateFlagStatus(flag.ID, "closed")
-			// closedFlag := models.FindFlagByID(flag.ID)
-
-			// if closedFlag.Status == strings.ToUpper("closed") {
-			// 	// send remaining amount to flag creator
-			// 	memo := fmt.Sprintf("来自立志: %s 的红包余额.", flag.Task)
-			// 	_, err := bot.Transfer(ctx, &sdk.TransferInput{
-			// 		TraceID:    uuid.Must(uuid.NewV1()).String(),
-			// 		AssetID:    flag.AssetID.String(),
-			// 		OpponentID: flag.PayerID.String(),
-			// 		Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
-			// 		Memo:       memo,
-			// 	}, setting.GetConfig().Bot.Pin)
-			// }
-			continue
-		}
-
 		// update flag's period and reset period status undone
 		models.UpdateFlagPeriodAndPeriodStatus(flag.ID, period, "undone")
 
@@ -391,6 +372,24 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// update flag's remaining amount
 		if successAmount > 0 {
 			models.UpdateFlagRemainingAmount(flag.ID, successAmount)
+		}
+
+		// period > total period means flag closed
+		if period > flag.TotalPeriod {
+			models.UpdateFlagStatus(flag.ID, "closed")
+			// closedFlag := models.FindFlagByID(flag.ID)
+
+			// if closedFlag.Status == strings.ToUpper("closed") {
+			// 	// send remaining amount to flag creator
+			// 	memo := fmt.Sprintf("来自立志: %s 的红包余额.", flag.Task)
+			// 	_, err := bot.Transfer(ctx, &sdk.TransferInput{
+			// 		TraceID:    uuid.Must(uuid.NewV1()).String(),
+			// 		AssetID:    flag.AssetID.String(),
+			// 		OpponentID: flag.PayerID.String(),
+			// 		Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
+			// 		Memo:       memo,
+			// 	}, setting.GetConfig().Bot.Pin)
+			// }
 		}
 	}
 }
