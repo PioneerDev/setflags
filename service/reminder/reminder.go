@@ -335,46 +335,42 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// fetch witness according to period and status = pending
 		witnesses := models.GetWitnessByFlagIDAndPeriod(flag.ID, flag.Period, "pending")
 
-		// current period no witness
-		if len(witnesses) == 0 {
-			continue
-		}
-
-		amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
-		// fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
-		// amount := 1.024
-		fmt.Println("normal amount", amount)
-		if math.IsNaN(amount) || math.IsInf(amount, 0) {
-			fmt.Println("abnormal amount", amount)
-			continue
-		}
-
-		fmt.Println("amount", amount)
-		var successAmount float64
-
-		for _, witness := range witnesses {
-			memo := fmt.Sprintf("来自@%s 的红包, 立志: %s, 周期: %d", flag.PayerName, flag.Task, flag.Period)
-			_, err := bot.Transfer(ctx, &sdk.TransferInput{
-				TraceID:    uuid.Must(uuid.NewV1()).String(),
-				AssetID:    witness.AssetID.String(),
-				OpponentID: witness.PayeeID.String(),
-				Amount:     fmt.Sprintf("%f", amount),
-				Memo:       memo,
-			}, setting.GetConfig().Bot.Pin)
-
-			if err != nil {
-				fmt.Printf("%v", err)
-				models.UpdateWitnessStatus(witness.ID, "error", amount)
-			} else {
-				successAmount += amount
-				models.UpdateWitnessStatus(witness.ID, "paid", amount)
-				sendUserAppCard(ctx, bot, witness.PayeeID, flag)
+		// current period exist witness
+		if len(witnesses) > 0 {
+			amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
+			fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
+			if math.IsNaN(amount) || math.IsInf(amount, 0) {
+				fmt.Println("abnormal amount", amount)
+				continue
 			}
-		}
 
-		// update flag's remaining amount
-		if successAmount > 0 {
-			models.UpdateFlagRemainingAmount(flag.ID, successAmount)
+			fmt.Println("amount", amount)
+			var successAmount float64
+
+			for _, witness := range witnesses {
+				memo := fmt.Sprintf("来自@%s 的红包, 立志: %s, 周期: %d", flag.PayerName, flag.Task, flag.Period)
+				_, err := bot.Transfer(ctx, &sdk.TransferInput{
+					TraceID:    uuid.Must(uuid.NewV1()).String(),
+					AssetID:    witness.AssetID.String(),
+					OpponentID: witness.PayeeID.String(),
+					Amount:     fmt.Sprintf("%f", amount),
+					Memo:       memo,
+				}, setting.GetConfig().Bot.Pin)
+
+				if err != nil {
+					fmt.Printf("%v", err)
+					models.UpdateWitnessStatus(witness.ID, "error", amount)
+				} else {
+					successAmount += amount
+					models.UpdateWitnessStatus(witness.ID, "paid", amount)
+					sendUserAppCard(ctx, bot, witness.PayeeID, flag)
+				}
+			}
+
+			// update flag's remaining amount
+			if successAmount > 0 {
+				models.UpdateFlagRemainingAmount(flag.ID, successAmount)
+			}
 		}
 
 		// period > total period means flag closed
@@ -418,7 +414,7 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 	// 	upsertAsset(ctx, bot)
 	// })
 
-	cron.AddFunc("0 */2 * * * ?", func() {
+	cron.AddFunc("0 */1 * * * ?", func() {
 		updateFlagPeriod(ctx, bot)
 	})
 }
