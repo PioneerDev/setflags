@@ -301,12 +301,14 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 				continue
 			}
 
+			fmt.Println("retry amount", witness.Amount)
+			memo := fmt.Sprintf("来自@%s 的红包, 立志: %s, 周期: %d", flag.PayerName, flag.Task, flag.Period)
 			_, err := bot.Transfer(ctx, &sdk.TransferInput{
 				TraceID:    uuid.Must(uuid.NewV1()).String(),
 				AssetID:    witness.AssetID.String(),
 				OpponentID: witness.PayeeID.String(),
 				Amount:     fmt.Sprintf("%f", witness.Amount),
-				Memo:       setting.GetConfig().App.Name,
+				Memo:       memo,
 			}, setting.GetConfig().Bot.Pin)
 
 			if err != nil {
@@ -341,8 +343,9 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
 		// fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
 		// amount := 1.024
-		if math.IsNaN(amount) {
-			fmt.Println("amount", amount)
+		fmt.Println("normal amount", amount)
+		if math.IsNaN(amount) || math.IsInf(amount, 0) {
+			fmt.Println("abnormal amount", amount)
 			continue
 		}
 

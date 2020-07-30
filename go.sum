@@ -63,6 +63,8 @@ github.com/fox-one/mixin-sdk v1.3.2 h1:IwL9k1WZfyb0+fk3iDnB3a6QJ+62gb7889MDJdbR8
 github.com/fox-one/mixin-sdk v1.3.2/go.mod h1:EZz+CvQxU2BLgwOQeqOPP4RFentYKc3y6K4Xv9lnulk=
 github.com/fox-one/mixin-sdk v1.3.4 h1:Am5zzkRBs2LG/99zj1nonUOkA+z5P38y4/C7d5OO8I4=
 github.com/fox-one/mixin-sdk v1.3.4/go.mod h1:0A9cpDyv03mUieXTwduWVfbEEAMlZXVSjRBSFfjggxU=
+github.com/fox-one/mixin-sdk v1.3.6 h1:ZeI2F96V8vclxClm+ALYDx1SQPNaECCANqtoLo06Dr0=
+github.com/fox-one/mixin-sdk v1.3.6/go.mod h1:0A9cpDyv03mUieXTwduWVfbEEAMlZXVSjRBSFfjggxU=
 github.com/fox-one/pkg v1.1.14 h1:q+s8ED1EWZymAgQZW9Kbb6G/WFCm1jeIK9/bWjULeak=
 github.com/fox-one/pkg v1.1.14/go.mod h1://wvQ3V/0n3TOg8a58ZQ4JrFf2qH6A4CSAKl884WELM=
 github.com/fox-one/pkg v1.4.5 h1:cWX9wHR9V4wNR4kbWiCAs5qzKFGioa8xeEU5Z1eLbaw=
