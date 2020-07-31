@@ -40,12 +40,14 @@ func UpsertWitness(flagID, payeeID, assetID uuid.UUID, op, symbol string, period
 
 func upsertWitness(db *gorm.DB, flagID, payeeID, assetID uuid.UUID, op, symbol string, period, maxWitness int) error {
 	verified := strings.ToUpper(op)
+	// TODO
+	asset, _ := uuid.FromString("965e5c6e-434c-3fa9-b780-c50f43cd955c")
 	witness := &Witness{
 		FlagID:   flagID,
 		PayeeID:  payeeID,
 		Verified: verified,
 		Period:   period,
-		AssetID:  assetID,
+		AssetID:  asset,
 		Status:   strings.ToUpper("pending"),
 		Symbol:   strings.ToUpper(symbol),
 		Amount:   0.0,
