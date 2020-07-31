@@ -32,7 +32,11 @@ func (h Handler) OnMessage(ctx context.Context, msgView *sdk.MessageView, userID
 
 		log.Println(snapshot.TraceID, snapshot.Amount)
 
-		models.UpdatePaymentAndFlag(global.Db, snapshot)
+		// transfer in
+		// now ignore transfer out
+		if snapshot.Amount > 0 {
+			models.UpdatePaymentAndFlag(global.Db, snapshot)
+		}
 	}
 
 	return nil

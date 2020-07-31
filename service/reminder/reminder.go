@@ -161,7 +161,7 @@ func sendTextMessage(ctx context.Context, bot *sdk.User, conversationId uuid.UUI
 	return err
 }
 
-func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag *models.Flag) error {
+func sendUserAppCard(ctx context.Context, bot *sdk.User, userID uuid.UUID, flag *models.Flag) error {
 	payer := models.FindUserByID(flag.PayerID)
 	card, _ := json.Marshal(map[string]string{
 		"app_id":      setting.GetConfig().Bot.ClientID.String(),
@@ -170,17 +170,14 @@ func sendUserAppCard(ctx context.Context, bot *sdk.User, userId uuid.UUID, flag 
 		"description": fmt.Sprintf("来自@%s 的红包", payer.IdentityNumber),
 		"action":      "https://group-redirect.droneidentity.eu" + "/flags/" + flag.ID.String(),
 	})
-	cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, userId)
+	cID := UniqueConversationId(setting.GetConfig().Bot.ClientID, userID)
 	err := bot.SendMessage(ctx, &sdk.MessageRequest{
 		ConversationID: cID.String(),
 		MessageID:      uuid.Must(uuid.NewV4()).String(),
 		Category:       "APP_CARD",
 		Data:           base64.StdEncoding.EncodeToString(card),
 	})
-	if err != nil {
-		log.Println(err)
-	}
-	return nil
+	return err
 }
 
 func remindWitnesses(ctx context.Context, bot *sdk.User, flag *models.Flag, remainingDays int, task string) {
@@ -363,7 +360,10 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 				} else {
 					successAmount += amount
 					models.UpdateWitnessStatus(witness.ID, "paid", amount)
-					sendUserAppCard(ctx, bot, witness.PayeeID, flag)
+					err := sendUserAppCard(ctx, bot, witness.PayeeID, flag)
+					if err != nil {
+						fmt.Printf("消息发送失败: %v", err)
+					}
 				}
 			}
 
