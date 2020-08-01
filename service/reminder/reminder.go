@@ -327,13 +327,13 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 
 		// calculate time gap
 		// now - created / 24
-		// timeDelta := time.Now().UTC().Sub(flag.PaidTime).Hours() / 24
-		timeDelta := time.Now().Sub(flag.PaidTime).Minutes()
+		timeDelta := time.Now().UTC().Sub(flag.PaidTime).Hours() / 24
+		// timeDelta := time.Now().Sub(flag.PaidTime).Minutes()
 
 		// calcaulte period
 		// 13 / 7 + 1 = 2
-		// period := int(math.Round(timeDelta/float64(flag.DaysPerPeriod))) + 1
-		period := int(math.Round(timeDelta/float64(5))) + 1
+		period := int(math.Round(timeDelta/float64(flag.DaysPerPeriod))) + 1
+		// period := int(math.Round(timeDelta/float64(5))) + 1
 		fmt.Println("period", period)
 
 		var retryAmount float64
@@ -423,19 +423,6 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 		// period > total period means flag closed
 		if period > flag.TotalPeriod {
 			models.UpdateFlagStatus(flag.ID, "closed")
-			// closedFlag := models.FindFlagByID(flag.ID)
-
-			// if closedFlag.Status == strings.ToUpper("closed") {
-			// 	// send remaining amount to flag creator
-			// 	memo := fmt.Sprintf("来自立志: %s 的红包余额.", flag.Task)
-			// 	_, err := bot.Transfer(ctx, &sdk.TransferInput{
-			// 		TraceID:    uuid.Must(uuid.NewV1()).String(),
-			// 		AssetID:    flag.AssetID.String(),
-			// 		OpponentID: flag.PayerID.String(),
-			// 		Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
-			// 		Memo:       memo,
-			// 	}, setting.GetConfig().Bot.Pin)
-			// }
 		}
 	}
 }
