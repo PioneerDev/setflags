@@ -267,9 +267,56 @@ func Reminder(ctx context.Context, bot *sdk.User, newDay bool) {
 	}
 }
 
+func updateClosedFlag(ctx context.Context, bot *sdk.User) {
+	closedFlags := models.ListPaidFlagsByStatus("closed")
+
+	for _, flag := range closedFlags {
+		if flag.RemainingAmount <= 0 {
+			continue
+		}
+
+		memo := fmt.Sprintf("来自您的立志: %s, 余额返还", flag.Task)
+		_, err := bot.Transfer(ctx, &sdk.TransferInput{
+			TraceID:    uuid.Must(uuid.NewV1()).String(),
+			AssetID:    "965e5c6e-434c-3fa9-b780-c50f43cd955c",
+			OpponentID: flag.PayerID.String(),
+			Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
+			Memo:       memo,
+		}, setting.GetConfig().Bot.Pin)
+
+		if err != nil {
+			models.UpdateFlagStatus(flag.ID, "error")
+		} else {
+			models.ResetFlagRemainingAmountAndStatus(flag.ID, 0, "end")
+		}
+	}
+
+	// handle error flag
+	errorFlags := models.ListPaidFlagsByStatus("error")
+	for _, flag := range errorFlags {
+
+		if flag.RemainingAmount <= 0 {
+			continue
+		}
+
+		memo := fmt.Sprintf("来自您的立志: %s, 余额返还", flag.Task)
+		_, err := bot.Transfer(ctx, &sdk.TransferInput{
+			TraceID:    uuid.Must(uuid.NewV1()).String(),
+			AssetID:    "965e5c6e-434c-3fa9-b780-c50f43cd955c",
+			OpponentID: flag.PayerID.String(),
+			Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
+			Memo:       memo,
+		}, setting.GetConfig().Bot.Pin)
+
+		if err == nil {
+			models.ResetFlagRemainingAmountAndStatus(flag.ID, 0, "end")
+		}
+	}
+}
+
 func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 	// fetch all paid flag
-	flags := models.ListPaidFlags()
+	flags := models.ListPaidFlagsByStatus("paid")
 
 	for _, flag := range flags {
 
@@ -416,6 +463,10 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 
 	cron.AddFunc("0 */1 * * * ?", func() {
 		updateFlagPeriod(ctx, bot)
+	})
+
+	cron.AddFunc(("0 */5 * * * ?"), func() {
+		updateClosedFlag(ctx, bot)
 	})
 }
 

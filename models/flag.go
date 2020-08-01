@@ -208,6 +208,16 @@ func UpdateFlagRemainingAmount(flagID uuid.UUID, spendAmount float64) bool {
 	return true
 }
 
+// ResetFlagRemainingAmountAndStatus ResetFlagRemainingAmountAndStatus
+func ResetFlagRemainingAmountAndStatus(flagID uuid.UUID, remainingAmount float64, status string) bool {
+	db.Model(&Flag{}).Where("id = ?", flagID).
+		Updates(map[string]interface{}{
+			"remaining_amount": 0,
+			"status":           strings.ToUpper(status),
+		})
+	return true
+}
+
 // BeforeCreate will set a UUID rather than numeric ID.
 func (flag *Flag) BeforeCreate(scope *gorm.Scope) error {
 	uuid, _ := uuid.NewV4()
@@ -248,8 +258,8 @@ func ListActiveFlags(paid bool) []*Flag {
 	return flags
 }
 
-// ListPaidFlags ListPaidFlags
-func ListPaidFlags() (flags []*Flag) {
-	db.Where("status = ?", "PAID").Find(&flags)
+// ListPaidFlagsByStatus ListPaidFlagsByStatus
+func ListPaidFlagsByStatus(status string) (flags []*Flag) {
+	db.Where("status = ?", strings.ToUpper(status)).Find(&flags)
 	return
 }
