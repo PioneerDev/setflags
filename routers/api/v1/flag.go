@@ -165,7 +165,6 @@ func CreateFlag(c *gin.Context) {
 	flagID := models.CreateFlag(&flag, user)
 
 	assetID := flag.AssetID.String()
-	assetID = "965e5c6e-434c-3fa9-b780-c50f43cd955c"
 	memo := "转账给励志机器人."
 	appID := setting.GetConfig().Bot.ClientID.String()
 
@@ -242,6 +241,16 @@ func UpdateFlag(c *gin.Context) {
 		return
 	}
 	flag := models.FindFlagByID(flagID)
+
+	if flag.Status == "CLOSED" {
+		code = e.ERROR_NO_PAID
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code": code,
+			"msg":  e.GetMsg(code),
+			"data": make(map[string]interface{}),
+		})
+		return
+	}
 
 	op := c.Param("op")
 

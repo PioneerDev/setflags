@@ -507,6 +507,10 @@ definitions:
           - "pending"
           # flag life end
           - "closed"
+          # remaining asset has return
+          - "end"
+          # error occur when return asset to payer
+          - "error"
       period_status:
         type: "string"
         enum:
