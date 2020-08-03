@@ -12,7 +12,8 @@ import (
 Config is used in user system.
 */
 type Config struct {
-	RUNMODE string `yaml:"run_mode"`
+	RUNMODE     string  `yaml:"run_mode"`
+	RewardRatio float64 `yaml:"reward_ratio"`
 
 	App struct {
 		Name         string `yaml:"name"`

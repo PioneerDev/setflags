@@ -12,6 +12,7 @@ var MsgFlags = map[int]string{
 	ERROR_NOT_FOUND_FLAG:           "未找到指定立志",
 	ERROR_NOT_FOUND_USER:           "未找到当前用户",
 	ERROR_FLAGER_NOT_CURRENT_USER:  "当前用户非当前立志者",
+	ERROR_CLOSED_FLAG:              "当前flag已经关闭",
 }
 
 func GetMsg(code int) string {

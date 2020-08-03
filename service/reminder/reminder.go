@@ -278,7 +278,7 @@ func updateClosedFlag(ctx context.Context, bot *sdk.User) {
 		memo := fmt.Sprintf("来自您的立志: %s, 余额返还", flag.Task)
 		_, err := bot.Transfer(ctx, &sdk.TransferInput{
 			TraceID:    uuid.Must(uuid.NewV1()).String(),
-			AssetID:    "965e5c6e-434c-3fa9-b780-c50f43cd955c",
+			AssetID:    flag.AssetID.String(),
 			OpponentID: flag.PayerID.String(),
 			Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
 			Memo:       memo,
@@ -302,7 +302,7 @@ func updateClosedFlag(ctx context.Context, bot *sdk.User) {
 		memo := fmt.Sprintf("来自您的立志: %s, 余额返还", flag.Task)
 		_, err := bot.Transfer(ctx, &sdk.TransferInput{
 			TraceID:    uuid.Must(uuid.NewV1()).String(),
-			AssetID:    "965e5c6e-434c-3fa9-b780-c50f43cd955c",
+			AssetID:    flag.AssetID.String(),
 			OpponentID: flag.PayerID.String(),
 			Amount:     fmt.Sprintf("%f", flag.RemainingAmount),
 			Memo:       memo,
@@ -381,7 +381,7 @@ func updateFlagPeriod(ctx context.Context, bot *sdk.User) {
 
 		// current period exist witness
 		if len(witnesses) > 0 {
-			amount := flag.Amount * 0.5 / float64(flag.TotalPeriod) / float64(len(witnesses))
+			amount := flag.Amount * setting.GetConfig().RewardRatio / float64(flag.TotalPeriod) / float64(len(witnesses))
 			fmt.Println("flag.Amount", flag.Amount, "flag.TotalPeriod", flag.TotalPeriod, "len(witnesses)", len(witnesses))
 			if math.IsNaN(amount) || math.IsInf(amount, 0) {
 				fmt.Println("abnormal amount", amount)
