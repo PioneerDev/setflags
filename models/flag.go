@@ -99,6 +99,10 @@ func GetFlagsWithVerified(pageSize, currentPage int, userID uuid.UUID) (flagSche
 			verified = witness.Verified
 		}
 
+		if flag.PeriodStatus == "UNDONE" && flag.PayerID != userID {
+			verified = "UNDONE"
+		}
+
 		flagSchemas = append(flagSchemas, schemas.FlagSchema{
 			ID:              flag.ID,
 			PayerID:         flag.PayerID,
