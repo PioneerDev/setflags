@@ -50,7 +50,7 @@ var cfg *Config
 // LoadConfig load config
 func LoadConfig() (*Config, error) {
 	cfg = new(Config)
-	bytes, err := ioutil.ReadFile("/home/ubuntu/setflags/secrets/config.yaml")
+	bytes, err := ioutil.ReadFile("/api/secrets/config.yaml")
 	if err != nil {
 		panic(err)
 	}
