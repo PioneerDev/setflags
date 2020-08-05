@@ -502,31 +502,33 @@ definitions:
         type: "string"
         enum:
           # payment has complete
-          - "paid"
+          - "PAID"
           # payment not complete
-          - "pending"
+          - "PENDING"
           # flag life end
-          - "closed"
+          - "CLOSED"
           # remaining asset has return
-          - "end"
+          - "END"
           # error occur when return asset to payer
-          - "error"
+          - "ERROR"
       period_status:
         type: "string"
         enum:
           # upload evidence
-          - "done"
+          - "DONE"
           # not yet upload evidence
-          - "undone"
+          - "UNDONE"
       verified:
         type: "string"
         enum:
           # payee flag complete
-          - "yes"
+          - "YES"
           # payee flag not complete
-          - "no"
+          - "NO"
           # init
-          - "unset"
+          - "UNSET"
+          # means flag's creator need upload evidence
+          - "UNDONE"
       remaining_days:
         type: "integer"
       remaining_amount:

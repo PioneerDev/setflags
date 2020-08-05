@@ -422,6 +422,10 @@ func FlagDetail(c *gin.Context) {
 		if witness.Verified != "" {
 			flagSchema.Verified = witness.Verified
 		}
+
+		if flag.PeriodStatus == "UNDONE" {
+			flagSchema.Verified = "UNDONE"
+		}
 	}
 
 	code = e.SUCCESS
