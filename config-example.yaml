@@ -1,0 +1,58 @@
+# debug, release, test
+run_mode: debug
+# 奖励比例, 总金额中的10%会发放给见证者
+reward_ratio: 0.1
+
+app:
+  # 应用名称
+  name: "立志"
+  # 数据分页, 每页数据
+  page_size: 10
+  # 服务监听端口
+  http_port: 8001
+  read_timeout: 60
+  write_timeout: 60
+  # jwt加密使用的随机字符串
+  jwt_secret: 23347$040412
+  # token过期时间, 24小时
+  jwt_token_expire_time: 24
+
+# 数据库配置
+database:
+  # 数据库类型, mysql, postgres...
+  type: postgres
+  # 用户名
+  user: postgres
+  # 密码
+  password: 123456
+  # 数据库服务器主机
+  host: localhost
+  # 端口
+  port: 5432
+  # 数据库名称
+  name: postgres
+
+# 机器人相关配置
+bot:
+  pin: "373616"
+  client_id: "3505a363-29d8-4819-b3c4-00ac03343675"
+  client_secret: "2e6e83c0a88bb3053b0cf92a7643cbfabcbee7705849d5eb949e469e6a8ae739"
+  session_id: "ab963627-8f64-4998-8658-478506a7c5ae"
+  pin_token: "hw9VT3Dw77JSehnOsTXBaADpe7rfs9CluICdWV2vL0fqDnIQoqcP6dZCSSARIHPnAjIEYtvNMvQaG9zVKHRvxv83lwleDpWTtcrDIhve7eLMzy4C9Soi4aZJHL697yXgwVIRAu9YUYSRCIUmkp27+CJWcbVxblxqMCfMsEuPKvs="
+  private_key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIICWwIBAAKBgQCI1bWHhTKQ2WB7K7Kin2j03Dd79EtoDeZ2oHlKS3WM5AOfHvJA
+    xAg0F4vyePZiaPAJowG3N+W5zAvi80vj/huAnz6gvPilgLl5SGK/ac+SRvUe2dNF
+    mnK5V5c81On0Z4bQ1Q/kfX8W75OyYSXHzGoIoDLM2UNhm2MOfdqi7vdhFwIDAQAB
+    AoGAMT4/itrLfMdN6mWqbs3RdrU9nnUnIfZGpxBPNgZ78k0oZH49jkM99Ik4yvTv
+    LjE3mTA5cNdD7B5bdLw75nvPJ2wN1a45+aAzz2fx5WAgmKKXpn5AhqsskfXIax0C
+    52PAFH1kIRVC0GuRpADVavfahaEtupXjAst2JI9wWceFGRECQQDmJeVPr0uSdVxg
+    pG+0Fx6kiqxg/PgGEnU0qJCn2eGllDTNIGCzP5SP3eEOEBHFVW4jFdh5/JweaLYd
+    QeyN5Q7PAkEAmDSC5ZFAjSL1BKUw31NYj8aZhu0Fpqm84yirI+QC1oiG+rKKbbzN
+    +GXWKRLpq3QbD9PaYVJKlwz+Jkx62vTbOQJAf/iIZmOJePmLES298vx8DHATY6al
+    3vJ6e3pTXRHY13HuXjTnsCPlXo24a1JiH0DeieHGyiW9RWdiBCi4+TlpnwJAY449
+    bFF1Cpwp7e7rJ7iJfgmmVFXm01vFHER2pNQ4cwD8YTC1URAlHWvnCBjB1Q7twI2P
+    EwdTmLe76WsvFNcCKQJAdfvLyh6D5kGeMdy5KFd3vTiFByKiGNv3lBkWtfxxPpA3
+    clXNX8l2py8U3IllpqQjfY4EjFDNtrD/1Ht6riZIeA==
+    -----END RSA PRIVATE KEY-----
+  code_verifier: ""
