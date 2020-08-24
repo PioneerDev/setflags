@@ -444,9 +444,9 @@ func addTimers(ctx context.Context, cron *cron.Cron, bot *sdk.User) {
 	// 	Reminder(ctx, bot, true)
 	// })
 
-	// cron.AddFunc("0 * * * * ?", func() {
-	// 	upsertAsset(ctx, bot)
-	// })
+	cron.AddFunc("0 */3 * * * ?", func() {
+		upsertAsset(ctx, bot)
+	})
 
 	cron.AddFunc("0 */1 * * * ?", func() {
 		updateFlagPeriod(ctx, bot)
