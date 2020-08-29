@@ -148,14 +148,14 @@ func CreateFlag(c *gin.Context) {
 	}
 
 	// check asset id
-	if !models.ExistAsset(flag.AssetID) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": code,
-			"msg":  fmt.Sprintf("asset not exist, asset_id: %s, symbol: %s", flag.AssetID, flag.Symbol),
-			"data": make(map[string]interface{}),
-		})
-		return
-	}
+	// if !models.ExistAsset(flag.AssetID) {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"code": code,
+	// 		"msg":  fmt.Sprintf("asset not exist, asset_id: %s, symbol: %s", flag.AssetID, flag.Symbol),
+	// 		"data": make(map[string]interface{}),
+	// 	})
+	// 	return
+	// }
 
 	// find user
 	user := models.FindUserByID(userID)
