@@ -2,10 +2,10 @@ package v1
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"set-flags/src/models"
 	"set-flags/src/pkg/e"
-	"set-flags/src/pkg/logging"
 	"set-flags/src/pkg/setting"
 	"set-flags/src/schemas"
 	"strings"
@@ -371,7 +371,7 @@ func FlagDetail(c *gin.Context) {
 
 	flagID, err := uuid.FromString(c.Query("flag_id"))
 
-	logging.Info(fmt.Sprintf("flag_id %v", flagID))
+	log.Printf("flag_id: %v\n", flagID)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

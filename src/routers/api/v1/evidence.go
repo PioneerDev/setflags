@@ -3,11 +3,11 @@ package v1
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"set-flags/src/global"
 	"set-flags/src/models"
 	"set-flags/src/pkg/e"
-	"set-flags/src/pkg/logging"
 	"set-flags/src/pkg/setting"
 	"set-flags/src/schemas"
 	"strconv"
@@ -159,7 +159,7 @@ func UploadEvidence(c *gin.Context) {
 		return
 	}
 
-	logging.Info("attachmentId: %s, flagId: %s", attachment.AttachmentID, flagID)
+	log.Printf("attachmentId: %s, flagId: %s\n", attachment.AttachmentID, flagID)
 
 	models.CreateEvidence(flagID, attachment.AttachmentID, mediaType, attachment.ViewURL, flag.Period)
 
@@ -193,7 +193,7 @@ func ListEvidencesWithPeriod(c *gin.Context) {
 
 	flagID, err := uuid.FromString(c.Param("id"))
 
-	logging.Info(fmt.Sprintf("flag_id %v", flagID))
+	log.Printf("flag_id: %v\n", flagID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code": code,

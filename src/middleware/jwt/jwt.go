@@ -1,10 +1,9 @@
 package jwt
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"set-flags/src/pkg/e"
-	"set-flags/src/pkg/logging"
 	"set-flags/src/pkg/utils"
 	"strings"
 	"time"
@@ -26,7 +25,7 @@ func JWT() gin.HandlerFunc {
 			authToken := strings.Fields(token)[1]
 			claims, err := utils.ParseToken(authToken)
 			if err != nil {
-				logging.Error(fmt.Sprintf("parse token failed, err: %v", err))
+				log.Printf("parse token failed, err: %v\n", err)
 				code = e.ERROR_AUTH_CHECK_TOKEN_FAIL
 			} else if time.Now().Unix() > claims.ExpiresAt {
 				code = e.ERROR_AUTH_CHECK_TOKEN_TIMEOUT

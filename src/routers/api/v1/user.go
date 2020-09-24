@@ -2,10 +2,10 @@ package v1
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"set-flags/src/models"
 	"set-flags/src/pkg/e"
-	"set-flags/src/pkg/logging"
 	"set-flags/src/pkg/setting"
 	"set-flags/src/pkg/utils"
 	"set-flags/src/schemas"
@@ -92,7 +92,7 @@ func Me(c *gin.Context) {
 
 		code = e.ERROR_AUTH_TOKEN
 
-		logging.Info("fetch user profile failed", err.Error())
+		log.Printf("fetch user profile failed: %v\n", err.Error())
 
 		c.JSON(http.StatusForbidden, gin.H{
 			"code": http.StatusForbidden,
@@ -122,7 +122,7 @@ func Auth(c *gin.Context) {
 	code := e.INVALID_PARAMS
 
 	authorizationCode := c.Query("code")
-	logging.Info("authorizationCode", authorizationCode)
+	log.Printf("authorizationCode: %v\n", authorizationCode)
 
 	ctx := context.Background()
 
@@ -135,7 +135,7 @@ func Auth(c *gin.Context) {
 	if err != nil {
 		code = e.ERROR_AUTH_TOKEN
 
-		logging.Info("fetch access token failed", err.Error())
+		log.Printf("fetch access token failed: %v\n", err.Error())
 
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": code,
@@ -151,7 +151,7 @@ func Auth(c *gin.Context) {
 
 		code = e.ERROR_AUTH_TOKEN
 
-		logging.Info("fetch user profile failed", err.Error())
+		log.Printf("fetch user profile failed: %v\n", err.Error())
 
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": code,
@@ -165,12 +165,12 @@ func Auth(c *gin.Context) {
 
 	// update user info and access token
 	if models.UserExist(userID) {
-		logging.Info("update user")
+		log.Println("update user")
 		models.UpdateUser(profile, accessToken)
 		models.UpdateFlagUserInfo(profile)
 	} else {
 		// create user
-		logging.Info("create user")
+		log.Println("create user")
 		models.CreateUser(profile, accessToken)
 	}
 	// mixin auth success

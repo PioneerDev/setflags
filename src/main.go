@@ -5,7 +5,6 @@ import (
 	"log"
 	"set-flags/src/global"
 	"set-flags/src/models"
-	"set-flags/src/pkg/logging"
 	"set-flags/src/pkg/setting"
 	"set-flags/src/routers"
 	"syscall"
@@ -15,7 +14,6 @@ import (
 )
 
 func main() {
-	logging.Setup()
 	models.InitDB()
 	global.BotInit()
 
@@ -26,13 +24,11 @@ func main() {
 
 	server := endless.NewServer(endPoint, routers.InitRouter())
 	server.BeforeBegin = func(add string) {
-		logging.Info(fmt.Sprintf("Actual pid is %d", syscall.Getpid()))
-		log.Printf("Actual pid is %d", syscall.Getpid())
+		log.Printf("Actual pid is %d\n", syscall.Getpid())
 	}
 
 	err := server.ListenAndServe()
 	if err != nil {
-		logging.Error(fmt.Sprintf("Server err: %v", err))
-		log.Printf("Server err: %v", err)
+		log.Printf("Server err: %v\n", err)
 	}
 }
